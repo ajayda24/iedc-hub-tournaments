@@ -1,0 +1,20 @@
+{
+  "name": "iedc-hub-tournaments",
+  "private": true,
+  "description": "Brain Arena — offline-first LAN tournament platform for quick logic games (IEDC)",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=20.11"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter @iedc/arena --filter @iedc/web dev",
+    "dev:arena": "pnpm --filter @iedc/arena dev",
+    "dev:web": "pnpm --filter @iedc/web dev",
+    "build": "pnpm --filter @iedc/web build && pnpm --filter @iedc/arena build",
+    "start": "pnpm --filter @iedc/arena start",
+    "test": "pnpm -r --if-present test",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "bots": "pnpm --filter @iedc/arena bots",
+    "pack:arena": "node scripts/pack-arena.mjs"
+  }
+}

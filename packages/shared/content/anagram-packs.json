@@ -1,0 +1,576 @@
+[
+ {
+  "id": "tech",
+  "title": "Tech Talk",
+  "words": [
+   "code",
+   "bug",
+   "wifi",
+   "chip",
+   "byte",
+   "data",
+   "link",
+   "loop",
+   "mouse",
+   "cache",
+   "pixel",
+   "cloud",
+   "robot",
+   "debug",
+   "linux",
+   "macro",
+   "modem",
+   "login",
+   "virus",
+   "array",
+   "query",
+   "stack",
+   "token",
+   "cyber",
+   "cursor",
+   "python",
+   "router",
+   "kernel",
+   "binary",
+   "server",
+   "laptop",
+   "socket",
+   "syntax",
+   "coding",
+   "script",
+   "widget",
+   "gadget",
+   "sensor",
+   "update",
+   "upload",
+   "github",
+   "docker",
+   "deploy",
+   "driver",
+   "backup",
+   "charger",
+   "hacker",
+   "browser",
+   "network",
+   "compile",
+   "monitor",
+   "storage",
+   "android",
+   "program",
+   "startup",
+   "circuit",
+   "battery",
+   "desktop",
+   "firewall",
+   "keyboard",
+   "terminal",
+   "database",
+   "software",
+   "hardware",
+   "wireless",
+   "function",
+   "variable"
+  ],
+  "alts": {
+   "code": [
+    "coed",
+    "deco",
+    "ecod"
+   ],
+   "bug": [
+    "gub"
+   ],
+   "byte": [
+    "ybet"
+   ],
+   "link": [
+    "kiln"
+   ],
+   "loop": [
+    "polo",
+    "pool"
+   ],
+   "mouse": [
+    "meous",
+    "moues"
+   ],
+   "cache": [
+    "chace"
+   ],
+   "cloud": [
+    "could"
+   ],
+   "debug": [
+    "budge"
+   ],
+   "macro": [
+    "carom",
+    "coram"
+   ],
+   "login": [
+    "lingo"
+   ],
+   "stack": [
+    "tacks"
+   ],
+   "cursor": [
+    "cruors"
+   ],
+   "python": [
+    "phyton",
+    "typhon"
+   ],
+   "router": [
+    "retour",
+    "tourer"
+   ],
+   "binary": [
+    "brainy"
+   ],
+   "server": [
+    "revers",
+    "verser"
+   ],
+   "gadget": [
+    "tagged"
+   ],
+   "sensor": [
+    "nosers",
+    "senors",
+    "serons",
+    "snores"
+   ],
+   "update": [
+    "tapued"
+   ],
+   "docker": [
+    "corked",
+    "redock",
+    "rocked"
+   ],
+   "deploy": [
+    "ployed",
+    "podley"
+   ],
+   "compile": [
+    "polemic"
+   ],
+   "monitor": [
+    "tromino"
+   ],
+   "storage": [
+    "garotes",
+    "orgeats",
+    "toerags"
+   ],
+   "startup": [
+    "upstart"
+   ],
+   "terminal": [
+    "tramline"
+   ],
+   "software": [
+    "forwaste"
+   ]
+  }
+ },
+ {
+  "id": "campus",
+  "title": "Campus Life",
+  "words": [
+   "exam",
+   "bunk",
+   "viva",
+   "labs",
+   "mess",
+   "quiz",
+   "chai",
+   "nap",
+   "note",
+   "fest",
+   "gate",
+   "club",
+   "canteen",
+   "library",
+   "hostel",
+   "lecture",
+   "record",
+   "project",
+   "college",
+   "campus",
+   "student",
+   "notes",
+   "marker",
+   "chalk",
+   "bench",
+   "duster",
+   "proxy",
+   "result",
+   "ticket",
+   "seminar",
+   "uniform",
+   "friends",
+   "lunch",
+   "coffee",
+   "snacks",
+   "warden",
+   "gossip",
+   "crush",
+   "selfie",
+   "notice",
+   "marks",
+   "topper",
+   "backlog",
+   "pending",
+   "deadline",
+   "semester",
+   "festival",
+   "workshop",
+   "assembly",
+   "holiday",
+   "homework",
+   "internal",
+   "tutorial",
+   "syllabus",
+   "hallway",
+   "bonfire",
+   "freshers"
+  ],
+  "alts": {
+   "bunk": [
+    "knub"
+   ],
+   "labs": [
+    "albs",
+    "bals",
+    "slab"
+   ],
+   "chai": [
+    "chia"
+   ],
+   "nap": [
+    "pan"
+   ],
+   "note": [
+    "tone"
+   ],
+   "fest": [
+    "efts",
+    "fets",
+    "tefs"
+   ],
+   "gate": [
+    "geat",
+    "geta"
+   ],
+   "hostel": [
+    "helots",
+    "hotels",
+    "tholes"
+   ],
+   "record": [
+    "corder"
+   ],
+   "student": [
+    "stunted"
+   ],
+   "notes": [
+    "onset",
+    "seton",
+    "steno",
+    "stone",
+    "tones"
+   ],
+   "marker": [
+    "remark"
+   ],
+   "duster": [
+    "rudest",
+    "rusted"
+   ],
+   "result": [
+    "luster",
+    "lustre",
+    "luters",
+    "rustle",
+    "sutler",
+    "ulster"
+   ],
+   "seminar": [
+    "marines",
+    "remains",
+    "sirname"
+   ],
+   "friends": [
+    "finders",
+    "redfins",
+    "refinds"
+   ],
+   "warden": [
+    "dawner",
+    "wander",
+    "warned"
+   ],
+   "notice": [
+    "noetic"
+   ],
+   "holiday": [
+    "hyaloid",
+    "hyoidal"
+   ]
+  }
+ },
+ {
+  "id": "food",
+  "title": "Snack Attack",
+  "words": [
+   "dosa",
+   "idli",
+   "vada",
+   "chai",
+   "rice",
+   "dal",
+   "roti",
+   "puri",
+   "tea",
+   "bun",
+   "mango",
+   "curry",
+   "tikka",
+   "kulfi",
+   "halwa",
+   "puttu",
+   "appam",
+   "lassi",
+   "pulao",
+   "momos",
+   "chips",
+   "toast",
+   "samosa",
+   "sambar",
+   "pickle",
+   "paneer",
+   "masala",
+   "pepper",
+   "ginger",
+   "banana",
+   "butter",
+   "cheese",
+   "noodle",
+   "burger",
+   "omelet",
+   "biryani",
+   "porotta",
+   "chutney",
+   "payasam",
+   "coconut",
+   "jalebi",
+   "biscuit",
+   "popcorn",
+   "sandwich",
+   "pancake",
+   "meatball",
+   "dumpling"
+  ],
+  "alts": {
+   "dosa": [
+    "ados",
+    "odas",
+    "sado",
+    "soda"
+   ],
+   "chai": [
+    "chia"
+   ],
+   "rice": [
+    "cire",
+    "eric",
+    "icer"
+   ],
+   "dal": [
+    "lad"
+   ],
+   "roti": [
+    "riot",
+    "tiro",
+    "tori",
+    "trio"
+   ],
+   "puri": [
+    "puir"
+   ],
+   "tea": [
+    "ate",
+    "eat",
+    "eta",
+    "tae"
+   ],
+   "bun": [
+    "nub"
+   ],
+   "mango": [
+    "among",
+    "ngoma"
+   ],
+   "appam": [
+    "pampa"
+   ],
+   "lassi": [
+    "sails",
+    "sials",
+    "sisal"
+   ],
+   "toast": [
+    "stoat"
+   ],
+   "masala": [
+    "salaam"
+   ],
+   "cheese": [
+    "eeches"
+   ],
+   "omelet": [
+    "telome"
+   ],
+   "porotta": [
+    "taproot"
+   ]
+  }
+ },
+ {
+  "id": "science",
+  "title": "Lab Rats",
+  "words": [
+   "atom",
+   "gene",
+   "cell",
+   "acid",
+   "ions",
+   "mass",
+   "wave",
+   "heat",
+   "star",
+   "moon",
+   "orbit",
+   "comet",
+   "prime",
+   "laser",
+   "force",
+   "sonar",
+   "ozone",
+   "proton",
+   "photon",
+   "magnet",
+   "fusion",
+   "galaxy",
+   "planet",
+   "rocket",
+   "nebula",
+   "vector",
+   "matrix",
+   "enzyme",
+   "plasma",
+   "energy",
+   "carbon",
+   "oxygen",
+   "neuron",
+   "theorem",
+   "entropy",
+   "voltage",
+   "quantum",
+   "neutron",
+   "gravity",
+   "crystal",
+   "element",
+   "formula",
+   "isotope",
+   "reactor",
+   "eclipse",
+   "spectrum",
+   "molecule",
+   "electron",
+   "asteroid",
+   "momentum"
+  ],
+  "alts": {
+   "atom": [
+    "moat"
+   ],
+   "acid": [
+    "cadi",
+    "caid"
+   ],
+   "mass": [
+    "sams"
+   ],
+   "heat": [
+    "eath",
+    "haet",
+    "hate",
+    "thae"
+   ],
+   "star": [
+    "arts",
+    "rast",
+    "rats",
+    "tars",
+    "tsar"
+   ],
+   "moon": [
+    "mono"
+   ],
+   "comet": [
+    "comte"
+   ],
+   "laser": [
+    "arles",
+    "earls",
+    "laers",
+    "lares",
+    "lears",
+    "rales",
+    "reals",
+    "seral"
+   ],
+   "sonar": [
+    "arson",
+    "roans"
+   ],
+   "proton": [
+    "pronto"
+   ],
+   "planet": [
+    "platen"
+   ],
+   "nebula": [
+    "unable",
+    "unbale"
+   ],
+   "vector": [
+    "corvet",
+    "covert"
+   ],
+   "plasma": [
+    "lampas"
+   ],
+   "energy": [
+    "greeny",
+    "gyrene"
+   ],
+   "carbon": [
+    "corban"
+   ],
+   "element": [
+    "telemen"
+   ],
+   "reactor": [
+    "acroter",
+    "creator"
+   ],
+   "spectrum": [
+    "crumpest",
+    "crumpets"
+   ]
+  }
+ }
+]

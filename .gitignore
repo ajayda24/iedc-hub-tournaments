@@ -1,0 +1,15 @@
+node_modules/
+.next/
+out/
+dist/
+coverage/
+*.log
+.DS_Store
+arena-data/
+apps/web/public/sw.js
+apps/web/public/sw.js.map
+apps/web/public/swe-worker-*.js
+test-results/
+playwright-report/
+*.tsbuildinfo
+next-env.d.ts
