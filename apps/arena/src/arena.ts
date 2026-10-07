@@ -664,7 +664,8 @@ export class Arena {
         reveal: this.phase === "results" ? r.reveal : null,
         results: this.phase === "results" ? r.results?.slice(0, 20) ?? null : null,
         solvedCount: Object.values(r.players).filter((x) => x.status === "solved").length,
-        activeCount: active.length,
+        // during results: everyone who took part (knockouts already removed some from `active`)
+        activeCount: this.phase === "results" ? Object.keys(r.players).length : active.length,
         firstSolver: r.firstSolver ? this.players.get(r.firstSolver)?.name ?? null : null,
       };
     }
