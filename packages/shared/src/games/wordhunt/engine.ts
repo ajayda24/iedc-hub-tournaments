@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { createRng } from "../../rng";
+import { GAME_META } from "../meta";
 import type { GameDefinition } from "../types";
 import answersJson from "../../../content/wordhunt-answers.json";
 import words5Json from "../../../content/words5.json";
@@ -55,12 +56,7 @@ export function scoreGuess(guess: string, answer: string): Tile[] {
 const MAX_GUESSES = 6;
 
 export const wordhunt: GameDefinition<WordHuntPub, WordHuntSecret, WordHuntSub, WordHuntProgress, WordHuntFeedback> = {
-  id: "wordhunt",
-  title: "Word Hunt",
-  tagline: "Five letters. Six tries. One ego.",
-  howTo: "Guess the 5-letter word. Green = right spot, yellow = wrong spot, grey = not in the word. Fewer guesses and faster solves score more.",
-  color: "yellow",
-  defaultTimeSec: { easy: 180, med: 150, hard: 120 },
+  ...GAME_META.wordhunt,
   subSchema: z.object({ guess: z.string().min(1).max(12) }),
   generate(seed) {
     const rng = createRng(seed);

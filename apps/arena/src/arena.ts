@@ -447,7 +447,7 @@ export class Arena {
       } else {
         this.pushFeed("solve", `${firstName(p.name)} solved it — ${fmtSecs(elapsed)}`);
       }
-      if (p.streak === 3 || p.streak === 5) this.pushFeed("streak", `${firstName(p.name)} is on a ${p.streak}-round streak 🔥`);
+      if (p.streak === 3 || p.streak === 5) this.pushFeed("streak", `${firstName(p.name)} is on a ${p.streak}-round streak!`);
     } else if (res.status === "failed") {
       pr.status = "failed";
       pr.points = partialPoints(game.partialCredit(r.pub, r.secret, pr.progress), pr.wrong);
@@ -679,6 +679,8 @@ export class Arena {
       playerCount: all.length,
       onlineCount: all.filter((p) => p.online).length,
       joinUrls: net.interfaces.map((i) => ({ label: i.label, url: i.url, qrSvg: i.qrSvg })),
+      blockInternet: this.config.blockInternet,
+      nextRound: this.phase === "lobby" || this.phase === "results" ? this.config.rounds[this.roundIndex + 1] ?? null : null,
     };
   }
 

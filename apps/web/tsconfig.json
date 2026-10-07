@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "ES2022", "webworker"],
+    "allowJs": false,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "types": ["@serwist/next/typings"],
+    "plugins": [{ "name": "next" }],
+    "paths": { "@/*": ["./src/*"] }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules", "out", "public/sw.js"]
+}

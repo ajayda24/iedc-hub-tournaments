@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { createRng, type Rng } from "../../rng";
+import { GAME_META } from "../meta";
 import type { Difficulty, GameDefinition } from "../types";
 import packsJson from "../../../content/anagram-packs.json";
 
@@ -63,12 +64,7 @@ export function pickPack(options?: { pack?: string; customWords?: string[] }): A
 }
 
 export const anagram: GameDefinition<AnagramPub, AnagramSecret, AnagramSub, AnagramProgress, AnagramFeedback> = {
-  id: "anagram",
-  title: "Anagram Blitz",
-  tagline: "Unscramble faster than your crush replies.",
-  howTo: "Each tile row is a scrambled word. Type the real word. Skip if stuck and come back. Solve all of them to finish.",
-  color: "coral",
-  defaultTimeSec: { easy: 120, med: 150, hard: 180 },
+  ...GAME_META.anagram,
   subSchema: z.object({ index: z.number().int().min(0).max(20), answer: z.string().max(16) }),
   generate(seed, difficulty, options) {
     const rng = createRng(seed);

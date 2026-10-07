@@ -15,6 +15,11 @@
     "test": "pnpm -r --if-present test",
     "typecheck": "pnpm -r --if-present typecheck",
     "bots": "pnpm --filter @iedc/arena bots",
-    "pack:arena": "node scripts/pack-arena.mjs"
+    "pack:arena": "node scripts/pack-arena.mjs",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1",
+    "playwright-core": "1.56.1"
   }
 }

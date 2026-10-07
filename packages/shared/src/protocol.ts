@@ -1,5 +1,4 @@
-import { z } from "zod";
-import type { Difficulty, GameId, Reveal, RoundOptions } from "./games/types";
+import type { CheckStatus, Difficulty, GameId, Reveal, RoundOptions } from "./games/types";
 
 /* ------------------------------------------------------------------ */
 /* Event names                                                         */
@@ -133,6 +132,10 @@ export interface PublicState {
   onlineCount: number;
   /** urls students can use to join (one per network the arena is on) */
   joinUrls: { label: string; url: string; qrSvg: string }[];
+  /** clients must run the internet probe and freeze play when it succeeds */
+  blockInternet: boolean;
+  /** what the host will start next (a teaser for the lobby / results screens) */
+  nextRound: RoundConfig | null;
 }
 
 export interface MyRound {
@@ -224,17 +227,14 @@ export interface HostState {
 }
 
 /* ------------------------------------------------------------------ */
-/* Inbound payload validation                                          */
+/* Inbound payloads (validated with the zod schemas in ./schemas)      */
 /* ------------------------------------------------------------------ */
 
-const trimmed = (max: number) => z.string().trim().min(1).max(max);
-
-export const helloSchema = z.object({
-  role: z.enum(["player", "host", "screen"]),
-  token: z.string().max(64).optional(),
-  pin: z.string().max(12).optional(),
-});
-export type HelloPayload = z.infer<typeof helloSchema>;
+export interface HelloPayload {
+  role: Role;
+  token?: string;
+  pin?: string;
+}
 
 export interface HelloAck {
   ok: boolean;
@@ -243,14 +243,13 @@ export interface HelloAck {
   me?: MeState | null;
 }
 
-export const joinSchema = z.object({
-  token: z.string().min(8).max(64),
-  name: trimmed(40),
-  sem: trimmed(8),
-  dept: trimmed(24),
-  avatar: z.number().int().min(0).max(1_000_000),
-});
-export type JoinPayload = z.infer<typeof joinSchema>;
+export interface JoinPayload {
+  token: string;
+  name: string;
+  sem: string;
+  dept: string;
+  avatar: number;
+}
 
 export interface JoinAck {
   ok: boolean;
@@ -258,58 +257,21 @@ export interface JoinAck {
   me?: MeState;
 }
 
-export const submitSchema = z.object({
-  roundId: z.string().max(40),
-  sub: z.unknown(),
-});
-export type SubmitPayload = z.infer<typeof submitSchema>;
-
 export interface SubmitAck {
   ok: boolean;
   error?: string;
-  status?: import("./games/types").CheckStatus;
+  status?: CheckStatus;
   feedback?: unknown;
   message?: string;
   progress?: unknown;
   points?: number;
 }
 
-export const cheatSchema = z.object({
-  kind: z.enum(["internet", "focus"]),
-  detail: z.string().max(120).optional(),
-  ms: z.number().nonnegative().max(3_600_000).optional(),
-});
-export type CheatPayload = z.infer<typeof cheatSchema>;
-
-const roundOptionsSchema = z
-  .object({
-    pack: z.string().max(24).optional(),
-    customWords: z.array(z.string().max(16)).max(60).optional(),
-  })
-  .optional();
-
-export const roundConfigSchema = z.object({
-  id: z.string().min(1).max(40),
-  game: z.enum(["sudoku", "wordhunt", "anagram", "numbercrunch"]),
-  difficulty: z.enum(["easy", "med", "hard"]),
-  timeLimitSec: z.number().int().min(20).max(1800),
-  options: roundOptionsSchema,
-});
-
-export const eventConfigSchema = z.object({
-  eventName: trimmed(60),
-  format: z.enum(["classic", "knockout"]),
-  knockoutPct: z.number().int().min(5).max(75),
-  rounds: z.array(roundConfigSchema).max(50),
-  strikePenaltyAt: z.number().int().min(1).max(10),
-  strikeLockAt: z.number().int().min(1).max(10),
-  blockInternet: z.boolean(),
-});
-
-export const idSchema = z.object({ id: z.string().max(40) });
-export const adjustSchema = z.object({ id: z.string().max(40), delta: z.number().int().min(-100000).max(100000) });
-export const startSchema = z.object({ index: z.number().int().min(0).max(49).optional() }).optional();
-export const resetSchema = z.object({ keepPlayers: z.boolean() });
+export interface CheatPayload {
+  kind: CheatKind;
+  detail?: string;
+  ms?: number;
+}
 
 export const DEFAULT_CONFIG: EventConfig = {
   eventName: "Brain Arena",

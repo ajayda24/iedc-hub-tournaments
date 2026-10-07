@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { createRng } from "../../rng";
+import { GAME_META } from "../meta";
 import type { Difficulty, GameDefinition } from "../types";
 
 export interface CrunchPub {
@@ -184,12 +185,7 @@ export function solveCrunch(numbers: number[], target: number, budgetMs = 1500):
 }
 
 export const numbercrunch: GameDefinition<CrunchPub, CrunchSecret, CrunchSub, CrunchProgress, CrunchFeedback> = {
-  id: "numbercrunch",
-  title: "Number Crunch",
-  tagline: "Maths, but make it a street fight.",
-  howTo: "Hit the target using the given numbers with + − × ÷. Each number once. No fractions, no negatives. Close counts for a little.",
-  color: "sky",
-  defaultTimeSec: { easy: 90, med: 120, hard: 150 },
+  ...GAME_META.numbercrunch,
   subSchema: z.object({ expr: z.string().max(160) }),
   generate: (seed, difficulty) => generateCrunch(seed, difficulty),
   initialProgress: () => ({ best: null, attempts: 0 }),

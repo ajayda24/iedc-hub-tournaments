@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { createRng, type Rng } from "../../rng";
+import { GAME_META } from "../meta";
 import type { Difficulty, GameDefinition } from "../types";
+import { candidates, conflicts, peers } from "./grid";
+
+export { conflicts };
 
 export interface SudokuPub {
   size: number;
@@ -32,39 +36,6 @@ const SHAPES: Record<Difficulty, Shape> = {
   med: { size: 6, boxR: 2, boxC: 3, givens: 12 },
   hard: { size: 9, boxR: 3, boxC: 3, givens: 30 },
 };
-
-/** Precomputed peer lists (row, column, box) per cell for a given shape. */
-const peerCache = new Map<string, number[][]>();
-function peers(size: number, boxR: number, boxC: number): number[][] {
-  const key = `${size}:${boxR}:${boxC}`;
-  const hit = peerCache.get(key);
-  if (hit) return hit;
-  const out: number[][] = [];
-  for (let i = 0; i < size * size; i++) {
-    const r = Math.floor(i / size);
-    const c = i % size;
-    const br = Math.floor(r / boxR) * boxR;
-    const bc = Math.floor(c / boxC) * boxC;
-    const set = new Set<number>();
-    for (let k = 0; k < size; k++) {
-      set.add(r * size + k);
-      set.add(k * size + c);
-    }
-    for (let rr = br; rr < br + boxR; rr++) for (let cc = bc; cc < bc + boxC; cc++) set.add(rr * size + cc);
-    set.delete(i);
-    out.push([...set]);
-  }
-  peerCache.set(key, out);
-  return out;
-}
-
-function candidates(grid: number[], i: number, size: number, pr: number[][]): number[] {
-  let used = 0;
-  for (const p of pr[i]) used |= 1 << grid[p];
-  const out: number[] = [];
-  for (let v = 1; v <= size; v++) if (!(used & (1 << v))) out.push(v);
-  return out;
-}
 
 /**
  * Backtracking solver with "fewest candidates first". Counts solutions up to
@@ -136,24 +107,8 @@ export function generateSudoku(seed: number, difficulty: Difficulty): { pub: Sud
   return { pub: { size, boxR, boxC, givens: puzzle }, secret: { solution } };
 }
 
-/** Cells that clash with another cell in their row/column/box. Safe to run on the client. */
-export function conflicts(grid: number[], size: number, boxR: number, boxC: number): Set<number> {
-  const pr = peers(size, boxR, boxC);
-  const out = new Set<number>();
-  for (let i = 0; i < grid.length; i++) {
-    if (!grid[i]) continue;
-    for (const p of pr[i]) if (grid[p] === grid[i]) out.add(i);
-  }
-  return out;
-}
-
 export const sudoku: GameDefinition<SudokuPub, SudokuSecret, SudokuSub, SudokuProgress, SudokuFeedback> = {
-  id: "sudoku",
-  title: "Mini Sudoku",
-  tagline: "Numbers. Boxes. Zero chill.",
-  howTo: "Fill every row, column and box with each number exactly once. A full grid is checked automatically — wrong checks cost 25 points.",
-  color: "mint",
-  defaultTimeSec: { easy: 150, med: 210, hard: 420 },
+  ...GAME_META.sudoku,
   subSchema: z.object({ grid: z.array(z.number().int().min(0).max(9)).max(81), final: z.boolean() }),
   generate: (seed, difficulty) => generateSudoku(seed, difficulty),
   initialProgress: (pub) => ({ grid: pub.givens.slice() }),
