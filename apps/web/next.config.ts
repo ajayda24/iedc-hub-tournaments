@@ -10,7 +10,7 @@ const withSerwist = withSerwistInit({
   register: false,
   reloadOnOnline: false,
   disable: process.env.NODE_ENV === "development",
-  additionalPrecacheEntries: ["/", "/practice/", "/play/", "/leaderboard/", "/~offline/"].map((url) => ({ url, revision })),
+  additionalPrecacheEntries: ["/", "/practice/", "/play/", "/leaderboard/", "/~offline/", "/credits/developer.webp"].map((url) => ({ url, revision })),
 });
 
 const nextConfig: NextConfig = {

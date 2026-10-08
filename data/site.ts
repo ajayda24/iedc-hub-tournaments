@@ -27,4 +27,10 @@ export const site = {
   defaultArenaAddress: "192.168.137.1",
   /** Port the arena server listens on */
   defaultPort: 4000,
+  /** Developer credit in the page footers (photo: apps/web/public/credits/developer.webp) */
+  credits: {
+    label: "developed by",
+    name: "Ajay Daniel Trevor",
+    url: "https://ajaydanieltrevor.com",
+  },
 } as const;

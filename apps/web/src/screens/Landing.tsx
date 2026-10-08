@@ -8,6 +8,7 @@ import { isArenaOrigin } from "@/lib/arena";
 import { store } from "@/lib/storage";
 import { Btn, COLOR, DoodleArrow, Hand, Slip, Squiggle, Star } from "@/ui/kit";
 import { Mascot } from "@/ui/Mascot";
+import { Credits } from "@/ui/Credits";
 
 const TILTS = [-2, 1.5, -1, 2];
 
@@ -131,6 +132,7 @@ export function Landing() {
           </div>
         ))}
       </section>
+      <Credits />
     </main>
   );
 }

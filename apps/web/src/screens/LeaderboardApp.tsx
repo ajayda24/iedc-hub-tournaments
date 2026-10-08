@@ -11,6 +11,7 @@ import { Hand, Slip } from "@/ui/kit";
 import { DeptBoard } from "@/ui/Leaderboard";
 import { Mascot } from "@/ui/Mascot";
 import { useFlip } from "@/ui/useFlip";
+import { Credits } from "@/ui/Credits";
 
 const avatarOf = (key: string) => parseInt(key, 36) % 1_000_000;
 const PODIUM_BG = ["#e9e4d8", "var(--color-yellow)", "#f3c9a2"];
@@ -109,6 +110,7 @@ export function LeaderboardApp() {
           )}
         </>
       )}
+      <Credits />
     </main>
   );
 }

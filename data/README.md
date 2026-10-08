@@ -24,6 +24,7 @@ roundOf: (n: number, total: number) => `round ${n} of ${total}`,
 |---|---|
 | App name, logo text, "by IEDC" sticker, browser tab title, description, install name, theme colour | `site.ts` |
 | Default event name, laptop address (192.168.137.1), port (4000) | `site.ts` |
+| "developed by" footer credit (name, link) | `site.ts` → `credits` (photo: `apps/web/public/credits/developer.webp`) |
 | Departments and semesters on the join form (Dept wars uses the same list) | `people.ts` |
 | Game names, one-liners, rules text, colours, default round times, game order | `games.ts` |
 | Difficulty names, anagram pack names in the host dropdown, default custom words | `games.ts` |

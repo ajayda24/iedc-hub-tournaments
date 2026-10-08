@@ -11,6 +11,7 @@ import { cx } from "@/lib/format";
 import { Avatar, randomAvatar } from "@/ui/Avatar";
 import { Btn, Hand, Slip } from "@/ui/kit";
 import { Mascot } from "@/ui/Mascot";
+import { Credits } from "@/ui/Credits";
 
 const cleanId = (v: string) => v.replace(/\s+/g, "").toUpperCase().slice(0, STUDENT_ID.maxLength);
 const pinOk = (v: string) => new RegExp(`^\\d{${PIN.length}}$`).test(v);
@@ -246,6 +247,7 @@ export function JoinForm() {
         {busy ? t.checking : t.nextButton}
       </Btn>
       <Hand className="text-center">{t.noSignupNote}</Hand>
+      <Credits className="mt-auto" />
     </main>
   );
 }

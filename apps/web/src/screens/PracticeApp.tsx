@@ -17,6 +17,7 @@ import { TimerBar } from "@/ui/Timer";
 import { DIFFICULTY_LABEL } from "@iedc/data/games";
 import { errors } from "@iedc/data/copy/errors";
 import { practice as P } from "@iedc/data/copy/practice";
+import { Credits } from "@/ui/Credits";
 
 interface Session {
   game: GameId;
@@ -117,6 +118,7 @@ export function PracticeApp() {
           </Btn>
         </Slip>
       )}
+      <Credits />
     </main>
   );
 }
