@@ -66,7 +66,7 @@ async function typeWord(page: Page, word: string) {
 test("a full anagram round: synced start, scoring, results on every device", async ({ browser }) => {
   const host = await hostPage(browser);
   const anjali = await player(browser, "Anjali Nair", "CSE");
-  const rahul = await player(browser, "Rahul K", "ECE");
+  const rahul = await player(browser, "Rahul K", "EEE");
   await expect(host.getByText("2/2 online")).toBeVisible();
 
   await host.getByRole("button", { name: /Start R1/ }).click();
