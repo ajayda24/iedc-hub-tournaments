@@ -82,7 +82,7 @@ async function main() {
       reply
         .type("text/html")
         .send(
-          `<h1>Brain Arena is running</h1><p>No web build found. Run <code>pnpm build</code> (or use <code>pnpm dev</code> and open port 3000).</p>`,
+          `<h1>IEDC Weekly Series is running</h1><p>No web build found. Run <code>pnpm build</code> (or use <code>pnpm dev</code> and open port 3000).</p>`,
         ),
     );
   }
