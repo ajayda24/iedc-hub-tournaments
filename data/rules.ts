@@ -72,3 +72,31 @@ export const ANTICHEAT = {
 
 /** Leaderboard rows sent to phones while a round is live */
 export const LIVE_LEADERBOARD_SIZE = 10;
+
+/** Student ID field on the join form (college ID, or admission / roll no. for new students) */
+export const STUDENT_ID = {
+  /** longest ID accepted */
+  maxLength: 10,
+} as const;
+
+/** Student PIN protection */
+export const PIN = {
+  /** digits in a PIN */
+  length: 4,
+  /** wrong tries before the Student ID is locked */
+  maxTries: 5,
+  /** how long the lock lasts (minutes); the host can also unlock */
+  lockMinutes: 10,
+} as const;
+
+/** Monthly leaderboard */
+export const MONTHLY = {
+  /**
+   * "points"     = add up each student's scores from every tournament that month
+   * "rankPoints" = award rank points per tournament (1st 25, 2nd 18, 3rd 15 …), F1-style
+   */
+  method: "points" as "points" | "rankPoints",
+  rankPoints: [25, 18, 15, 12, 10, 8, 6, 4, 2, 1],
+  /** months shown on the public page (newest first) */
+  monthsShown: 12,
+};

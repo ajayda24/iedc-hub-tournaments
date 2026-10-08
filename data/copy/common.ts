@@ -28,5 +28,5 @@ export const common = {
   offlineTitle: "You're offline",
   offlineBody: "That page wasn't saved for offline use. Practice games still work.",
   offlineButton: "Go practise",
-  pageTitles: { play: "Play", host: "Host console", screen: "Big screen", practice: "Practice", offline: "Offline" },
+  pageTitles: { leaderboard: "Monthly leaderboard", play: "Play", host: "Host console", screen: "Big screen", practice: "Practice", offline: "Offline" },
 } as const;

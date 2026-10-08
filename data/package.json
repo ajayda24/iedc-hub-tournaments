@@ -6,7 +6,8 @@
   "description": "Every text, label and constant used by Brain Arena. Edit these files to change wording.",
   "exports": {
     "./*": "./*.ts",
-    "./words/*": "./words/*"
+    "./words/*": "./words/*",
+    "./leaderboard/*": "./leaderboard/*"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"

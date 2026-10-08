@@ -20,7 +20,7 @@ function setup(cfg: Partial<EventConfig> = {}) {
     ...cfg,
   });
   const join = (name: string, dept = "CSE") =>
-    arena.join({ token: `tok-${name}-xxxxxxxx`, name, sem: "S3", dept, avatar: 1 }, `sock-${name}`, "192.168.137.10").me!;
+    arena.join({ token: `tok-${name}-xxxxxxxx`, studentId: `ID${name.replace(/\W/g, "").toUpperCase()}`.slice(0, 10), pin: "1234", name, sem: "S3", dept, avatar: 1 }, `sock-${name}`, "192.168.137.10").me!;
   return { arena, sent, join };
 }
 
@@ -119,15 +119,21 @@ describe("arena round lifecycle", () => {
     expect(out).toEqual(["C", "D"]);
   });
 
-  it("rejoining with the same token keeps the score; duplicate names are refused", () => {
+  it("the same Student ID on another phone takes over the same player and score", () => {
     const { arena, join } = setup();
     const a = join("Meera");
     arena.adjust(a.id, 50);
-    const again = arena.join({ token: "tok-Meera-xxxxxxxx", name: "Meera", sem: "S3", dept: "CSE", avatar: 2 }, "sock-2", "x");
+    const again = arena.join({ token: "new-phone-token-123", studentId: "IDMEERA", pin: "1234", name: "Meera J", sem: "S3", dept: "CSE", avatar: 2 }, "sock-2", "x");
     expect(again.me!.score).toBe(50);
+    expect(again.me!.id).toBe(a.id);
     expect(again.previousSocket).toBe("sock-Meera");
-    const clash = arena.join({ token: "another-token-123", name: "meera", sem: "S1", dept: "CSE", avatar: 1 }, "s3", "x");
-    expect(clash.ok).toBe(false);
+    expect(arena.players.size).toBe(1);
+    // a refresh on the new phone reattaches by device token, no PIN needed
+    expect(arena.attach("new-phone-token-123", "sock-3", "x").player!.id).toBe(a.id);
+    // a different Student ID is a different player, even with the same name
+    const other = arena.join({ token: "third-token-1234", studentId: "IDOTHER", pin: "1234", name: "Meera J", sem: "S3", dept: "CSE", avatar: 2 }, "s4", "x");
+    expect(other.me!.id).not.toBe(a.id);
+    expect(arena.summary().players.map((p) => p.studentId).sort()).toEqual(["IDMEERA", "IDOTHER"]);
   });
 
   it("restores a snapshot and closes a round that was live", () => {
