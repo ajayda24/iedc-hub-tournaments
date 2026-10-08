@@ -87,8 +87,9 @@ For more phones than the laptop's Wi-Fi card can handle, you can add *Wi-Fi shar
 The web app is a static export, so Vercel can host the **online half**: the landing page, solo practice and the installable PWA. Live events still run on the laptop. Vercel can't host the arena server, because it needs a long-running WebSocket process.
 
 1. In Vercel, choose **Add New → Project** and import `ajayda24/iedc-hub-tournaments`.
-2. Set **Root Directory** to `apps/web` and leave "Include files outside the root directory" on. Everything else comes from `apps/web/vercel.json`: a pnpm workspace install, `next build --webpack` and output `out/`.
-3. No environment variables are needed. Every push to `main` redeploys.
+2. Set **Root Directory** to `apps/web` and leave "Include files outside the root directory" on. Everything else comes from `apps/web/vercel.json`: a pnpm workspace install, `next build --webpack` and output `out/`, deployed as a plain static site (framework "Other").
+3. If an old deploy fails with `routes-manifest.json couldn't be found`, set **Settings → Build & Deployment → Framework Preset** to **Other** and redeploy.
+4. No environment variables are needed. Every push to `main` redeploys.
 
 ---
 
