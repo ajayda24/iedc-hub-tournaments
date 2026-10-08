@@ -19,6 +19,7 @@ import { Reveal } from "@/ui/Reveal";
 import { setSound, sfx, soundOn } from "@/ui/sfx";
 import { TimerBar } from "@/ui/Timer";
 import { JoinForm } from "./JoinForm";
+import { leaderboard as LB } from "@iedc/data/copy/leaderboard";
 import { DIFFICULTY_LABEL } from "@iedc/data/games";
 import { common } from "@iedc/data/copy/common";
 import { play as t } from "@iedc/data/copy/play";
@@ -149,6 +150,10 @@ function Lobby({ state, me }: { state: PublicState; me: MeState }) {
       </div>
 
       {state.nextRound && <NextUp cfg={state.nextRound} />}
+
+      <a href="/leaderboard/" className="self-start text-sm font-bold underline decoration-2 underline-offset-4">
+        {LB.linkLabel}
+      </a>
 
       {feed.length > 0 && (
         <section>
@@ -410,6 +415,9 @@ function Final({ me }: { me: MeState }) {
         <div className="font-bold">{t.points(me.score)}</div>
         {title && <div className="stamp mt-3 text-xl">{title}</div>}
       </Slip>
+      <a href="/leaderboard/" className="sticker self-center !bg-yellow">
+        {LB.linkLabel}
+      </a>
       <Leaderboard entries={entries} meId={me.id} me={me} />
     </div>
   );

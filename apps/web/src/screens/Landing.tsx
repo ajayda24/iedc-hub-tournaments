@@ -35,8 +35,11 @@ export function Landing() {
           {site.brand.right}
         </span>
         <span className="chip -rotate-3 !bg-sky text-xs">{site.organiser}</span>
+        <Link href="/leaderboard/" className="ml-auto text-sm font-bold underline decoration-2 underline-offset-4">
+          {t.leaderboardLink}
+        </Link>
         {onLan && (
-          <Link href="/host/" className="ml-auto text-sm font-bold underline decoration-2 underline-offset-4">
+          <Link href="/host/" className="text-sm font-bold underline decoration-2 underline-offset-4">
             {t.hostLink}
           </Link>
         )}

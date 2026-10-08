@@ -43,16 +43,19 @@ Everything runs from **one laptop**. Nobody needs internet, and students install
 
 | Step | You do | Students see |
 |---|---|---|
-| Lobby | Edit the **Playlist** (game, difficulty, time). Save. | Join form → lobby with the "next up" rules |
+| Lobby | Edit the **Playlist** (game, difficulty, time). Save. | Join form (name, Student ID, sem, dept) → create or enter their PIN → lobby with the "next up" rules |
 | Start | **▶ Start R1** | 3-2-1 countdown on every phone at the same moment |
 | Live | Watch solved count and **Flags**. Pause if the projector dies. | The puzzle, a timer and their live rank |
 | Results | Read out first blood; the screen rotates the answer, top round results, overall board and dept wars | Their points, the answer and the full leaderboard |
-| Finale | **Show podium** | Podium, final rank and a funny title |
+| Finale | **Show podium** (this also records the tournament for the monthly leaderboard) | Podium, final rank and a funny title |
 | After | **Export CSV** (also saved in `arena-data/` on the laptop) | — |
+| End of the day | **Monthly** tab → **Download for website** → replace `data/leaderboard/monthly.json` in the repo, commit, push | The website's `/leaderboard` updates after Vercel rebuilds |
 
 - **Knockout mode** (Event settings): the bottom X% are eliminated after each round and keep watching as spectators.
 - **Anagram custom words**: pick "Custom words" in the round to use your own (event themes, sponsor names, inside jokes).
-- **Crash?** Just run `start-arena.bat` again. Scores, players and the playlist are restored. A round that was live is closed and unfinished players get partial credit. Start a clean event with `start-arena.bat --fresh`.
+- **Crash?** Just run `start-arena.bat` again. Scores, players and the playlist are restored. A round that was live is closed and unfinished players get partial credit. Start a clean event with `start-arena.bat --fresh`. `--fresh` never deletes students' PINs (`students.json`) or the monthly history (`history.json`).
+- **Forgot PIN?** Host console → **Students** tab → search the Student ID → **reset PIN**. The student then creates a new one on their next join. **Unlock** clears the 10-minute lock after 5 wrong tries.
+- **Moving laptops?** On the old one: Monthly tab → **Backup history**. On the new one: **Import backup**. Copy `arena-data/students.json` across too to keep PINs. The backup contains Student IDs, so don't commit it.
 
 ## Anti-cheat
 

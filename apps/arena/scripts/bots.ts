@@ -81,7 +81,7 @@ async function bot(i: number, stats: BotStats) {
       socket.on("connect", async () => {
         const hello: HelloAck = await socket.timeout(5000).emitWithAck(EV.hello, { role: "player", token });
         if (!hello.me) {
-          const res: JoinAck = await socket.timeout(5000).emitWithAck(EV.join, { token, name, sem, dept, avatar: rng.int(1_000_000) });
+          const res: JoinAck = await socket.timeout(5000).emitWithAck(EV.join, { token, studentId: `BOT${String(i).padStart(4, "0")}`, pin: "1234", name, sem, dept, avatar: rng.int(1_000_000) });
           if (!res.ok) console.error(`bot ${i} join failed: ${res.error}`);
           me = res.me ?? null;
         } else me = hello.me;

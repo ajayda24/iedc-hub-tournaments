@@ -8,3 +8,4 @@ export { ANAGRAM_PACKS, pickPack } from "./games/anagram/engine";
 export { evaluateExpression, solveCrunch, ExprError } from "./games/numbercrunch/engine";
 export * from "./schemas";
 export * from "./games/meta";
+export * from "./monthly";

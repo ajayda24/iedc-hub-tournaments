@@ -10,12 +10,18 @@ import {
   joinSchema,
   resetSchema,
   startSchema,
+  studentCheckSchema,
+  studentRefSchema,
+  historyEditSchema,
+  historyImportSchema,
   submitSchema,
   type HelloAck,
   type Role,
 } from "@iedc/shared";
 import type { Arena, ArenaOutput } from "./arena";
 import { errors } from "@iedc/data/copy/errors";
+import type { Students } from "./students";
+import type { History } from "./history";
 
 interface SocketData {
   role?: Role;
@@ -29,6 +35,8 @@ const safeAck = (ack: unknown): Ack => (typeof ack === "function" ? (ack as Ack)
 export interface RealtimeOptions {
   pin: string;
   onExport?: () => string;
+  students: Students;
+  history: History;
 }
 
 /** Socket.IO transport. Builds the ArenaOutput the Arena talks to. */
@@ -95,7 +103,7 @@ export function createRealtime(http: HttpServer, opts: RealtimeOptions) {
         if (!parsed.success) return reply({ ok: false, error: errors.badHello, serverNow: Date.now() } satisfies HelloAck);
         const { role, token, pin } = parsed.data;
         if (role === "host") {
-          if (pin !== opts.pin) return reply({ ok: false, error: errors.wrongPin, serverNow: Date.now() } satisfies HelloAck);
+          if (pin !== opts.pin) return reply({ ok: false, error: errors.wrongHostPin, serverNow: Date.now() } satisfies HelloAck);
           socket.data.role = "host";
           socket.join("hosts");
           sendSnapshot(socket);
@@ -127,7 +135,14 @@ export function createRealtime(http: HttpServer, opts: RealtimeOptions) {
         const reply = safeAck(ack);
         const parsed = joinSchema.safeParse(raw);
         if (!parsed.success) return reply({ ok: false, error: errors.joinFormIncomplete });
+        const v = opts.students.verifyOrCreate(parsed.data.studentId, parsed.data.pin, {
+          name: parsed.data.name,
+          dept: parsed.data.dept,
+          sem: parsed.data.sem,
+        });
+        if (!v.ok) return reply({ ok: false, error: v.error, locked: v.locked });
         const res = arena.join(parsed.data, socket.id, ip);
+        if (res.ok) arena.studentsChanged();
         if (res.ok && res.me) bindPlayer(socket, res.me.id, res.previousSocket);
         reply({ ok: res.ok, error: res.error, me: res.me });
       });
@@ -185,7 +200,12 @@ export function createRealtime(http: HttpServer, opts: RealtimeOptions) {
       hostOnly(EV.hostEnd, () => arena.endRound());
       hostOnly(EV.hostPause, () => arena.pause());
       hostOnly(EV.hostResume, () => arena.resume());
-      hostOnly(EV.hostPodium, () => arena.showPodium());
+      hostOnly(EV.hostPodium, () => {
+        const res = arena.showPodium();
+        // the finished tournament goes into the monthly history automatically
+        opts.history.record(arena.summary());
+        return res;
+      });
       hostOnly(EV.hostLobby, () => arena.toLobby());
       hostOnly(EV.hostKick, (raw) => {
         const p = idSchema.safeParse(raw);
@@ -204,6 +224,45 @@ export function createRealtime(http: HttpServer, opts: RealtimeOptions) {
         return arena.reset(p.success ? p.data.keepPlayers : true);
       });
       hostOnly(EV.hostExport, () => ({ ok: true, csv: arena.toCsv(), savedTo: opts.onExport?.() }));
+
+      /* ---------- students & PINs ---------- */
+      socket.on(EV.studentCheck, (raw: unknown, ack: unknown) => {
+        const reply = safeAck(ack);
+        const parsed = studentCheckSchema.safeParse(raw);
+        if (!parsed.success) return reply({ ok: false, error: errors.badStudentId });
+        reply({ ok: true, ...opts.students.check(parsed.data.studentId) });
+      });
+      hostOnly(EV.hostStudents, () => ({ ok: true, students: opts.students.list() }));
+      hostOnly(EV.hostResetPin, (raw) => {
+        const p = studentRefSchema.safeParse(raw);
+        return { ok: p.success && opts.students.resetPin(p.data.studentId) };
+      });
+      hostOnly(EV.hostUnlockStudent, (raw) => {
+        const p = studentRefSchema.safeParse(raw);
+        return { ok: p.success && opts.students.unlock(p.data.studentId) };
+      });
+
+      /* ---------- monthly history ---------- */
+      const historyView = () => ({ ok: true, tournaments: opts.history.all(), currentId: arena.eventId, file: opts.history.exportMonthly() });
+      hostOnly(EV.hostHistory, () => historyView());
+      hostOnly(EV.hostRecord, () => {
+        const res = opts.history.record(arena.summary());
+        return res.ok ? historyView() : res;
+      });
+      hostOnly(EV.hostHistoryEdit, (raw) => {
+        const p = historyEditSchema.safeParse(raw);
+        if (!p.success) return { ok: false };
+        const res = opts.history.edit(p.data.id, p.data);
+        return res.ok ? historyView() : res;
+      });
+      hostOnly(EV.hostExportMonthly, () => ({ ok: true, file: opts.history.exportMonthly() }));
+      hostOnly(EV.hostBackupHistory, () => ({ ok: true, backup: { kind: "brain-arena-history", tournaments: opts.history.all() } }));
+      hostOnly(EV.hostImportHistory, (raw) => {
+        const p = historyImportSchema.safeParse(raw);
+        if (!p.success) return { ok: false, error: errors.badBackup };
+        const added = opts.history.import(p.data.tournaments);
+        return { ...historyView(), added };
+      });
 
       socket.on("disconnect", () => {
         const id = pid();

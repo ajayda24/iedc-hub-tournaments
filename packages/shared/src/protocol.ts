@@ -27,6 +27,16 @@ export const EV = {
   hostAdjust: "host:adjust",
   hostReset: "host:reset",
   hostExport: "host:export",
+  studentCheck: "student:check",
+  hostStudents: "host:students",
+  hostResetPin: "host:resetPin",
+  hostUnlockStudent: "host:unlockStudent",
+  hostHistory: "host:history",
+  hostHistoryEdit: "host:historyEdit",
+  hostRecord: "host:record",
+  hostExportMonthly: "host:exportMonthly",
+  hostBackupHistory: "host:backupHistory",
+  hostImportHistory: "host:importHistory",
   // server → client
   state: "state",
   me: "me",
@@ -150,6 +160,7 @@ export interface MyRound {
 
 export interface MeState {
   id: string;
+  studentId: string;
   name: string;
   sem: string;
   dept: string;
@@ -194,6 +205,7 @@ export interface CheatFlag {
 }
 
 export interface HostPlayer extends LbEntry {
+  studentId: string;
   online: boolean;
   ip: string;
   rtt: number | null;
@@ -247,6 +259,10 @@ export interface HelloAck {
 
 export interface JoinPayload {
   token: string;
+  /** college Student ID (or admission / roll no.), upper-cased */
+  studentId: string;
+  /** PIN: created on first join, checked after */
+  pin: string;
   name: string;
   sem: string;
   dept: string;
@@ -256,6 +272,8 @@ export interface JoinPayload {
 export interface JoinAck {
   ok: boolean;
   error?: string;
+  /** too many wrong PINs: this Student ID is locked for a while */
+  locked?: boolean;
   me?: MeState;
 }
 
@@ -280,3 +298,29 @@ export const DEFAULT_CONFIG: EventConfig = { eventName: site.defaultEventName, .
 
 /** Round countdown before a puzzle appears (data/rules.ts). */
 export { COUNTDOWN_MS };
+
+/* ------------------------------------------------------------------ */
+/* Students & monthly leaderboard                                      */
+/* ------------------------------------------------------------------ */
+
+export interface StudentCheckAck {
+  ok: boolean;
+  error?: string;
+  /** a PIN already exists for this ID: ask for it instead of creating one */
+  exists?: boolean;
+  lockedUntil?: number | null;
+}
+
+/** A student as the host console sees them (never the PIN) */
+export interface StudentInfo {
+  studentId: string;
+  name: string;
+  dept: string;
+  sem: string;
+  hasPin: boolean;
+  createdAt: number;
+  pinSetAt: number | null;
+  pinResetAt: number | null;
+  lastSeenAt: number;
+  lockedUntil: number | null;
+}

@@ -43,6 +43,17 @@ The host taps **Start** and every connected phone gets the same puzzle at the sa
 - **Leaving the game:** leaving for more than 1.5 s mid-round is a strike. Strikes go warn → −200 → round lock.
 - **Server-side answers:** answers are only ever on the laptop. Copying and long-press menus are disabled in games.
 
+**Student ID + PIN:**
+- Students join with full name, Student ID (or admission / roll no., up to 10 characters), semester and department.
+- On the next screen they create a 4-digit PIN the first time, or enter it later. There's no "forgot PIN"; the browser offers to save it.
+- The same Student ID on another phone (with the right PIN) continues with the same score.
+- PINs are scrypt-hashed on the laptop; 5 wrong tries lock the ID for 10 minutes. The host can unlock or reset a PIN from the **Students** tab.
+
+**Monthly leaderboard** (`/leaderboard`):
+- Every tournament is recorded on the laptop when the host shows the podium. The **Monthly** tab lets the host include/exclude, rename or delete them.
+- Points add up per Student ID across the month; this month and previous months are shown, with a "Last updated" time.
+- On the event Wi-Fi the page is live from the laptop. Online it shows `data/leaderboard/monthly.json`: download it from the Monthly tab, commit, push, and Vercel rebuilds ([how](data/README.md#publishing-the-monthly-leaderboard)). No Student IDs are published.
+
 **Host console:**
 - Playlist builder.
 - Start, pause, end round, podium.
@@ -124,7 +135,7 @@ Measured locally with `pnpm bots --n 80` over four rounds:
 data              ALL text, labels, constants and word lists (edit here)
 packages/shared   protocol types, zod schemas, seeded RNG, scoring, the 4 game engines (+ tests)
 apps/arena        Fastify + Socket.IO server: Arena state machine, anti-cheat, persistence, network info
-apps/web          Next.js (App Router, static export) + Serwist PWA: /play /host /screen /practice
+apps/web          Next.js (App Router, static export) + Serwist PWA: /play /host /screen /practice /leaderboard
 scripts           precompress, pack-arena, Windows hotspot scripts
 e2e               Playwright end-to-end tests
 docs              EVENT_DAY.md, screenshots
@@ -170,7 +181,7 @@ docs              EVENT_DAY.md, screenshots
 
 **Platform:**
 - an online mode,
-- a season leaderboard synced after events,
+- syncing the monthly leaderboard automatically (a database instead of a committed file),
 - a daily puzzle,
 - a satellite-relay mode (`--upstream`) for a second laptop,
 - an Android host app.

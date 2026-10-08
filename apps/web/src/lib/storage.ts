@@ -36,6 +36,7 @@ export function deviceToken(): string {
 }
 
 export interface Profile {
+  studentId?: string;
   name: string;
   sem: string;
   dept: string;

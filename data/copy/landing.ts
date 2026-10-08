@@ -26,6 +26,7 @@ export const landing = {
 
   mascotNote: "this is Bulbu",
 
+  leaderboardLink: "Monthly leaderboard →",
   practiceTitle: "Warm up solo",
   practiceLink: "practice →",
   practiceOfflineNote: "Practice works offline once this site is installed (Add to Home Screen).",

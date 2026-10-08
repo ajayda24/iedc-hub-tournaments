@@ -21,6 +21,9 @@ export const host = {
   tabFlags: (newCount: number) => `Flags${newCount ? ` · ${newCount} new` : ""}`,
   tabNetwork: "Network doctor",
   tabBoard: "Leaderboard",
+  tabStudents: "Students",
+  tabMonthly: "Monthly",
+  monthlyLink: "Monthly board ↗",
 
   // round controls
   knockoutChip: (pct: number) => `knockout ${pct}%`,
@@ -99,6 +102,46 @@ export const host = {
     "Overflow: a phone with \"Wi-Fi sharing\" joins the laptop hotspot and re-shares it. Same URL works.",
     "Any phone hotspot used must have mobile data OFF.",
   ],
+
+  // students tab
+  studentsSearch: "Search Student ID or name…",
+  studentsEmpty: "No students yet. They appear here after their first join.",
+  studentsCount: (n: number) => `${n} students on this laptop`,
+  pinSet: "PIN set",
+  noPin: "no PIN (creates one on next join)",
+  lockedUntil: (time: string) => `locked until ${time}`,
+  lastSeen: (date: string) => `last seen ${date}`,
+  resetPin: "reset PIN",
+  confirmResetPin: (id: string, name: string) => `Reset the PIN for ${id} (${name})? They will create a new PIN on their next join.`,
+  pinWasReset: "PIN reset. They'll create a new one when they join.",
+  unlock: "unlock",
+
+  // monthly tab
+  monthlyIntro:
+    "Every tournament is saved here when you show the podium. Untick one to leave it out of the monthly leaderboard.",
+  recordNow: "Record this tournament now",
+  recordedNow: "Saved to this month's history.",
+  monthlyEmpty: "No tournaments recorded yet. Finish one with Show podium.",
+  included: "counts",
+  excluded: "left out",
+  rename: "rename",
+  renamePrompt: "New name for this tournament:",
+  remove: "delete",
+  confirmRemove: (name: string) => `Delete "${name}" from the monthly history? This can't be undone.`,
+  playersCount: (n: number) => `${n} players`,
+  previewTitle: (month: string) => `${month} standings (preview)`,
+  publishTitle: "Publish to the website",
+  publishSteps: [
+    "Click \"Download for website\" — you get monthly.json (names, departments and points only; no Student IDs).",
+    "Replace data/leaderboard/monthly.json in the GitHub repo with it, commit and push.",
+    "Vercel rebuilds the site; /leaderboard shows the new standings and the update time.",
+  ],
+  downloadWebsite: "Download for website",
+  backup: "Backup history",
+  importBackup: "Import backup",
+  imported: (n: number) => `Imported ${n} tournament${n === 1 ? "" : "s"}.`,
+  importFailed: "That file isn't a Brain Arena history backup.",
+  backupNote: "The backup includes Student IDs. Keep it private (don't commit it).",
 
   // board tab
   boardPlayers: "Players",

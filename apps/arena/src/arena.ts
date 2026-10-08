@@ -42,6 +42,7 @@ import { LIVE_LEADERBOARD_SIZE } from "@iedc/data/rules";
 export interface Player {
   id: string;
   token: string;
+  studentId: string;
   name: string;
   sem: string;
   dept: string;
@@ -107,6 +108,7 @@ export interface ArenaOptions {
 
 export interface ArenaSnapshot {
   v: 1;
+  eventId?: string;
   config: EventConfig;
   phase: Phase;
   roundIndex: number;
@@ -139,6 +141,8 @@ export class Arena {
   feedLog: FeedItem[] = [];
   /** bumps on every change; the persister saves when it moves */
   version = 0;
+  /** identifies this tournament in the monthly history; new on every fresh event */
+  eventId = shortId();
 
   private out: ArenaOutput;
   private now: () => number;
@@ -172,24 +176,26 @@ export class Arena {
     return { player: p, previousSocket };
   }
 
+  /**
+   * Join (or rejoin) the tournament. The Student ID is the player's identity:
+   * the PIN has already been checked by the caller, so the same ID on a new
+   * phone takes over the same player and score.
+   */
   join(payload: JoinPayload, socketId: string, ip: string): JoinAck & { previousSocket?: string | null } {
-    const existing = this.byToken(payload.token);
+    const existing = this.byStudentId(payload.studentId) ?? this.byToken(payload.token, true);
     if (existing?.kicked) return { ok: false, error: errors.removedByHost };
     const name = payload.name.replace(/\s+/g, " ").trim();
-    const clash = [...this.players.values()].find(
-      (p) => !p.kicked && p.token !== payload.token && p.name.toLowerCase() === name.toLowerCase() && p.dept === payload.dept,
-    );
-    if (clash) return { ok: false, error: errors.duplicateName };
 
     let previousSocket: string | null = null;
     let p = existing;
     if (p) {
       previousSocket = p.online && p.socketId !== socketId ? p.socketId : null;
-      Object.assign(p, { name, sem: payload.sem, dept: payload.dept, avatar: payload.avatar });
+      Object.assign(p, { name, sem: payload.sem, dept: payload.dept, avatar: payload.avatar, token: payload.token, studentId: payload.studentId });
     } else {
       p = {
         id: shortId(),
         token: payload.token,
+        studentId: payload.studentId,
         name,
         sem: payload.sem,
         dept: payload.dept,
@@ -220,6 +226,11 @@ export class Arena {
     p.ip = ip;
     this.touch({ me: [p.id], host: true, state: true, lb: true });
     return { ok: true, me: this.meState(p), previousSocket };
+  }
+
+  /** a student record changed (new PIN etc.): refresh the host view */
+  studentsChanged() {
+    this.touch({ host: true });
   }
 
   disconnect(socketId: string) {
@@ -380,6 +391,7 @@ export class Arena {
 
   reset(keepPlayers: boolean) {
     this.clearTimers();
+    this.eventId = shortId();
     this.phase = "lobby";
     this.round = null;
     this.roundIndex = -1;
@@ -630,6 +642,7 @@ export class Arena {
     const pr = r ? r.players[p.id] : undefined;
     return {
       id: p.id,
+      studentId: p.studentId,
       name: p.name,
       sem: p.sem,
       dept: p.dept,
@@ -694,6 +707,7 @@ export class Arena {
     const kicked = [...this.players.values()].filter((p) => p.kicked);
     const players: HostPlayer[] = [...ranked, ...kicked].map((p, i) => ({
       ...this.lbEntry(p, p.kicked ? 0 : i + 1),
+      studentId: p.studentId,
       online: p.online,
       ip: p.ip,
       rtt: p.rtt,
@@ -725,9 +739,10 @@ export class Arena {
       const s = String(v ?? "");
       return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
     };
-    const head = ["Rank", "Name", "Semester", "Department", "Score", "Solves", "Strikes", "Eliminated", ...this.history.map((h) => h.title)];
+    const head = ["Rank", "Student ID", "Name", "Semester", "Department", "Score", "Solves", "Strikes", "Eliminated", ...this.history.map((h) => h.title)];
     const rows = this.ranking().map((p, i) => [
       i + 1,
+      p.studentId,
       p.name,
       p.sem,
       p.dept,
@@ -745,6 +760,7 @@ export class Arena {
   snapshot(): ArenaSnapshot {
     return {
       v: 1,
+      eventId: this.eventId,
       config: this.config,
       phase: this.phase,
       roundIndex: this.roundIndex,
@@ -757,6 +773,7 @@ export class Arena {
   }
 
   restore(s: ArenaSnapshot) {
+    if (s.eventId) this.eventId = s.eventId;
     this.config = { ...structuredClone(DEFAULT_CONFIG), ...s.config };
     this.roundIndex = s.roundIndex;
     this.roundsPlayed = s.roundsPlayed;
@@ -826,9 +843,26 @@ export class Arena {
     }
   }
 
-  private byToken(token: string): Player | undefined {
-    for (const p of this.players.values()) if (p.token === token) return p;
+  /** `anonymousOnly`: only match players without a Student ID (old snapshots) */
+  private byToken(token: string, anonymousOnly = false): Player | undefined {
+    for (const p of this.players.values()) if (p.token === token && (!anonymousOnly || !p.studentId)) return p;
     return undefined;
+  }
+
+  private byStudentId(studentId: string): Player | undefined {
+    for (const p of this.players.values()) if (p.studentId === studentId) return p;
+    return undefined;
+  }
+
+  /** Final standings of this tournament, for the monthly history. */
+  summary(): { id: string; name: string; players: { studentId: string; name: string; dept: string; sem: string; score: number; rank: number; solves: number }[] } {
+    return {
+      id: this.eventId,
+      name: this.config.eventName,
+      players: this.ranking()
+        .filter((p) => p.studentId)
+        .map((p, i) => ({ studentId: p.studentId, name: p.name, dept: p.dept, sem: p.sem, score: p.score, rank: i + 1, solves: p.solves })),
+    };
   }
 
   private freshPlayerRound(progress: unknown): PlayerRound {

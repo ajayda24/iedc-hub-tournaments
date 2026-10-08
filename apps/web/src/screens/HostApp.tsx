@@ -12,6 +12,7 @@ import { Btn, COLOR, ConnDot, Hand, Slip } from "@/ui/kit";
 import { DeptBoard, Leaderboard } from "@/ui/Leaderboard";
 import { Mascot } from "@/ui/Mascot";
 import { TimerBar } from "@/ui/Timer";
+import { MonthlyTab, StudentsTab } from "./host/HostExtras";
 import { ANAGRAM_PACK_OPTIONS, DEFAULT_CUSTOM_WORDS, DIFFICULTY_LABEL } from "@iedc/data/games";
 import { SCORING } from "@iedc/data/rules";
 import { host as H } from "@iedc/data/copy/host";
@@ -84,7 +85,7 @@ async function act(event: string, payload?: unknown): Promise<Ack> {
 
 function Console({ host, state }: { host: HostState; state: PublicState }) {
   const conn = useArena((s) => s.conn);
-  const [tab, setTab] = useState<"players" | "flags" | "network" | "board">("players");
+  const [tab, setTab] = useState<"players" | "flags" | "students" | "monthly" | "network" | "board">("players");
   const flagsNew = host.flags.filter((f) => Date.now() - f.at < 5 * 60_000).length;
 
   const exportCsv = async () => {
@@ -109,6 +110,9 @@ function Console({ host, state }: { host: HostState; state: PublicState }) {
           <span className="chip">
             {H.online(state.onlineCount, state.playerCount)}
           </span>
+          <a className="sticker !bg-yellow !px-3 !py-1.5 text-sm" href="/leaderboard/" target="_blank" rel="noreferrer">
+            {H.monthlyLink}
+          </a>
           <a className="sticker !bg-sky !px-3 !py-1.5 text-sm" href="/screen/" target="_blank" rel="noreferrer">
             {H.openScreen}
           </a>
@@ -131,6 +135,8 @@ function Console({ host, state }: { host: HostState; state: PublicState }) {
               [
                 ["players", H.tabPlayers(host.players.length)],
                 ["flags", H.tabFlags(flagsNew)],
+                ["students", H.tabStudents],
+                ["monthly", H.tabMonthly],
                 ["network", H.tabNetwork],
                 ["board", H.tabBoard],
               ] as const
@@ -149,6 +155,8 @@ function Console({ host, state }: { host: HostState; state: PublicState }) {
           {tab === "flags" && <Flags host={host} />}
           {tab === "network" && <Network host={host} />}
           {tab === "board" && <Board />}
+          {tab === "students" && <StudentsTab />}
+          {tab === "monthly" && <MonthlyTab />}
         </div>
       </div>
     </div>
@@ -499,7 +507,7 @@ function Players({ players }: { players: HostPlayer[] }) {
           <div className="min-w-0 flex-1 leading-tight">
             <div className="truncate font-bold">{p.name}</div>
             <div className="text-xs text-pencil">
-              {p.dept} · {p.sem} · {p.ip}
+              <span className="font-mono font-bold text-ink-soft">{p.studentId}</span> · {p.dept} · {p.sem} · {p.ip}
               {p.rtt != null && ` · ${p.rtt}ms`}
             </div>
           </div>
@@ -517,6 +525,15 @@ function Players({ players }: { players: HostPlayer[] }) {
             {(p.strikes > 0 || p.internet || p.kicked || p.roundStatus === "locked") && (
               <button type="button" className="chip !bg-mint !px-1.5 text-xs" onClick={() => act(EV.hostUnblock, { id: p.id })}>
                 {H.unblock}
+              </button>
+            )}
+            {p.studentId && (
+              <button
+                type="button"
+                className="chip !px-1.5 text-xs"
+                onClick={() => confirm(H.confirmResetPin(p.studentId, p.name)) && act(EV.hostResetPin, { studentId: p.studentId }).then((r) => r.ok && alert(H.pinWasReset))}
+              >
+                {H.resetPin}
               </button>
             )}
             {!p.kicked && (
