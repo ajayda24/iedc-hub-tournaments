@@ -1,0 +1,17 @@
+{
+  "name": "@iedc/data",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Every text, label and constant used by Brain Arena. Edit these files to change wording.",
+  "exports": {
+    "./*": "./*.ts",
+    "./words/*": "./words/*"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

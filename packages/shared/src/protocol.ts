@@ -1,3 +1,5 @@
+import { COUNTDOWN_MS, DEFAULT_EVENT } from "@iedc/data/rules";
+import { site } from "@iedc/data/site";
 import type { CheckStatus, Difficulty, GameId, Reveal, RoundOptions } from "./games/types";
 
 /* ------------------------------------------------------------------ */
@@ -44,8 +46,8 @@ export type EventFormat = "classic" | "knockout";
 export type Role = "player" | "host" | "screen";
 export type RoundStatus = "idle" | "playing" | "solved" | "failed" | "locked" | "timeout" | "out";
 
-export const DEPARTMENTS = ["CSE", "ECE", "EEE", "ME", "CE", "IT", "AI & DS", "Mechatronics", "MCA", "MBA", "Other"];
-export const SEMESTERS = ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8"];
+/** Edit these lists in data/people.ts */
+export { DEPARTMENTS, SEMESTERS } from "@iedc/data/people";
 
 export interface RoundConfig {
   id: string;
@@ -273,20 +275,8 @@ export interface CheatPayload {
   ms?: number;
 }
 
-export const DEFAULT_CONFIG: EventConfig = {
-  eventName: "Brain Arena",
-  format: "classic",
-  knockoutPct: 25,
-  rounds: [
-    { id: "r1", game: "anagram", difficulty: "easy", timeLimitSec: 120 },
-    { id: "r2", game: "sudoku", difficulty: "easy", timeLimitSec: 150 },
-    { id: "r3", game: "wordhunt", difficulty: "med", timeLimitSec: 150 },
-    { id: "r4", game: "numbercrunch", difficulty: "med", timeLimitSec: 120 },
-  ],
-  strikePenaltyAt: 2,
-  strikeLockAt: 3,
-  blockInternet: true,
-};
+/** Edit the defaults in data/rules.ts and data/site.ts */
+export const DEFAULT_CONFIG: EventConfig = { eventName: site.defaultEventName, ...DEFAULT_EVENT };
 
-/** Round countdown before a puzzle appears. */
-export const COUNTDOWN_MS = 3500;
+/** Round countdown before a puzzle appears (data/rules.ts). */
+export { COUNTDOWN_MS };

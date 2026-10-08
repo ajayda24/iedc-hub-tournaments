@@ -12,16 +12,12 @@ import { Btn, COLOR, ConnDot, Hand, Slip } from "@/ui/kit";
 import { DeptBoard, Leaderboard } from "@/ui/Leaderboard";
 import { Mascot } from "@/ui/Mascot";
 import { TimerBar } from "@/ui/Timer";
+import { ANAGRAM_PACK_OPTIONS, DEFAULT_CUSTOM_WORDS, DIFFICULTY_LABEL } from "@iedc/data/games";
+import { SCORING } from "@iedc/data/rules";
+import { host as H } from "@iedc/data/copy/host";
 
-const PACKS = [
-  { id: "mixed", label: "Mixed bag" },
-  { id: "tech", label: "Tech talk" },
-  { id: "campus", label: "Campus life" },
-  { id: "food", label: "Snack attack" },
-  { id: "science", label: "Lab rats" },
-  { id: "custom", label: "Custom words" },
-];
-const DIFF_LABEL: Record<Difficulty, string> = { easy: "easy", med: "medium", hard: "hard" };
+const PACKS = ANAGRAM_PACK_OPTIONS;
+const DIFF_LABEL = DIFFICULTY_LABEL;
 
 type Ack = { ok: boolean; error?: string };
 
@@ -49,9 +45,9 @@ export function HostApp() {
       <main className="mx-auto flex min-h-dvh max-w-sm flex-col items-center justify-center gap-4 px-6 text-center">
         <Mascot mood={helloError ? "dizzy" : "think"} size={100} />
         <h1 className="text-3xl font-black">
-          <span className="hl">Host console</span>
+          <span className="hl">{H.title}</span>
         </h1>
-        <p className="font-semibold text-ink-soft">The PIN is printed in the arena terminal on the laptop.</p>
+        <p className="font-semibold text-ink-soft">{H.pinHint}</p>
         <input
           className="field text-center text-3xl tracking-[0.4em]"
           inputMode="numeric"
@@ -60,13 +56,13 @@ export function HostApp() {
           value={pin}
           onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
           onKeyDown={(e) => e.key === "Enter" && login()}
-          placeholder="••••"
+          placeholder={H.pinPlaceholder}
         />
         <Btn size="lg" tone="mint" className="w-full" onClick={login} disabled={pin.length < 4}>
-          Enter
+          {H.enter}
         </Btn>
         {tried && helloDone && helloError && <p className="hand text-xl text-stamp">{helloError}</p>}
-        {tried && conn === "offline" && <p className="hand text-xl text-stamp">Can&apos;t reach the arena server.</p>}
+        {tried && conn === "offline" && <p className="hand text-xl text-stamp">{H.cantReach}</p>}
       </main>
     );
   }
@@ -81,7 +77,7 @@ async function act(event: string, payload?: unknown): Promise<Ack> {
     if (!res.ok && res.error) alert(res.error);
     return res;
   } catch (e) {
-    alert(e instanceof Error ? e.message : "Failed");
+    alert(e instanceof Error ? e.message : H.failed);
     return { ok: false };
   }
 }
@@ -96,7 +92,7 @@ function Console({ host, state }: { host: HostState; state: PublicState }) {
     const blob = new Blob([res.csv], { type: "text/csv" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `${host.config.eventName.replace(/\W+/g, "-")}-results.csv`;
+    a.download = `${host.config.eventName.replace(/\W+/g, "-")}${H.csvFileSuffix}`;
     a.click();
     URL.revokeObjectURL(a.href);
   };
@@ -111,13 +107,13 @@ function Console({ host, state }: { host: HostState; state: PublicState }) {
             <ConnDot conn={conn} />
           </div>
           <span className="chip">
-            {state.onlineCount}/{state.playerCount} online
+            {H.online(state.onlineCount, state.playerCount)}
           </span>
           <a className="sticker !bg-sky !px-3 !py-1.5 text-sm" href="/screen/" target="_blank" rel="noreferrer">
-            Open big screen ↗
+            {H.openScreen}
           </a>
           <Btn size="sm" tone="paper" onClick={exportCsv}>
-            Export CSV
+            {H.exportCsv}
           </Btn>
         </div>
       </header>
@@ -133,10 +129,10 @@ function Console({ host, state }: { host: HostState; state: PublicState }) {
           <div className="flex flex-wrap gap-2">
             {(
               [
-                ["players", `Players (${host.players.length})`],
-                ["flags", `Flags${flagsNew ? ` · ${flagsNew} new` : ""}`],
-                ["network", "Network doctor"],
-                ["board", "Leaderboard"],
+                ["players", H.tabPlayers(host.players.length)],
+                ["flags", H.tabFlags(flagsNew)],
+                ["network", H.tabNetwork],
+                ["board", H.tabBoard],
               ] as const
             ).map(([k, label]) => (
               <button
@@ -175,34 +171,34 @@ function Controls({ host, state }: { host: HostState; state: PublicState }) {
             R{round.index + 1} · {round.title} · {DIFF_LABEL[round.config.difficulty]}
           </span>
         )}
-        {host.config.format === "knockout" && <span className="chip !bg-coral">knockout {host.config.knockoutPct}%</span>}
+        {host.config.format === "knockout" && <span className="chip !bg-coral">{H.knockoutChip(host.config.knockoutPct)}</span>}
       </div>
 
       {live && round && (
         <>
           {state.phase === "countdown" ? (
-            <div className="text-2xl font-black">Starting in {Math.max(0, Math.ceil((round.startsAt - now) / 1000))}…</div>
+            <div className="text-2xl font-black">{H.startingIn(Math.max(0, Math.ceil((round.startsAt - now) / 1000)))}</div>
           ) : (
             <TimerBar endsAt={round.endsAt} total={round.config.timeLimitSec * 1000} now={now} paused={round.pausedRemainingMs} big />
           )}
           <div className="flex items-baseline gap-2">
             <span className="text-4xl font-black tabular-nums">{round.solvedCount}</span>
-            <span className="font-bold text-pencil">/ {round.activeCount} solved</span>
-            {round.firstSolver && <Hand className="ml-auto text-lg">first blood: {round.firstSolver}</Hand>}
+            <span className="font-bold text-pencil">{H.solvedOf(round.activeCount)}</span>
+            {round.firstSolver && <Hand className="ml-auto text-lg">{H.firstBlood(round.firstSolver)}</Hand>}
           </div>
           <div className="flex flex-wrap gap-2">
             {state.phase === "playing" &&
               (host.paused ? (
                 <Btn tone="mint" onClick={() => act(EV.hostResume)}>
-                  Resume
+                  {H.resume}
                 </Btn>
               ) : (
                 <Btn tone="paper" onClick={() => act(EV.hostPause)}>
-                  Pause
+                  {H.pause}
                 </Btn>
               ))}
-            <Btn tone="coral" onClick={() => confirm("End this round now? Unfinished players get partial credit.") && act(EV.hostEnd)}>
-              End round now
+            <Btn tone="coral" onClick={() => confirm(H.confirmEndRound) && act(EV.hostEnd)}>
+              {H.endRound}
             </Btn>
           </div>
         </>
@@ -212,24 +208,24 @@ function Controls({ host, state }: { host: HostState; state: PublicState }) {
         <div className="flex flex-wrap gap-2">
           {next ? (
             <Btn size="lg" tone="mint" onClick={() => act(EV.hostStart)} disabled={state.playerCount === 0}>
-              ▶ Start R{host.roundIndex + 2}: {GAME_META[next.game].title} ({DIFF_LABEL[next.difficulty]})
+              {H.startRound(host.roundIndex + 2, GAME_META[next.game].title, DIFF_LABEL[next.difficulty])}
             </Btn>
           ) : (
-            <Hand className="self-center text-lg">Playlist finished — add a round or crown the winners.</Hand>
+            <Hand className="self-center text-lg">{H.playlistDone}</Hand>
           )}
           {state.phase !== "podium" && (
             <Btn tone="yellow" onClick={() => act(EV.hostPodium)} disabled={state.roundsPlayed === 0}>
-              Show podium
+              {H.showPodium}
             </Btn>
           )}
           {state.phase !== "lobby" && (
             <Btn tone="paper" onClick={() => act(EV.hostLobby)}>
-              Back to lobby
+              {H.backToLobby}
             </Btn>
           )}
         </div>
       )}
-      {state.playerCount === 0 && <Hand className="text-base">Waiting for players — show the QR from the Network tab or the big screen.</Hand>}
+      {state.playerCount === 0 && <Hand className="text-base">{H.waitingForPlayers}</Hand>}
     </Slip>
   );
 }
@@ -271,14 +267,14 @@ function Playlist({ host }: { host: HostState }) {
   return (
     <section className="flex flex-col gap-3">
       <div className="flex items-center gap-2">
-        <h2 className="mr-auto text-2xl font-black">Playlist</h2>
+        <h2 className="mr-auto text-2xl font-black">{H.playlist}</h2>
         {dirty && (
           <>
             <Btn size="sm" tone="paper" onClick={() => (setDraft(host.config.rounds), setDirty(false))}>
-              Discard
+              {H.discard}
             </Btn>
             <Btn size="sm" tone="mint" onClick={save}>
-              Save changes
+              {H.saveChanges}
             </Btn>
           </>
         )}
@@ -330,13 +326,13 @@ function Playlist({ host }: { host: HostState }) {
                   value={r.timeLimitSec}
                   onChange={(e) => edit(i, { timeLimitSec: Math.max(20, Number(e.target.value) || 60) })}
                 />
-                s <span className="text-pencil">({fmtClock(r.timeLimitSec * 1000)})</span>
+                {H.seconds} <span className="text-pencil">({fmtClock(r.timeLimitSec * 1000)})</span>
               </label>
               <div className="ml-auto flex gap-1">
-                <button type="button" className="chip !px-2" onClick={() => move(i, -1)} aria-label="move up">
+                <button type="button" className="chip !px-2" onClick={() => move(i, -1)} aria-label={H.moveUp}>
                   ↑
                 </button>
-                <button type="button" className="chip !px-2" onClick={() => move(i, 1)} aria-label="move down">
+                <button type="button" className="chip !px-2" onClick={() => move(i, 1)} aria-label={H.moveDown}>
                   ↓
                 </button>
                 <button
@@ -346,7 +342,7 @@ function Playlist({ host }: { host: HostState }) {
                     setDraft((d) => d.filter((_, k) => k !== i));
                     setDirty(true);
                   }}
-                  aria-label="remove round"
+                  aria-label={H.removeRound}
                 >
                   ✕
                 </button>
@@ -357,7 +353,7 @@ function Playlist({ host }: { host: HostState }) {
                 <select
                   className="field !w-auto !py-1.5 text-sm"
                   value={r.options?.customWords?.length ? "custom" : r.options?.pack ?? "mixed"}
-                  onChange={(e) => edit(i, { options: e.target.value === "custom" ? { customWords: ["iedc", "startup", "idea"] } : { pack: e.target.value } })}
+                  onChange={(e) => edit(i, { options: e.target.value === "custom" ? { customWords: [...DEFAULT_CUSTOM_WORDS] } : { pack: e.target.value } })}
                 >
                   {PACKS.map((p) => (
                     <option key={p.id} value={p.id}>
@@ -368,7 +364,7 @@ function Playlist({ host }: { host: HostState }) {
                 {r.options?.customWords && (
                   <textarea
                     className="field min-h-[3rem] flex-1 !py-1.5 text-sm"
-                    placeholder="words separated by spaces or commas (min 3)"
+                    placeholder={H.customWordsPlaceholder}
                     defaultValue={r.options.customWords.join(", ")}
                     onBlur={(e) => edit(i, { options: { customWords: e.target.value.split(/[\s,]+/).filter(Boolean) } })}
                   />
@@ -377,14 +373,14 @@ function Playlist({ host }: { host: HostState }) {
             )}
             {!dirty && !played && i !== host.roundIndex + 1 && (
               <button type="button" className="hand mt-1 text-base text-pencil underline" onClick={() => act(EV.hostStart, { index: i })}>
-                play this one next instead →
+                {H.playNext}
               </button>
             )}
           </div>
         );
       })}
       <div className="flex flex-wrap gap-2">
-        <Hand className="self-center text-lg">add:</Hand>
+        <Hand className="self-center text-lg">{H.add}</Hand>
         {GAME_ORDER.map((g) => (
           <Btn key={g} size="sm" tone={GAME_META[g].color} onClick={() => add(g)}>
             + {GAME_META[g].title}
@@ -414,47 +410,47 @@ function Settings({ host }: { host: HostState }) {
   return (
     <section className="flex flex-col gap-3">
       <div className="flex items-center">
-        <h2 className="mr-auto text-2xl font-black">Event settings</h2>
+        <h2 className="mr-auto text-2xl font-black">{H.settings}</h2>
         {dirty && (
           <Btn size="sm" tone="mint" onClick={save}>
-            Save settings
+            {H.saveSettings}
           </Btn>
         )}
       </div>
       <div className="grid gap-3 rounded-lg border-2 border-ink bg-card p-3 sm:grid-cols-2">
         <label className="flex flex-col gap-1 sm:col-span-2">
-          <span className="text-sm font-bold">Event name</span>
+          <span className="text-sm font-bold">{H.eventName}</span>
           <input className="field" maxLength={60} value={cfg.eventName} onChange={(e) => patch({ eventName: e.target.value })} />
         </label>
         <div className="flex flex-col gap-1">
-          <span className="text-sm font-bold">Format</span>
+          <span className="text-sm font-bold">{H.format}</span>
           <div className="flex gap-2">
             {(["classic", "knockout"] as const).map((f) => (
               <button key={f} type="button" onClick={() => patch({ format: f })} className={cx("chip !px-3 !py-1.5", cfg.format === f && "!bg-ink !text-paper")}>
-                {f}
+                {H.formats[f]}
               </button>
             ))}
           </div>
         </div>
         {cfg.format === "knockout" && (
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-bold">Knock out bottom {cfg.knockoutPct}% each round</span>
+            <span className="text-sm font-bold">{H.knockoutPct(cfg.knockoutPct)}</span>
             <input type="range" min={5} max={75} step={5} value={cfg.knockoutPct} onChange={(e) => patch({ knockoutPct: Number(e.target.value) })} />
           </label>
         )}
         <label className="flex items-center gap-2 sm:col-span-2">
           <input type="checkbox" className="h-5 w-5 accent-ink" checked={cfg.blockInternet} onChange={(e) => patch({ blockInternet: e.target.checked })} />
-          <span className="font-bold">Freeze players whose phone has internet</span>
+          <span className="font-bold">{H.blockInternet}</span>
         </label>
         <label className="flex flex-col gap-1">
-          <span className="text-sm font-bold">−200 penalty at strike #</span>
+          <span className="text-sm font-bold">{H.penaltyAt(SCORING.strikePenalty)}</span>
           <input type="number" min={1} max={10} className="field !py-1.5" value={cfg.strikePenaltyAt} onChange={(e) => patch({ strikePenaltyAt: Number(e.target.value) || 2 })} />
         </label>
         <label className="flex flex-col gap-1">
-          <span className="text-sm font-bold">Round lock at strike #</span>
+          <span className="text-sm font-bold">{H.lockAt}</span>
           <input type="number" min={1} max={10} className="field !py-1.5" value={cfg.strikeLockAt} onChange={(e) => patch({ strikeLockAt: Number(e.target.value) || 3 })} />
         </label>
-        <Hand className="text-sm sm:col-span-2">A strike = leaving the game for over 1.5s during a round, or internet detected (once per round).</Hand>
+        <Hand className="text-sm sm:col-span-2">{H.strikeHelp}</Hand>
       </div>
     </section>
   );
@@ -463,12 +459,12 @@ function Settings({ host }: { host: HostState }) {
 function Danger() {
   return (
     <section className="flex flex-wrap items-center gap-2 rounded-lg border-2 border-dashed border-stamp p-3">
-      <span className="mr-auto font-black text-stamp">Danger zone</span>
-      <Btn size="sm" tone="paper" onClick={() => confirm("Reset all scores but keep players joined?") && act(EV.hostReset, { keepPlayers: true })}>
-        Reset scores
+      <span className="mr-auto font-black text-stamp">{H.danger}</span>
+      <Btn size="sm" tone="paper" onClick={() => confirm(H.confirmResetScores) && act(EV.hostReset, { keepPlayers: true })}>
+        {H.resetScores}
       </Btn>
-      <Btn size="sm" tone="coral" onClick={() => confirm("Start a brand new event? Everyone must join again.") && act(EV.hostReset, { keepPlayers: false })}>
-        New event
+      <Btn size="sm" tone="coral" onClick={() => confirm(H.confirmNewEvent) && act(EV.hostReset, { keepPlayers: false })}>
+        {H.newEvent}
       </Btn>
     </section>
   );
@@ -484,8 +480,8 @@ function Players({ players }: { players: HostPlayer[] }) {
   }, [players, q]);
   return (
     <div className="flex flex-col gap-2">
-      <input className="field !py-2" placeholder="Search name / dept…" value={q} onChange={(e) => setQ(e.target.value)} />
-      {shown.length === 0 && <Hand className="py-6 text-center text-lg">Nobody here yet.</Hand>}
+      <input className="field !py-2" placeholder={H.search} value={q} onChange={(e) => setQ(e.target.value)} />
+      {shown.length === 0 && <Hand className="py-6 text-center text-lg">{H.nobody}</Hand>}
       {shown.map((p) => (
         <div
           key={p.id}
@@ -507,25 +503,25 @@ function Players({ players }: { players: HostPlayer[] }) {
               {p.rtt != null && ` · ${p.rtt}ms`}
             </div>
           </div>
-          {p.internet && <span className="chip !bg-coral text-xs">internet!</span>}
-          {p.strikes > 0 && <span className="chip !border-stamp text-xs !text-stamp">{p.strikes} strike{p.strikes > 1 ? "s" : ""}</span>}
+          {p.internet && <span className="chip !bg-coral text-xs">{H.internetChip}</span>}
+          {p.strikes > 0 && <span className="chip !border-stamp text-xs !text-stamp">{H.strikes(p.strikes)}</span>}
           {p.roundStatus !== "idle" && <span className="chip text-xs">{p.roundStatus}</span>}
           <span className="w-14 text-right font-black tabular-nums">{p.score}</span>
           <div className="flex gap-1">
-            <button type="button" className="chip !px-1.5 text-xs" onClick={() => act(EV.hostAdjust, { id: p.id, delta: 100 })}>
-              +100
+            <button type="button" className="chip !px-1.5 text-xs" onClick={() => act(EV.hostAdjust, { id: p.id, delta: H.adjustStep })}>
+              +{H.adjustStep}
             </button>
-            <button type="button" className="chip !px-1.5 text-xs" onClick={() => act(EV.hostAdjust, { id: p.id, delta: -100 })}>
-              −100
+            <button type="button" className="chip !px-1.5 text-xs" onClick={() => act(EV.hostAdjust, { id: p.id, delta: -H.adjustStep })}>
+              −{H.adjustStep}
             </button>
             {(p.strikes > 0 || p.internet || p.kicked || p.roundStatus === "locked") && (
               <button type="button" className="chip !bg-mint !px-1.5 text-xs" onClick={() => act(EV.hostUnblock, { id: p.id })}>
-                unblock
+                {H.unblock}
               </button>
             )}
             {!p.kicked && (
-              <button type="button" className="chip !px-1.5 text-xs !text-stamp" onClick={() => confirm(`Remove ${p.name}?`) && act(EV.hostKick, { id: p.id })}>
-                kick
+              <button type="button" className="chip !px-1.5 text-xs !text-stamp" onClick={() => confirm(H.confirmKick(p.name)) && act(EV.hostKick, { id: p.id })}>
+                {H.kick}
               </button>
             )}
           </div>
@@ -540,7 +536,7 @@ function Flags({ host }: { host: HostState }) {
     return (
       <div className="flex flex-col items-center gap-2 py-8">
         <Mascot mood="happy" size={70} />
-        <Hand className="text-xl">Clean game so far. Suspicious.</Hand>
+        <Hand className="text-xl">{H.noFlags}</Hand>
       </div>
     );
   }
@@ -554,7 +550,7 @@ function Flags({ host }: { host: HostState }) {
           <span className="flex-1 text-ink-soft">{f.detail}</span>
           <span className={cx("chip text-xs", f.action === "lock" && "!bg-stamp !text-paper")}>{f.action}</span>
           <button type="button" className="chip !bg-mint !px-1.5 text-xs" onClick={() => act(EV.hostUnblock, { id: f.playerId })}>
-            unblock
+            {H.unblock}
           </button>
         </div>
       ))}
@@ -570,18 +566,15 @@ function Network({ host }: { host: HostState }) {
         <div className="slip flex items-center gap-3 !bg-coral px-4 py-3">
           <Mascot mood="shock" size={50} bob={false} />
           <div>
-            <div className="text-lg font-black">This laptop has internet</div>
-            <div className="text-sm font-semibold">
-              If students are on this network they could reach AI tools. Use the laptop&apos;s own hotspot (sharing a loopback adapter) or turn off the
-              hotspot phone&apos;s mobile data.
-            </div>
+            <div className="text-lg font-black">{H.laptopHasInternet}</div>
+            <div className="text-sm font-semibold">{H.laptopHasInternetBody}</div>
           </div>
         </div>
       )}
-      {network.internet === false && <div className="chip self-start !bg-mint">No internet on the arena laptop</div>}
+      {network.internet === false && <div className="chip self-start !bg-mint">{H.laptopOffline}</div>}
 
       <div className="grid gap-3 sm:grid-cols-2">
-        {network.interfaces.length === 0 && <Hand className="text-lg">No network yet. Turn on the hotspot.</Hand>}
+        {network.interfaces.length === 0 && <Hand className="text-lg">{H.noNetwork}</Hand>}
         {network.interfaces.map((i) => (
           <div key={i.url} className="slip flex flex-col items-center gap-2 p-3 text-center">
             <span className="chip !bg-yellow">{i.label}</span>
@@ -592,23 +585,22 @@ function Network({ host }: { host: HostState }) {
       </div>
 
       <div>
-        <h3 className="mb-1 font-black">Players per source IP</h3>
-        <Hand className="block text-sm">Players behind one repeater phone share its IP. Phones usually cope with 8–15 each.</Hand>
+        <h3 className="mb-1 font-black">{H.perIp}</h3>
+        <Hand className="block text-sm">{H.perIpHint}</Hand>
         <div className="mt-2 flex flex-wrap gap-2">
           {network.groups.map((g) => (
-            <span key={g.ip} className={cx("chip", g.count > 12 && "!bg-coral")}>
+            <span key={g.ip} className={cx("chip", g.count > H.perIpWarnAt && "!bg-coral")}>
               {g.ip} · {g.count}
             </span>
           ))}
         </div>
       </div>
       <details className="rounded-lg border-2 border-ink bg-card p-3 text-sm">
-        <summary className="cursor-pointer font-black">Hotspot cheat-sheet</summary>
+        <summary className="cursor-pointer font-black">{H.cheatSheet}</summary>
         <ul className="mt-2 list-disc space-y-1 pl-5">
-          <li>Windows: run <code>setup-hotspot.ps1</code> once as admin (raises the client limit to 128), then <code>start-arena.bat</code>.</li>
-          <li>The laptop hotspot is always <code>192.168.137.1</code>, so print the QR before the event.</li>
-          <li>Overflow: a phone with &quot;Wi-Fi sharing&quot; joins the laptop hotspot and re-shares it. Same URL works.</li>
-          <li>Any phone hotspot used must have mobile data OFF.</li>
+          {H.cheatSheetTips.map((tip) => (
+            <li key={tip}>{tip}</li>
+          ))}
         </ul>
       </details>
     </div>
@@ -623,10 +615,10 @@ function Board() {
       <Feed items={feed} max={6} />
       <div className="flex gap-2">
         <button type="button" className={cx("chip", t === "p" && "!bg-ink !text-paper")} onClick={() => setT("p")}>
-          Players
+          {H.boardPlayers}
         </button>
         <button type="button" className={cx("chip", t === "d" && "!bg-ink !text-paper")} onClick={() => setT("d")}>
-          Dept wars
+          {H.boardDepts}
         </button>
       </div>
       {lb && (t === "p" ? <Leaderboard entries={lb.entries} showStatus /> : <DeptBoard depts={lb.depts} />)}

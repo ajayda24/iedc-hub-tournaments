@@ -19,6 +19,9 @@ import { Reveal } from "@/ui/Reveal";
 import { setSound, sfx, soundOn } from "@/ui/sfx";
 import { TimerBar } from "@/ui/Timer";
 import { JoinForm } from "./JoinForm";
+import { DIFFICULTY_LABEL } from "@iedc/data/games";
+import { common } from "@iedc/data/copy/common";
+import { play as t } from "@iedc/data/copy/play";
 
 export function PlayApp() {
   const { conn, helloDone, state, me, kicked, bumped } = useArena();
@@ -27,19 +30,19 @@ export function PlayApp() {
     connectArena({ role: "player" });
   }, []);
 
-  if (bumped) return <Note mood="sleep" title="This tab is asleep" body={bumped} />;
+  if (bumped) return <Note mood="sleep" title={t.bumpedTitle} body={bumped} />;
   if (kicked)
     return (
-      <Note mood="dizzy" title="You're out of this one" body={kicked}>
-        <Btn onClick={() => reconnectArena({ role: "player" })}>Try joining again</Btn>
+      <Note mood="dizzy" title={t.kickedTitle} body={kicked}>
+        <Btn onClick={() => reconnectArena({ role: "player" })}>{t.tryAgain}</Btn>
       </Note>
     );
   if (!helloDone || !state) {
     return (
       <Note
         mood="sleep"
-        title={conn === "offline" ? "Can't reach the arena" : "Finding the arena…"}
-        body={conn === "offline" ? "Make sure you're on the event Wi-Fi (the host's hotspot), then hang on — we retry automatically." : "Waking up the host laptop."}
+        title={conn === "offline" ? t.offlineTitle : t.connectingTitle}
+        body={conn === "offline" ? t.offlineBody : t.connectingBody}
       />
     );
   }
@@ -98,9 +101,9 @@ function TopBar({ me, conn }: { me: MeState; conn: string }) {
             setS(!sound);
           }}
           className="chip !px-2 text-xs"
-          aria-label="toggle sound"
+          aria-label={common.toggleSound}
         >
-          {sound ? "sound on" : "muted"}
+          {sound ? common.soundOn : common.muted}
         </button>
         <div className="text-right leading-tight">
           <div key={bump} className={cx("text-xl font-black tabular-nums", bump > 0 && "animate-pop")}>
@@ -126,22 +129,22 @@ function Lobby({ state, me }: { state: PublicState; me: MeState }) {
         <Mascot mood="idle" size={84} />
         <div>
           <h1 className="text-3xl font-black leading-tight">
-            You&apos;re in, <span className="hl">{firstName(me.name)}</span>!
+            {t.youreIn} <span className="hl">{firstName(me.name)}</span>!
           </h1>
-          <Hand className="text-lg">Host is cooking. Don&apos;t touch anything.</Hand>
+          <Hand className="text-lg">{t.hostCooking}</Hand>
         </div>
       </section>
 
       <div className="grid grid-cols-2 gap-3">
         <Slip className="px-3 py-2" tilt={-1}>
           <div className="text-3xl font-black tabular-nums">{state.playerCount}</div>
-          <div className="text-sm font-semibold text-pencil">players joined</div>
+          <div className="text-sm font-semibold text-pencil">{t.playersJoined}</div>
         </Slip>
         <Slip className="px-3 py-2" tilt={1}>
           <div className="text-3xl font-black tabular-nums">
             {state.roundsPlayed}/{state.roundsTotal}
           </div>
-          <div className="text-sm font-semibold text-pencil">rounds played</div>
+          <div className="text-sm font-semibold text-pencil">{t.roundsPlayed}</div>
         </Slip>
       </div>
 
@@ -149,7 +152,7 @@ function Lobby({ state, me }: { state: PublicState; me: MeState }) {
 
       {feed.length > 0 && (
         <section>
-          <h2 className="mb-2 font-black">Live gossip</h2>
+          <h2 className="mb-2 font-black">{t.liveGossip}</h2>
           <Feed items={feed} max={4} />
         </section>
       )}
@@ -170,10 +173,10 @@ function NextUp({ cfg }: { cfg: NonNullable<PublicState["nextRound"]> }) {
   const g = GAME_META[cfg.game];
   return (
     <Slip taped className="px-4 pb-4 pt-5" tilt={-0.8} style={{ background: COLOR[g.color] }}>
-      <Hand className="text-lg">next up</Hand>
+      <Hand className="text-lg">{t.nextUp}</Hand>
       <div className="text-2xl font-black">{g.title}</div>
       <div className="text-sm font-bold uppercase tracking-wide">
-        {cfg.difficulty === "med" ? "medium" : cfg.difficulty} · {Math.round(cfg.timeLimitSec / 6) / 10} min
+        {DIFFICULTY_LABEL[cfg.difficulty]} · {common.minutes(Math.round(cfg.timeLimitSec / 6) / 10)}
       </div>
       <p className="mt-2 text-sm font-medium">{g.howTo}</p>
     </Slip>
@@ -181,7 +184,7 @@ function NextUp({ cfg }: { cfg: NonNullable<PublicState["nextRound"]> }) {
 }
 
 function Tabs({ tab, setTab, withRound }: { tab: string; setTab: (t: any) => void; withRound?: boolean }) {
-  const tabs = [...(withRound ? [["round", "This round"]] : []), ["players", "Leaderboard"], ["depts", "Dept wars"]];
+  const tabs = [...(withRound ? [["round", common.tabs.round]] : []), ["players", common.tabs.players], ["depts", common.tabs.depts]];
   return (
     <div className="flex gap-2">
       {tabs.map(([k, label]) => (
@@ -208,9 +211,7 @@ function Countdown({ state }: { state: PublicState }) {
   }, [left]);
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-5 text-center">
-      <Hand className="text-xl">
-        round {round.index + 1} of {round.total}
-      </Hand>
+      <Hand className="text-xl">{t.roundOf(round.index + 1, round.total)}</Hand>
       <h1 className="text-4xl font-black">
         <span className="hl" style={{ ["--hl" as string]: COLOR[g.color] }}>
           {g.title}
@@ -218,14 +219,14 @@ function Countdown({ state }: { state: PublicState }) {
       </h1>
       <p className="max-w-xs font-semibold">{g.howTo}</p>
       <div key={left} className="stamp !text-7xl !text-ink" style={{ borderColor: "var(--color-ink)" }}>
-        {left > 0 ? left : "GO"}
+        {left > 0 ? left : t.go}
       </div>
       <Btn
         size="sm"
         tone="paper"
         onClick={() => document.documentElement.requestFullscreen?.().catch(() => {})}
       >
-        Go fullscreen (fewer accidents)
+        {t.fullscreen}
       </Btn>
     </div>
   );
@@ -264,7 +265,7 @@ function Playing({ state, me, frozen }: { state: PublicState; me: MeState; froze
       <div className="flex items-center justify-between gap-2">
         <div className="min-w-0">
           <Hand className="text-base">
-            R{round.index + 1} · {round.config.difficulty === "med" ? "medium" : round.config.difficulty}
+            R{round.index + 1} · {DIFFICULTY_LABEL[round.config.difficulty]}
           </Hand>
           <h1 className="truncate text-xl font-black leading-tight">{g.title}</h1>
         </div>
@@ -273,17 +274,18 @@ function Playing({ state, me, frozen }: { state: PublicState; me: MeState; froze
       <TimerBar endsAt={round.endsAt} total={round.config.timeLimitSec * 1000} now={now} paused={paused} />
       <div className="flex items-center justify-between text-sm font-bold">
         <span>
-          You #{me.rank}
+          {t.you} #{me.rank}
           {me.delta !== 0 && <span className={me.delta > 0 ? "text-ok" : "text-stamp"}> {me.delta > 0 ? `▲${me.delta}` : `▼${-me.delta}`}</span>}
         </span>
         <span className="text-pencil">
-          {round.solvedCount}/{round.activeCount} solved
+          {t.solvedCount(round.solvedCount, round.activeCount)}
         </span>
       </div>
 
       {paused != null && (
         <Slip className="py-3 text-center !bg-yellow">
-          <b>Paused by the host.</b> Hands off — the clock is frozen.
+          <b>{t.pausedBold}</b>
+          {t.pausedRest}
         </Slip>
       )}
 
@@ -297,7 +299,7 @@ function Playing({ state, me, frozen }: { state: PublicState; me: MeState; froze
 
       {status !== "playing" && lb && (
         <section className="mt-2">
-          <h2 className="mb-2 font-black">Live top 10</h2>
+          <h2 className="mb-2 font-black">{t.liveTop}</h2>
           <Leaderboard entries={lb.entries} meId={me.id} me={me} showStatus />
         </section>
       )}
@@ -307,11 +309,11 @@ function Playing({ state, me, frozen }: { state: PublicState; me: MeState; froze
 
 function DoneCard({ status, points, stamp }: { status: string; points: number; stamp: boolean }) {
   const map: Record<string, { mood: "happy" | "dizzy" | "sleep" | "shock"; title: string; body: string }> = {
-    solved: { mood: "happy", title: "SOLVED", body: "Sit back and watch the others sweat." },
-    failed: { mood: "dizzy", title: "Out of tries", body: "Partial credit is on its way." },
-    locked: { mood: "shock", title: "Locked", body: "Too many strikes this round. Talk to the host." },
-    out: { mood: "sleep", title: "Spectating", body: "Knocked out — but you can still cheer." },
-    timeout: { mood: "sleep", title: "Time!", body: "" },
+    solved: { mood: "happy", ...t.done.solved },
+    failed: { mood: "dizzy", ...t.done.failed },
+    locked: { mood: "shock", ...t.done.locked },
+    out: { mood: "sleep", ...t.done.out },
+    timeout: { mood: "sleep", ...t.done.timeout },
   };
   const m = map[status] ?? map.timeout;
   return (
@@ -340,20 +342,20 @@ function Results({ state, me }: { state: PublicState; me: MeState }) {
       <section className="flex items-center gap-3 pt-1">
         <Mascot mood={status === "solved" ? "happy" : "dizzy"} size={70} />
         <div>
-          <Hand className="text-lg">round {round.index + 1} · {g.title}</Hand>
+          <Hand className="text-lg">{t.resultsRound(round.index + 1, g.title)}</Hand>
           <h1 className="text-3xl font-black leading-tight">
-            {status === "solved" ? "Nailed it." : myPoints > 0 ? "Some points!" : "Oof."}{" "}
+            {status === "solved" ? t.resultSolved : myPoints > 0 ? t.resultSome : t.resultNone}{" "}
             <span className="hl">+{myPoints}</span>
           </h1>
           <div className="text-sm font-bold text-pencil">
-            now {ordinal(me.rank)} of {me.of}
-            {me.delta !== 0 && <span className={me.delta > 0 ? "text-ok" : "text-stamp"}> ({me.delta > 0 ? `up ${me.delta}` : `down ${-me.delta}`})</span>}
+            {t.nowRank(ordinal(me.rank), me.of)}
+            {me.delta !== 0 && <span className={me.delta > 0 ? "text-ok" : "text-stamp"}> ({me.delta > 0 ? t.up(me.delta) : t.down(-me.delta)})</span>}
           </div>
         </div>
       </section>
 
       {me.eliminated && state.format === "knockout" && (
-        <Slip className="py-2 text-center !bg-coral font-bold">You&apos;ve been knocked out. Stick around for the finale!</Slip>
+        <Slip className="py-2 text-center !bg-coral font-bold">{t.knockedOut}</Slip>
       )}
 
       <Tabs tab={tab} setTab={setTab} withRound />
@@ -362,7 +364,7 @@ function Results({ state, me }: { state: PublicState; me: MeState }) {
         <div className="flex flex-col gap-4">
           {round.reveal && (
             <Slip taped className="flex flex-col items-center gap-3 px-3 pb-4 pt-6" tilt={0.6}>
-              <Hand className="text-lg">the answer was</Hand>
+              <Hand className="text-lg">{common.answerWas}</Hand>
               <Reveal reveal={round.reveal} />
             </Slip>
           )}
@@ -399,13 +401,13 @@ function Final({ me }: { me: MeState }) {
     <div className="flex flex-col gap-6 pt-2">
       <Confetti pieces={50} />
       <h1 className="text-center text-4xl font-black">
-        <span className="hl">That&apos;s a wrap!</span>
+        <span className="hl">{t.wrap}</span>
       </h1>
       <Podium entries={entries} />
       <Slip taped className="px-4 pb-4 pt-6 text-center" tilt={-1}>
-        <Hand className="text-lg">you finished</Hand>
+        <Hand className="text-lg">{t.youFinished}</Hand>
         <div className="text-5xl font-black">{ordinal(me.rank)}</div>
-        <div className="font-bold">{me.score} points</div>
+        <div className="font-bold">{t.points(me.score)}</div>
         {title && <div className="stamp mt-3 text-xl">{title}</div>}
       </Slip>
       <Leaderboard entries={entries} meId={me.id} me={me} />

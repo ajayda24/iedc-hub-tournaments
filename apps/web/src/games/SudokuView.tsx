@@ -5,6 +5,7 @@ import { conflicts } from "@iedc/shared/games/sudoku/grid";
 import { cx } from "@/lib/format";
 import { sfx } from "@/ui/sfx";
 import type { ViewProps } from "./types";
+import { gameText as G } from "@iedc/data/copy/games";
 
 export default function SudokuView({ pub, progress, done, frozen, submit }: ViewProps<SudokuPub, SudokuProgress>) {
   const { size, boxR, boxC, givens } = pub;
@@ -36,10 +37,10 @@ export default function SudokuView({ pub, progress, done, frozen, submit }: View
         const res = await submit({ grid: g, final: true });
         if (res.status === "wrong") {
           setShake((n) => n + 1);
-          setMsg(res.message ?? "Not quite.");
+          setMsg(res.message ?? G.sudoku.notQuite);
         } else if (!res.ok && res.error) setMsg(res.error);
       } catch {
-        setMsg("Lost the arena for a sec — try again.");
+        setMsg(G.lostConnection);
         lastFinal.current = "";
       }
     },
@@ -147,7 +148,7 @@ export default function SudokuView({ pub, progress, done, frozen, submit }: View
                 borderRight: c < size - 1 ? `${(c + 1) % boxC === 0 ? 2.5 : 1}px solid ${(c + 1) % boxC === 0 ? "#1d1b16" : "#1d1b1633"}` : undefined,
                 borderBottom: r < size - 1 ? `${(r + 1) % boxR === 0 ? 2.5 : 1}px solid ${(r + 1) % boxR === 0 ? "#1d1b16" : "#1d1b1633"}` : undefined,
               }}
-              aria-label={`row ${r + 1} column ${c + 1}${v ? ` is ${v}` : " empty"}`}
+              aria-label={G.sudoku.cellLabel(r + 1, c + 1, v)}
             >
               {v > 0 ? (
                 v
@@ -183,7 +184,7 @@ export default function SudokuView({ pub, progress, done, frozen, submit }: View
       </div>
       <div className="flex w-full gap-2">
         <button type="button" disabled={locked} onClick={() => place(0)} className="sticker flex-1 !bg-card">
-          Erase
+          {G.sudoku.eraseButton}
         </button>
         <button
           type="button"
@@ -193,10 +194,10 @@ export default function SudokuView({ pub, progress, done, frozen, submit }: View
           data-pressed={noteMode}
           style={{ background: noteMode ? "var(--color-yellow)" : "var(--color-card)" }}
         >
-          {noteMode ? "Pencil ✓" : "Pencil"}
+          {noteMode ? G.sudoku.pencilOnButton : G.sudoku.pencilButton}
         </button>
         <button type="button" disabled={locked || !history.length} onClick={undo} className="sticker flex-1 !bg-card">
-          Undo
+          {G.sudoku.undoButton}
         </button>
       </div>
     </div>

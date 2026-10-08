@@ -14,6 +14,9 @@ import { Mascot } from "@/ui/Mascot";
 import { Reveal } from "@/ui/Reveal";
 import { sfx } from "@/ui/sfx";
 import { TimerBar } from "@/ui/Timer";
+import { DIFFICULTY_LABEL } from "@iedc/data/games";
+import { errors } from "@iedc/data/copy/errors";
+import { practice as P } from "@iedc/data/copy/practice";
 
 interface Session {
   game: GameId;
@@ -70,13 +73,13 @@ export function PracticeApp() {
     <main className="mx-auto flex max-w-2xl flex-col gap-6 px-4 pb-12 pt-6">
       <header className="flex items-center gap-3">
         <Link href="/" className="chip">
-          ← home
+          {P.home}
         </Link>
         <h1 className="text-3xl font-black">
-          <span className="hl">Practice room</span>
+          <span className="hl">{P.title}</span>
         </h1>
       </header>
-      <Hand className="-mt-3 text-lg">No pressure, no leaderboard. Just you vs. the clock (and your personal best).</Hand>
+      <Hand className="-mt-3 text-lg">{P.intro}</Hand>
       <div className="grid gap-4 sm:grid-cols-2">
         {GAME_ORDER.map((g, i) => {
           const m = GAME_META[g];
@@ -102,15 +105,15 @@ export function PracticeApp() {
           <div className="flex gap-2">
             {DIFF.map((d) => (
               <button key={d} type="button" className={cx("chip !px-3 !py-1.5", difficulty === d && "!bg-ink !text-paper")} onClick={() => setDifficulty(d)}>
-                {d === "med" ? "medium" : d}
+                {DIFFICULTY_LABEL[d]}
               </button>
             ))}
             <span className="ml-auto self-center text-sm font-bold text-pencil">
-              best: {store.get<number | null>(bestKey(game, difficulty), null) ?? "–"}
+              {P.best(store.get<number | null>(bestKey(game, difficulty), null) ?? "–")}
             </span>
           </div>
           <Btn size="lg" tone="mint" onClick={start} disabled={loading}>
-            {loading ? "Shuffling…" : "Start warm-up"}
+            {loading ? P.starting : P.start}
           </Btn>
         </Slip>
       )}
@@ -166,9 +169,9 @@ function PracticeRound({
   const submit = useCallback(
     async (sub: unknown): Promise<SubmitAck> => {
       const s = ref.current;
-      if (s.result) return { ok: false, error: "Round over." };
+      if (s.result) return { ok: false, error: P.roundOver };
       const parsed = s.def.subSchema.safeParse(sub);
-      if (!parsed.success) return { ok: false, error: "Bad move." };
+      if (!parsed.success) return { ok: false, error: errors.badMove };
       const res = s.def.check(s.pub, s.secret, s.progress, parsed.data);
       const next = { ...s, progress: res.progress, wrong: s.wrong + (res.penalty ? 1 : 0) };
       ref.current = next;
@@ -186,32 +189,32 @@ function PracticeRound({
     <main className="mx-auto flex max-w-xl flex-col gap-3 px-4 pb-12 pt-4">
       <div className="flex items-center gap-2">
         <button type="button" className="chip" onClick={onExit}>
-          ← games
+          {P.backToGames}
         </button>
         <h1 className="mr-auto text-xl font-black">
           <span className="hl" style={{ ["--hl" as string]: COLOR[meta.color] }}>
             {meta.title}
           </span>
         </h1>
-        <span className="chip">{session.difficulty === "med" ? "medium" : session.difficulty}</span>
+        <span className="chip">{DIFFICULTY_LABEL[session.difficulty]}</span>
       </div>
       {!r && <TimerBar endsAt={session.startedAt + session.limitMs} total={session.limitMs} now={now} />}
       {r ? (
         <Slip taped className="mt-3 flex flex-col items-center gap-3 px-4 pb-5 pt-7 text-center" tilt={-0.8}>
           {r.status === "solved" && <Confetti />}
           <Mascot mood={r.status === "solved" ? "happy" : "dizzy"} size={84} />
-          <div className={r.status === "solved" ? "stamp text-4xl" : "text-3xl font-black"}>{r.status === "solved" ? "Solved" : "Time!"}</div>
+          <div className={r.status === "solved" ? "stamp text-4xl" : "text-3xl font-black"}>{r.status === "solved" ? P.solved : P.timesUp}</div>
           <div className="text-2xl font-black">
-            {r.points} pts <span className="text-base font-bold text-pencil">in {fmtSecs(r.ms)}</span>
+            {P.points(r.points)} <span className="text-base font-bold text-pencil">{P.inTime(fmtSecs(r.ms))}</span>
           </div>
-          <Hand className="text-lg">the answer</Hand>
+          <Hand className="text-lg">{P.theAnswer}</Hand>
           <Reveal reveal={r.reveal} />
           <div className="mt-2 flex gap-2">
             <Btn tone="paper" onClick={onExit}>
-              Other games
+              {P.otherGames}
             </Btn>
             <Btn tone="mint" onClick={onAgain}>
-              Again!
+              {P.again}
             </Btn>
           </div>
         </Slip>

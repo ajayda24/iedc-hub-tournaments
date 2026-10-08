@@ -17,7 +17,7 @@ const nextConfig: NextConfig = {
   output: "export",
   trailingSlash: true,
   images: { unoptimized: true },
-  transpilePackages: ["@iedc/shared"],
+  transpilePackages: ["@iedc/shared", "@iedc/data"],
   reactStrictMode: true,
   poweredByHeader: false,
 };

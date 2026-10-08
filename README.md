@@ -66,6 +66,12 @@ The host taps **Start** and every connected phone gets the same puzzle at the sa
 
 ---
 
+## Changing text and settings
+
+All wording (titles, descriptions, buttons, funny messages), the department list, scoring numbers, timings and word lists live in **[`data/`](data/README.md)**. Edit a file there and every screen updates. No app code to touch. `data/README.md` has a "change X → edit file Y" table.
+
+---
+
 ## Running an event
 
 👉 **Read [docs/EVENT_DAY.md](docs/EVENT_DAY.md)**. It's the checklist for hosts.
@@ -115,7 +121,8 @@ Measured locally with `pnpm bots --n 80` over four rounds:
 ### Layout
 
 ```
-packages/shared   protocol types, zod schemas, seeded RNG, scoring, the 4 game engines (+ tests), word content
+data              ALL text, labels, constants and word lists (edit here)
+packages/shared   protocol types, zod schemas, seeded RNG, scoring, the 4 game engines (+ tests)
 apps/arena        Fastify + Socket.IO server: Arena state machine, anti-cheat, persistence, network info
 apps/web          Next.js (App Router, static export) + Serwist PWA: /play /host /screen /practice
 scripts           precompress, pack-arena, Windows hotspot scripts
@@ -138,7 +145,7 @@ docs              EVENT_DAY.md, screenshots
   - Add metadata to `games/meta.ts`.
   - Add a view in `apps/web/src/games/`.
   - Register it in the two registries.
-- **Content.** Word lists come from the MIT [`word-list`](https://github.com/sindresorhus/word-list) package. Edit the curated answers and anagram packs in `packages/shared/scripts/build-content.mjs`, then run `pnpm --filter @iedc/shared content:build`.
+- **Content.** All text and constants live in `data/` (see above). Word lists come from the MIT [`word-list`](https://github.com/sindresorhus/word-list) package. Edit `data/words/wordhunt-answers.txt` or `data/words/anagram-packs.source.json`, then run `pnpm content:build`.
 
 ---
 

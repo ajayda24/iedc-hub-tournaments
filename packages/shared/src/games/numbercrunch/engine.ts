@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createRng } from "../../rng";
 import { GAME_META } from "../meta";
 import type { Difficulty, GameDefinition } from "../types";
+import { gameText } from "@iedc/data/copy/games";
 
 export interface CrunchPub {
   numbers: number[];
@@ -94,10 +95,10 @@ export class ExprError extends Error {}
 
 export function evaluateExpression(src: string, allowed: number[]): number {
   const text = src.replace(/×/g, "*").replace(/÷/g, "/").replace(/\s+/g, "");
-  if (!text) throw new ExprError("Build something first.");
-  if (text.length > 120) throw new ExprError("Too long.");
+  if (!text) throw new ExprError(gameText.numbercrunch.buildSomething);
+  if (text.length > 120) throw new ExprError(gameText.numbercrunch.tooLong);
   const tokens = text.match(/\d+|[+\-*/()]/g) ?? [];
-  if (tokens.join("") !== text) throw new ExprError("Only numbers and + − × ÷.");
+  if (tokens.join("") !== text) throw new ExprError(gameText.numbercrunch.onlyNumbersAndOps);
   let pos = 0;
   const used: number[] = [];
   const peek = () => tokens[pos];
@@ -107,17 +108,17 @@ export function evaluateExpression(src: string, allowed: number[]): number {
     else if (op === "-") r = a - b;
     else if (op === "*") r = a * b;
     else {
-      if (b === 0 || a % b !== 0) throw new ExprError("Division must come out whole.");
+      if (b === 0 || a % b !== 0) throw new ExprError(gameText.numbercrunch.divisionWhole);
       r = a / b;
     }
-    if (r <= 0) throw new ExprError("No negatives or zero along the way.");
+    if (r <= 0) throw new ExprError(gameText.numbercrunch.noNegatives);
     return r;
   };
   const factor = (): number => {
     const t = tokens[pos++];
     if (t === "(") {
       const v = expr();
-      if (tokens[pos++] !== ")") throw new ExprError("Missing a bracket.");
+      if (tokens[pos++] !== ")") throw new ExprError(gameText.numbercrunch.missingBracket);
       return v;
     }
     if (t && /^\d+$/.test(t)) {
@@ -125,7 +126,7 @@ export function evaluateExpression(src: string, allowed: number[]): number {
       used.push(n);
       return n;
     }
-    throw new ExprError("That expression is broken.");
+    throw new ExprError(gameText.numbercrunch.broken);
   };
   const term = (): number => {
     let v = factor();
@@ -144,11 +145,11 @@ export function evaluateExpression(src: string, allowed: number[]): number {
     return v;
   };
   const value = expr();
-  if (pos !== tokens.length) throw new ExprError("That expression is broken.");
+  if (pos !== tokens.length) throw new ExprError(gameText.numbercrunch.broken);
   const pool = allowed.slice();
   for (const n of used) {
     const at = pool.indexOf(n);
-    if (at === -1) throw new ExprError(`You don't have a spare ${n}.`);
+    if (at === -1) throw new ExprError(gameText.numbercrunch.noSpare(n));
     pool.splice(at, 1);
   }
   return value;
@@ -194,7 +195,7 @@ export const numbercrunch: GameDefinition<CrunchPub, CrunchSecret, CrunchSub, Cr
     try {
       value = evaluateExpression(sub.expr, pub.numbers);
     } catch (e) {
-      return { status: "invalid", progress, message: e instanceof ExprError ? e.message : "Broken expression." };
+      return { status: "invalid", progress, message: e instanceof ExprError ? e.message : gameText.numbercrunch.broken };
     }
     const distance = Math.abs(value - pub.target);
     const prevBest = progress.best ? Math.abs(progress.best.value - pub.target) : Infinity;
@@ -207,7 +208,7 @@ export const numbercrunch: GameDefinition<CrunchPub, CrunchSecret, CrunchSub, Cr
       status: "wrong",
       progress: next,
       feedback: { value, distance },
-      message: distance <= 5 ? `So close — ${distance} away.` : `${value}. Off by ${distance}.`,
+      message: distance <= 5 ? gameText.numbercrunch.soClose(distance) : gameText.numbercrunch.offBy(value, distance),
     };
   },
   partialCredit(pub, _secret, progress) {

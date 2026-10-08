@@ -2,7 +2,8 @@ import { z } from "zod";
 import { createRng, type Rng } from "../../rng";
 import { GAME_META } from "../meta";
 import type { Difficulty, GameDefinition } from "../types";
-import packsJson from "../../../content/anagram-packs.json";
+import packsJson from "@iedc/data/words/generated/anagram-packs.json";
+import { gameText } from "@iedc/data/copy/games";
 
 export interface AnagramPack {
   id: string;
@@ -51,13 +52,13 @@ export function pickPack(options?: { pack?: string; customWords?: string[] }): A
   const custom = (options?.customWords ?? [])
     .map((w) => w.trim().toLowerCase())
     .filter((w) => /^[a-z]{3,10}$/.test(w));
-  if (custom.length >= 3) return { id: "custom", title: "Host's Special", words: [...new Set(custom)], alts: {} };
+  if (custom.length >= 3) return { id: "custom", title: gameText.anagram.customPackTitle, words: [...new Set(custom)], alts: {} };
   const found = ANAGRAM_PACKS.find((p) => p.id === options?.pack);
   if (found) return found;
   // "mixed": everything, titled accordingly
   return {
     id: "mixed",
-    title: "Mixed Bag",
+    title: gameText.anagram.mixedPackTitle,
     words: ANAGRAM_PACKS.flatMap((p) => p.words),
     alts: Object.assign({}, ...ANAGRAM_PACKS.map((p) => p.alts)),
   };
@@ -80,8 +81,8 @@ export const anagram: GameDefinition<AnagramPub, AnagramSecret, AnagramSub, Anag
   initialProgress: (pub) => ({ answers: pub.scrambles.map(() => null) }),
   check(pub, secret, progress, sub) {
     const i = sub.index;
-    if (i >= pub.scrambles.length) return { status: "invalid", progress, message: "No such word." };
-    if (progress.answers[i]) return { status: "invalid", progress, message: "Already solved." };
+    if (i >= pub.scrambles.length) return { status: "invalid", progress, message: gameText.anagram.noSuchWord };
+    if (progress.answers[i]) return { status: "invalid", progress, message: gameText.anagram.alreadySolved };
     const answer = sub.answer.trim().toLowerCase();
     if (!secret.accepted[i].includes(answer)) {
       const sameLetters = [...answer].sort().join("") === [...secret.words[i]].sort().join("");
@@ -89,7 +90,7 @@ export const anagram: GameDefinition<AnagramPub, AnagramSecret, AnagramSub, Anag
         status: "wrong",
         progress,
         feedback: { index: i, correct: false },
-        message: sameLetters ? "Right letters, wrong word." : "Nope.",
+        message: sameLetters ? gameText.anagram.rightLettersWrongWord : gameText.anagram.nope,
       };
     }
     const answers = progress.answers.slice();

@@ -1,17 +1,18 @@
 import type { MetadataRoute } from "next";
+import { site } from "@iedc/data/site";
 
 export const dynamic = "force-static";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Brain Arena · IEDC",
-    short_name: "Brain Arena",
-    description: "Live logic-game tournaments for IEDC events.",
+    name: site.defaultTitle,
+    short_name: site.shortName,
+    description: site.manifestDescription,
     start_url: "/",
     display: "standalone",
     orientation: "portrait",
-    background_color: "#fffbf2",
-    theme_color: "#fffbf2",
+    background_color: site.themeColor,
+    theme_color: site.themeColor,
     categories: ["games", "education"],
     icons: [
       { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },

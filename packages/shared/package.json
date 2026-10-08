@@ -16,7 +16,8 @@
     "content:build": "node scripts/build-content.mjs"
   },
   "dependencies": {
-    "zod": "^4.3.5"
+    "zod": "^4.3.5",
+    "@iedc/data": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.9.3",

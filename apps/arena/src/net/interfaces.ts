@@ -1,13 +1,11 @@
 import os from "node:os";
 import QRCode from "qrcode";
 import type { NetIface } from "@iedc/shared";
+import { NETWORK_LABELS } from "@iedc/data/network";
 
 /** Friendly names for the subnets hotspots hand out. */
 function labelFor(address: string, name: string): string {
-  if (address.startsWith("192.168.137.")) return "Laptop hotspot";
-  if (address.startsWith("192.168.43.")) return "Android hotspot";
-  if (address.startsWith("172.20.10.")) return "iPhone hotspot";
-  return name;
+  return NETWORK_LABELS.find((n) => address.startsWith(n.prefix))?.label ?? name;
 }
 
 const qrCache = new Map<string, string>();
@@ -30,6 +28,7 @@ export async function listInterfaces(port: number): Promise<NetIface[]> {
       out.push({ name, label: labelFor(a.address, name), address: a.address, url, qrSvg: await qrSvg(url) });
     }
   }
-  const score = (i: NetIface) => (i.address.startsWith("192.168.137.") ? 0 : i.label.includes("hotspot") ? 1 : 2);
+  const known = (i: NetIface) => NETWORK_LABELS.findIndex((n) => i.address.startsWith(n.prefix));
+  const score = (i: NetIface) => (known(i) === -1 ? NETWORK_LABELS.length : known(i));
   return out.sort((a, b) => score(a) - score(b));
 }

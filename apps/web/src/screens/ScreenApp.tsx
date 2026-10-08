@@ -15,6 +15,9 @@ import { Podium } from "@/ui/Podium";
 import { Reveal } from "@/ui/Reveal";
 import { setSound, sfx, soundOn } from "@/ui/sfx";
 import { TimerBar } from "@/ui/Timer";
+import { DIFFICULTY_LABEL } from "@iedc/data/games";
+import { common } from "@iedc/data/copy/common";
+import { screen as S } from "@iedc/data/copy/screen";
 
 /** The projector view. Big type, no controls, everything readable from the back row. */
 export function ScreenApp() {
@@ -30,7 +33,7 @@ export function ScreenApp() {
       <main className="grid min-h-dvh place-items-center">
         <div className="flex flex-col items-center gap-3">
           <Mascot mood="sleep" size={140} />
-          <Hand className="text-3xl">waiting for the arena…</Hand>
+          <Hand className="text-3xl">{S.waiting}</Hand>
         </div>
       </main>
     );
@@ -41,7 +44,7 @@ export function ScreenApp() {
         <h1 className="mr-auto text-3xl font-black">
           <span className="hl">{state.eventName}</span>
         </h1>
-        <span className="chip text-base">{state.playerCount} players</span>
+        <span className="chip text-base">{S.players(state.playerCount)}</span>
         <ConnDot conn={conn} />
         <button
           type="button"
@@ -52,7 +55,7 @@ export function ScreenApp() {
             if (!sound) sfx.pop();
           }}
         >
-          {sound ? "sound on" : "sound off"}
+          {sound ? common.soundOn : common.soundOff}
         </button>
       </header>
       <div className="flex flex-1 flex-col">
@@ -73,14 +76,14 @@ function LobbyScreen({ state }: { state: PublicState }) {
     <div className="grid flex-1 grid-cols-[auto_1fr] gap-12">
       <div className="flex flex-col items-center gap-4">
         <Slip taped className="flex flex-col items-center gap-3 px-8 pb-6 pt-8" tilt={-1.5}>
-          <Hand className="text-3xl">scan to join</Hand>
+          <Hand className="text-3xl">{S.scanToJoin}</Hand>
           {main ? (
             <div className="w-[min(34vw,420px)]" dangerouslySetInnerHTML={{ __html: main.qrSvg }} />
           ) : (
-            <div className="grid h-80 w-80 place-items-center text-center font-bold">Turn on the hotspot…</div>
+            <div className="grid h-80 w-80 place-items-center text-center font-bold">{S.hotspotOff}</div>
           )}
           {main && <code className="text-2xl font-black">{main.url.replace("http://", "").replace(/\/play\/$/, "")}</code>}
-          {main && <span className="chip !bg-yellow text-base">via {main.label}</span>}
+          {main && <span className="chip !bg-yellow text-base">{S.via(main.label)}</span>}
         </Slip>
         {others.length > 0 && (
           <div className="flex gap-4">
@@ -98,7 +101,7 @@ function LobbyScreen({ state }: { state: PublicState }) {
           <Mascot mood="happy" size={150} />
           <div>
             <div className="text-[7rem] font-black leading-none tabular-nums">{state.playerCount}</div>
-            <Hand className="text-3xl">brains in the room</Hand>
+            <Hand className="text-3xl">{S.brainsInRoom}</Hand>
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -112,7 +115,7 @@ function LobbyScreen({ state }: { state: PublicState }) {
         </div>
         {state.nextRound && (
           <div className="text-2xl font-bold">
-            First up:{" "}
+            {S.firstUp}{" "}
             <span className="hl" style={{ ["--hl" as string]: COLOR[GAME_META[state.nextRound.game].color] }}>
               {GAME_META[state.nextRound.game].title}
             </span>
@@ -137,9 +140,7 @@ function CountdownScreen({ state }: { state: PublicState }) {
   }, [left]);
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-6 text-center">
-      <Hand className="text-4xl">
-        round {round.index + 1} of {round.total}
-      </Hand>
+      <Hand className="text-4xl">{S.roundOf(round.index + 1, round.total)}</Hand>
       <h2 className="text-8xl font-black">
         <span className="hl" style={{ ["--hl" as string]: COLOR[g.color] }}>
           {g.title}
@@ -147,7 +148,7 @@ function CountdownScreen({ state }: { state: PublicState }) {
       </h2>
       <p className="max-w-3xl text-3xl font-semibold">{g.howTo}</p>
       <div key={left} className="stamp !text-[10rem] !leading-none !text-ink" style={{ borderColor: "var(--color-ink)" }}>
-        {left > 0 ? left : "GO"}
+        {left > 0 ? left : S.go}
       </div>
     </div>
   );
@@ -169,7 +170,7 @@ function PlayingScreen({ state }: { state: PublicState }) {
       <div className="flex items-center gap-6">
         <div>
           <Hand className="text-2xl">
-            round {round.index + 1} · {round.config.difficulty === "med" ? "medium" : round.config.difficulty}
+            {S.roundLabel(round.index + 1, DIFFICULTY_LABEL[round.config.difficulty])}
           </Hand>
           <h2 className="text-5xl font-black">
             <span className="hl" style={{ ["--hl" as string]: COLOR[g.color] }}>
@@ -183,7 +184,7 @@ function PlayingScreen({ state }: { state: PublicState }) {
       </div>
       <div className="grid flex-1 grid-cols-[1.4fr_1fr] gap-10">
         <section>
-          <h3 className="mb-3 text-2xl font-black">Live top 10</h3>
+          <h3 className="mb-3 text-2xl font-black">{S.liveTop}</h3>
           <Leaderboard entries={lb?.entries ?? []} big showStatus max={10} />
         </section>
         <section className="flex flex-col gap-6">
@@ -191,13 +192,13 @@ function PlayingScreen({ state }: { state: PublicState }) {
             <Mascot mood={round.pausedRemainingMs != null ? "sleep" : left < 10_000 ? "sweat" : "think"} size={110} />
             <div>
               <div className="text-8xl font-black leading-none tabular-nums">{round.solvedCount}</div>
-              <div className="text-2xl font-bold text-pencil">of {round.activeCount} solved</div>
+              <div className="text-2xl font-bold text-pencil">{S.ofSolved(round.activeCount)}</div>
             </div>
           </Slip>
-          {round.pausedRemainingMs != null && <div className="stamp self-center text-5xl">paused</div>}
+          {round.pausedRemainingMs != null && <div className="stamp self-center text-5xl">{S.paused}</div>}
           {round.firstSolver && (
             <div className="text-2xl">
-              <Hand className="text-3xl">first blood</Hand> <b>{round.firstSolver}</b>
+              <Hand className="text-3xl">{S.firstBlood}</Hand> <b>{round.firstSolver}</b>
             </div>
           )}
           <Feed items={feed} max={6} big />
@@ -214,25 +215,25 @@ function ResultsScreen({ state }: { state: PublicState }) {
   const [view, setView] = useState<"round" | "overall" | "depts">("round");
   // rotate panels so the room sees everything without anyone touching the laptop
   useEffect(() => {
-    const t = setInterval(() => setView((v) => (v === "round" ? "overall" : v === "overall" ? "depts" : "round")), 9000);
+    const t = setInterval(() => setView((v) => (v === "round" ? "overall" : v === "overall" ? "depts" : "round")), S.rotateEverySec * 1000);
     return () => clearInterval(t);
   }, []);
   return (
     <div className="flex flex-1 flex-col gap-6">
       <div className="flex items-center gap-4">
         <h2 className="mr-auto text-5xl font-black">
-          Round {round.index + 1} done · <span className="hl" style={{ ["--hl" as string]: COLOR[g.color] }}>{g.title}</span>
+          {S.roundDone(round.index + 1)}<span className="hl" style={{ ["--hl" as string]: COLOR[g.color] }}>{g.title}</span>
         </h2>
         {(["round", "overall", "depts"] as const).map((v) => (
           <button key={v} type="button" className={cx("chip text-base", view === v && "!bg-ink !text-paper")} onClick={() => setView(v)}>
-            {v === "round" ? "this round" : v === "overall" ? "overall" : "dept wars"}
+            {S.views[v]}
           </button>
         ))}
       </div>
       {view === "round" && (
         <div className="grid flex-1 grid-cols-[1fr_1.2fr] gap-10">
           <Slip taped className="flex flex-col items-center justify-center gap-4 p-8" tilt={-1}>
-            <Hand className="text-3xl">the answer was</Hand>
+            <Hand className="text-3xl">{common.answerWas}</Hand>
             {round.reveal && <Reveal reveal={round.reveal} big />}
           </Slip>
           <div className="flex flex-col gap-2">
@@ -252,7 +253,7 @@ function ResultsScreen({ state }: { state: PublicState }) {
       {view === "depts" && <DeptBoard depts={lb?.depts ?? []} big />}
       {state.nextRound && (
         <div className="text-2xl font-bold">
-          Next up: <span className="hl">{GAME_META[state.nextRound.game].title}</span>
+          {S.nextUp} <span className="hl">{GAME_META[state.nextRound.game].title}</span>
         </div>
       )}
     </div>
@@ -267,12 +268,12 @@ function PodiumScreen() {
       <Confetti pieces={70} />
       <div className="flex flex-col items-center gap-4">
         <h2 className="text-7xl font-black">
-          <span className="hl">Champions</span>
+          <span className="hl">{S.champions}</span>
         </h2>
         <Podium entries={lb?.entries ?? []} big />
       </div>
       <div>
-        <h3 className="mb-4 text-3xl font-black">Dept wars</h3>
+        <h3 className="mb-4 text-3xl font-black">{S.deptWars}</h3>
         <DeptBoard depts={(lb?.depts ?? []).slice(0, 8)} big />
       </div>
     </div>

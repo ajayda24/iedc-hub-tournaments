@@ -4,6 +4,7 @@ import type { Tile, WordHuntProgress, WordHuntPub } from "@iedc/shared/games/wor
 import { cx } from "@/lib/format";
 import { sfx } from "@/ui/sfx";
 import type { ViewProps } from "./types";
+import { gameText as G } from "@iedc/data/copy/games";
 
 const ROWS = ["qwertyuiop", "asdfghjkl", "zxcvbnm"];
 const TILE_BG: Record<Tile, string> = { g: "var(--color-mint)", y: "var(--color-yellow)", x: "#d8d1c2" };
@@ -36,7 +37,7 @@ export default function WordHuntView({ pub, progress, done, frozen, submit }: Vi
     if (locked) return;
     if (typing.length !== pub.length) {
       setShake((n) => n + 1);
-      setMsg(`Needs ${pub.length} letters.`);
+      setMsg(G.wordhunt.needsLetters(pub.length));
       return;
     }
     setBusy(true);
@@ -46,18 +47,18 @@ export default function WordHuntView({ pub, progress, done, frozen, submit }: Vi
         const p = res.progress as WordHuntProgress;
         if (res.status === "invalid") {
           setShake((n) => n + 1);
-          setMsg(res.message ?? "Not a word.");
+          setMsg(res.message ?? G.wordhunt.notAWord);
         } else {
           setGuesses(p.guesses);
           setTyping("");
-          setMsg(res.status === "failed" ? "Out of guesses. Partial credit for your best row." : null);
+          setMsg(res.status === "failed" ? G.wordhunt.outOfGuesses : null);
         }
       } else {
         setShake((n) => n + 1);
-        setMsg(res.message ?? res.error ?? "Hmm.");
+        setMsg(res.message ?? res.error ?? G.wordhunt.hmm);
       }
     } catch {
-      setMsg("Lost the arena for a sec — try again.");
+      setMsg(G.lostConnection);
     } finally {
       setBusy(false);
     }
@@ -129,7 +130,7 @@ export default function WordHuntView({ pub, progress, done, frozen, submit }: Vi
           <div key={row} className="flex justify-center gap-1">
             {ri === 2 && (
               <button type="button" disabled={locked} onClick={() => press("enter")} className="sticker !rounded-lg !px-2 !py-3 text-xs !shadow-[2px_2px_0_0_var(--color-ink)]">
-                ENTER
+                {G.wordhunt.enterKey}
               </button>
             )}
             {[...row].map((k) => (
@@ -145,7 +146,7 @@ export default function WordHuntView({ pub, progress, done, frozen, submit }: Vi
               </button>
             ))}
             {ri === 2 && (
-              <button type="button" disabled={locked} onClick={() => press("back")} className="sticker !rounded-lg !bg-card !px-2 !py-3 text-xs !shadow-[2px_2px_0_0_var(--color-ink)]" aria-label="backspace">
+              <button type="button" disabled={locked} onClick={() => press("back")} className="sticker !rounded-lg !bg-card !px-2 !py-3 text-xs !shadow-[2px_2px_0_0_var(--color-ink)]" aria-label={G.wordhunt.backspaceLabel}>
                 ⌫
               </button>
             )}

@@ -4,6 +4,7 @@ import type { AnagramProgress, AnagramPub } from "@iedc/shared/games/anagram/eng
 import { cx } from "@/lib/format";
 import { sfx } from "@/ui/sfx";
 import type { ViewProps } from "./types";
+import { gameText as G } from "@iedc/data/copy/games";
 
 export default function AnagramView({ pub, progress, done, frozen, submit }: ViewProps<AnagramPub, AnagramProgress>) {
   const [answers, setAnswers] = useState<(string | null)[]>(progress?.answers ?? pub.scrambles.map(() => null));
@@ -53,11 +54,11 @@ export default function AnagramView({ pub, progress, done, frozen, submit }: Vie
           if (res.status !== "solved") setCur(nextOpen(cur, p.answers));
         } else {
           setShake((n) => n + 1);
-          setMsg(res.message ?? res.error ?? "Nope.");
+          setMsg(res.message ?? res.error ?? G.anagram.nope);
           setTimeout(() => setPicked([]), 450);
         }
       } catch {
-        setMsg("Lost the arena for a sec — try again.");
+        setMsg(G.lostConnection);
       } finally {
         setBusy(false);
       }
@@ -123,7 +124,7 @@ export default function AnagramView({ pub, progress, done, frozen, submit }: Vie
       </div>
 
       {allDone ? (
-        <p className="hand py-6 text-2xl">All unscrambled. Show-off.</p>
+        <p className="hand py-6 text-2xl">{G.anagram.allDone}</p>
       ) : (
         <>
           {/* answer slots */}
@@ -132,7 +133,7 @@ export default function AnagramView({ pub, progress, done, frozen, submit }: Vie
             onClick={unpick}
             key={shake}
             className={cx("flex min-h-[4rem] flex-wrap justify-center gap-1.5", shake > 0 && "animate-wiggle")}
-            aria-label="remove last letter"
+            aria-label={G.anagram.removeLetterLabel}
           >
             {letters.map((_, i) => (
               <span
@@ -170,10 +171,10 @@ export default function AnagramView({ pub, progress, done, frozen, submit }: Vie
 
           <div className="flex w-full gap-2">
             <button type="button" disabled={locked || !picked.length} onClick={() => setPicked([])} className="sticker flex-1 !bg-card">
-              Clear
+              {G.anagram.clearButton}
             </button>
             <button type="button" disabled={locked || solvedCount >= answers.length - 1} onClick={() => go(nextOpen(cur))} className="sticker flex-1 !bg-card">
-              Skip →
+              {G.anagram.skipButton}
             </button>
           </div>
         </>

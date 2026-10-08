@@ -2,8 +2,9 @@ import { z } from "zod";
 import { createRng } from "../../rng";
 import { GAME_META } from "../meta";
 import type { GameDefinition } from "../types";
-import answersJson from "../../../content/wordhunt-answers.json";
-import words5Json from "../../../content/words5.json";
+import answersJson from "@iedc/data/words/generated/wordhunt-answers.json";
+import words5Json from "@iedc/data/words/generated/words5.json";
+import { gameText } from "@iedc/data/copy/games";
 
 /** g = right spot, y = in the word, x = nope */
 export type Tile = "g" | "y" | "x";
@@ -67,11 +68,11 @@ export const wordhunt: GameDefinition<WordHuntPub, WordHuntSecret, WordHuntSub, 
     const guess = sub.guess.trim().toLowerCase();
     if (progress.guesses.length >= pub.maxGuesses) return { status: "failed", progress };
     if (!/^[a-z]+$/.test(guess) || guess.length !== pub.length) {
-      return { status: "invalid", progress, message: `Needs ${pub.length} letters.` };
+      return { status: "invalid", progress, message: gameText.wordhunt.needsLetters(pub.length) };
     }
-    if (!isValidGuess(guess)) return { status: "invalid", progress, message: "Not in our dictionary. Nice try." };
+    if (!isValidGuess(guess)) return { status: "invalid", progress, message: gameText.wordhunt.notAWord };
     if (progress.guesses.some((g) => g.word === guess)) {
-      return { status: "invalid", progress, message: "You already tried that one." };
+      return { status: "invalid", progress, message: gameText.wordhunt.alreadyTried };
     }
     const tiles = scoreGuess(guess, secret.word);
     const next = { guesses: [...progress.guesses, { word: guess, tiles }] };

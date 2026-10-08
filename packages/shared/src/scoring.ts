@@ -1,16 +1,9 @@
+import { DIFFICULTY_MULTIPLIER, SCORING } from "@iedc/data/rules";
 import type { Difficulty } from "./games/types";
 
-export const DIFF_MULT: Record<Difficulty, number> = { easy: 1, med: 1.5, hard: 2 };
-
-export const SCORING = {
-  base: 1000,
-  speedMax: 500,
-  firstBlood: 100,
-  wrongPenalty: 25,
-  partialMax: 300,
-  strikePenalty: 200,
-  minSolve: 100,
-} as const;
+/** Edit the numbers in data/rules.ts */
+export const DIFF_MULT: Record<Difficulty, number> = DIFFICULTY_MULTIPLIER;
+export { SCORING };
 
 export interface SolveInput {
   difficulty: Difficulty;

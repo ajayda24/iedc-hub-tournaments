@@ -1,8 +1,10 @@
+import { LAPTOP_PROBE_URLS } from "@iedc/data/network";
+
 /**
  * Does this laptop reach the internet? If it does, the hotspot is probably
  * sharing mobile data and students could reach AI tools through it.
  */
-const PROBES = ["http://connectivitycheck.gstatic.com/generate_204", "http://www.msftconnecttest.com/connecttest.txt", "https://1.1.1.1/cdn-cgi/trace"];
+const PROBES = LAPTOP_PROBE_URLS;
 
 export async function hasInternet(timeoutMs = 2500): Promise<boolean> {
   const tries = PROBES.map(async (url) => {

@@ -2,20 +2,19 @@
 import { useEffect, useRef, useState } from "react";
 import { EV, type CheatAction, type CheatKind } from "@iedc/shared/protocol";
 import { emit, emitAck } from "@/net/arena";
+import { PHONE_PROBE_URLS } from "@iedc/data/network";
+import { ANTICHEAT } from "@iedc/data/rules";
+import { anticheat as A } from "@iedc/data/copy/anticheat";
 
 /**
- * Public endpoints that answer instantly when a device has internet. On the
- * event Wi-Fi (no internet) every probe fails; a success means mobile data,
- * a VPN or a second network is on — exactly what someone asking an AI needs.
+ * Public endpoints that answer instantly when a device has internet (see data/network.ts).
+ * On the event Wi-Fi every probe fails; a success means mobile data, a VPN or a
+ * second network is on — exactly what someone asking an AI needs.
  */
-const PROBE_URLS = [
-  "https://www.gstatic.com/generate_204",
-  "https://cp.cloudflare.com/generate_204",
-  "https://www.google.com/favicon.ico",
-];
-const PROBE_EVERY_MS = 8000;
-const PROBE_TIMEOUT_MS = 2500;
-const FOCUS_GRACE_MS = 1500;
+const PROBE_URLS = PHONE_PROBE_URLS;
+const PROBE_EVERY_MS = ANTICHEAT.probeEveryMs;
+const PROBE_TIMEOUT_MS = ANTICHEAT.probeTimeoutMs;
+const FOCUS_GRACE_MS = ANTICHEAT.focusGraceMs;
 
 export function probeInternet(timeoutMs = PROBE_TIMEOUT_MS): Promise<boolean> {
   return new Promise((resolve) => {
@@ -80,7 +79,7 @@ export function useAntiCheat({ probe, watchFocus }: { probe: boolean; watchFocus
       if (online) {
         misses.current = 0;
         // report every time while it lasts: the server strikes once per round
-        void report("internet", { detail: "Device reached the internet (mobile data / VPN?)" });
+        void report("internet", { detail: A.flagInternet });
         if (!internetRef.current) {
           internetRef.current = true;
           setInternet(true);
@@ -90,7 +89,7 @@ export function useAntiCheat({ probe, watchFocus }: { probe: boolean; watchFocus
         setInternet(false);
         emit(EV.cheatClear);
       }
-      timer = setTimeout(run, internetRef.current ? 4000 : PROBE_EVERY_MS);
+      timer = setTimeout(run, internetRef.current ? ANTICHEAT.probeWhileOnlineMs : PROBE_EVERY_MS);
     };
     void run();
     const kick = () => {
@@ -122,8 +121,8 @@ export function useAntiCheat({ probe, watchFocus }: { probe: boolean; watchFocus
       awayAt = null;
       if (ms >= FOCUS_GRACE_MS) void report("focus", { ms, detail: why });
     };
-    const onVis = () => (document.hidden ? away("switched app or tab") : back());
-    const onBlur = () => away("left the window");
+    const onVis = () => (document.hidden ? away(A.leftApp) : back());
+    const onBlur = () => away(A.leftWindow);
     document.addEventListener("visibilitychange", onVis);
     window.addEventListener("blur", onBlur);
     window.addEventListener("focus", back);

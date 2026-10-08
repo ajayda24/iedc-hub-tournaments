@@ -3,17 +3,18 @@ import type { LbEntry } from "@iedc/shared/protocol";
 import { Avatar } from "./Avatar";
 import { Mascot } from "./Mascot";
 import { cx } from "@/lib/format";
+import { podiumTitles } from "@iedc/data/copy/podium";
 
 /** Funny titles handed out on the podium. Deterministic per player. */
 export function titleFor(e: LbEntry, index: number, total: number): string {
-  if (index === 0) return "Certified Big Brain";
-  if (index === 1) return "So Close It Hurts";
-  if (index === 2) return "Bronze, Baby";
-  if (e.streak >= 3) return "Streak Machine";
-  if (index === total - 1 && total > 3) return "Participation Legend";
-  if (e.solves === 0) return "Vibes Only";
-  if (index < total / 3) return "Low-key Genius";
-  return "Brain Warming Up";
+  if (index === 0) return podiumTitles.first;
+  if (index === 1) return podiumTitles.second;
+  if (index === 2) return podiumTitles.third;
+  if (e.streak >= 3) return podiumTitles.streak;
+  if (index === total - 1 && total > 3) return podiumTitles.last;
+  if (e.solves === 0) return podiumTitles.noSolves;
+  if (index < total / 3) return podiumTitles.topThird;
+  return podiumTitles.rest;
 }
 
 export function Podium({ entries, big }: { entries: LbEntry[]; big?: boolean }) {

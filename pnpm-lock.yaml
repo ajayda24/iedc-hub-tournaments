@@ -20,6 +20,9 @@ importers:
       '@fastify/static':
         specifier: ^10.1.5
         version: 10.1.5
+      '@iedc/data':
+        specifier: workspace:*
+        version: link:../../data
       '@iedc/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -60,6 +63,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@iedc/data':
+        specifier: workspace:*
+        version: link:../../data
       '@iedc/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -110,8 +116,17 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
+  data:
+    devDependencies:
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
   packages/shared:
     dependencies:
+      '@iedc/data':
+        specifier: workspace:*
+        version: link:../../data
       zod:
         specifier: ^4.3.5
         version: 4.6.5

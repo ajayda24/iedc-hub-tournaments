@@ -15,6 +15,7 @@ import {
   type Role,
 } from "@iedc/shared";
 import type { Arena, ArenaOutput } from "./arena";
+import { errors } from "@iedc/data/copy/errors";
 
 interface SocketData {
   role?: Role;
@@ -66,7 +67,7 @@ export function createRealtime(http: HttpServer, opts: RealtimeOptions) {
     if (previousSocket && previousSocket !== socket.id) {
       const old = io.sockets.sockets.get(previousSocket);
       if (old) {
-        old.emit(EV.bumped, { reason: "You opened the game somewhere else. This tab is now asleep." });
+        old.emit(EV.bumped, { reason: errors.openedElsewhere });
         old.data.playerId = undefined;
         old.disconnect(true);
       }
@@ -91,10 +92,10 @@ export function createRealtime(http: HttpServer, opts: RealtimeOptions) {
       socket.on(EV.hello, (raw: unknown, ack: unknown) => {
         const reply = safeAck(ack);
         const parsed = helloSchema.safeParse(raw);
-        if (!parsed.success) return reply({ ok: false, error: "Bad hello", serverNow: Date.now() } satisfies HelloAck);
+        if (!parsed.success) return reply({ ok: false, error: errors.badHello, serverNow: Date.now() } satisfies HelloAck);
         const { role, token, pin } = parsed.data;
         if (role === "host") {
-          if (pin !== opts.pin) return reply({ ok: false, error: "Wrong PIN", serverNow: Date.now() } satisfies HelloAck);
+          if (pin !== opts.pin) return reply({ ok: false, error: errors.wrongPin, serverNow: Date.now() } satisfies HelloAck);
           socket.data.role = "host";
           socket.join("hosts");
           sendSnapshot(socket);
@@ -106,7 +107,7 @@ export function createRealtime(http: HttpServer, opts: RealtimeOptions) {
         sendSnapshot(socket);
         if (role === "player" && token) {
           const { player, previousSocket } = arena.attach(token, socket.id, ip);
-          if (player?.kicked) return reply({ ok: false, error: "The host removed you from this event.", serverNow: Date.now() });
+          if (player?.kicked) return reply({ ok: false, error: errors.removedByHost, serverNow: Date.now() });
           if (player) {
             bindPlayer(socket, player.id, previousSocket);
             return reply({ ok: true, serverNow: Date.now(), me: arena.meState(player) } satisfies HelloAck);
@@ -125,7 +126,7 @@ export function createRealtime(http: HttpServer, opts: RealtimeOptions) {
       socket.on(EV.join, (raw: unknown, ack: unknown) => {
         const reply = safeAck(ack);
         const parsed = joinSchema.safeParse(raw);
-        if (!parsed.success) return reply({ ok: false, error: "Fill in your name, semester and department." });
+        if (!parsed.success) return reply({ ok: false, error: errors.joinFormIncomplete });
         const res = arena.join(parsed.data, socket.id, ip);
         if (res.ok && res.me) bindPlayer(socket, res.me.id, res.previousSocket);
         reply({ ok: res.ok, error: res.error, me: res.me });
@@ -135,7 +136,7 @@ export function createRealtime(http: HttpServer, opts: RealtimeOptions) {
         const reply = safeAck(ack);
         const id = pid();
         const parsed = submitSchema.safeParse(raw);
-        if (!id || !parsed.success) return reply({ ok: false, error: "Join first." });
+        if (!id || !parsed.success) return reply({ ok: false, error: errors.joinFirst });
         reply(arena.submit(id, parsed.data.roundId, parsed.data.sub));
       });
 
@@ -162,7 +163,7 @@ export function createRealtime(http: HttpServer, opts: RealtimeOptions) {
       const hostOnly = (event: string, handler: (raw: unknown) => unknown) => {
         socket.on(event, (raw: unknown, ack: unknown) => {
           const reply = safeAck(ack);
-          if (!isHost()) return reply({ ok: false, error: "Host only." });
+          if (!isHost()) return reply({ ok: false, error: errors.hostOnly });
           try {
             reply(handler(raw) ?? { ok: true });
           } catch (e) {

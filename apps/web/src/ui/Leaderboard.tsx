@@ -4,6 +4,7 @@ import { cx } from "@/lib/format";
 import { Avatar } from "./Avatar";
 import { Hand } from "./kit";
 import { useFlip } from "./useFlip";
+import { common } from "@iedc/data/copy/common";
 
 const RANK_BG = ["var(--color-yellow)", "#e9e4d8", "#f3c9a2"];
 
@@ -18,9 +19,9 @@ function Delta({ d }: { d: number }) {
 }
 
 function StatusMark({ s }: { s: LbEntry["roundStatus"] }) {
-  if (s === "solved") return <span className="chip !border-ok !py-0 text-[0.7rem] !text-ok">solved</span>;
-  if (s === "locked") return <span className="chip !border-stamp !py-0 text-[0.7rem] !text-stamp">locked</span>;
-  if (s === "out") return <span className="chip !py-0 text-[0.7rem] text-pencil">out</span>;
+  if (s === "solved") return <span className="chip !border-ok !py-0 text-[0.7rem] !text-ok">{common.status.solved}</span>;
+  if (s === "locked") return <span className="chip !border-stamp !py-0 text-[0.7rem] !text-stamp">{common.status.locked}</span>;
+  if (s === "out") return <span className="chip !py-0 text-[0.7rem] text-pencil">{common.status.out}</span>;
   return null;
 }
 
@@ -44,7 +45,7 @@ export function Leaderboard({
   const ref = useFlip<HTMLDivElement>(shown.map((e) => e.id).join());
   return (
     <div ref={ref} className="flex flex-col gap-1.5">
-      {shown.length === 0 && <Hand className="py-6 text-center text-lg">Empty board. Someone score already.</Hand>}
+      {shown.length === 0 && <Hand className="py-6 text-center text-lg">{common.emptyBoard}</Hand>}
       {shown.map((e) => (
         <div
           key={e.id}
@@ -67,7 +68,7 @@ export function Leaderboard({
             <div className="truncate font-bold leading-tight">{e.name}</div>
             <div className={cx("text-pencil", big ? "text-sm" : "text-xs")}>
               {e.dept} · {e.sem}
-              {e.streak >= 3 && <span className="ml-1 font-bold text-coral">· {e.streak} streak</span>}
+              {e.streak >= 3 && <span className="ml-1 font-bold text-coral">· {common.streak(e.streak)}</span>}
             </div>
           </div>
           {showStatus && <StatusMark s={e.roundStatus} />}
@@ -96,7 +97,7 @@ export function DeptBoard({ depts, myDept, big }: { depts: DeptEntry[]; myDept?:
   const ref = useFlip<HTMLDivElement>(depts.map((d) => d.dept).join());
   return (
     <div ref={ref} className="flex flex-col gap-2">
-      {depts.length === 0 && <Hand className="py-6 text-center text-lg">No departments yet.</Hand>}
+      {depts.length === 0 && <Hand className="py-6 text-center text-lg">{common.noDepartments}</Hand>}
       {depts.map((d, i) => (
         <div key={d.dept} data-flip={d.dept} className={cx("flex items-center gap-3", big ? "text-xl" : "text-sm")}>
           <span className="w-6 text-right font-black">{i + 1}</span>
@@ -111,7 +112,7 @@ export function DeptBoard({ depts, myDept, big }: { depts: DeptEntry[]; myDept?:
           <span className="w-10 text-right text-pencil">×{d.players}</span>
         </div>
       ))}
-      <Hand className="text-sm">average score per player · ×players</Hand>
+      <Hand className="text-sm">{common.deptLegend}</Hand>
     </div>
   );
 }

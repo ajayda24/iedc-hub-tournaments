@@ -10,12 +10,13 @@ import { createRealtime } from "./realtime";
 import { listInterfaces } from "./net/interfaces";
 import { hasInternet } from "./net/internetCheck";
 import { Store } from "./persist/store";
+import { site } from "@iedc/data/site";
 
 const VERSION = "0.1.0";
 
 const { values: args } = parseArgs({
   options: {
-    port: { type: "string", default: process.env.ARENA_PORT ?? "4000" },
+    port: { type: "string", default: process.env.ARENA_PORT ?? String(site.defaultPort) },
     data: { type: "string", default: process.env.ARENA_DATA ?? "arena-data" },
     web: { type: "string", default: process.env.ARENA_WEB },
     pin: { type: "string", default: process.env.ARENA_PIN },
@@ -123,7 +124,7 @@ async function main() {
   function banner(web: string | null) {
     const line = "─".repeat(58);
     console.log(`\n  ${line}`);
-    console.log(`   BRAIN ARENA v${VERSION}  ·  IEDC Hub Tournaments`);
+    console.log(`   ${site.appName.toUpperCase()} v${VERSION}  ·  ${site.organiser}`);
     console.log(`  ${line}`);
     console.log(`   Host PIN      ${pin}`);
     console.log(`   Host console  http://localhost:${port}/host/`);

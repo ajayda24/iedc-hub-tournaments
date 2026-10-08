@@ -16,7 +16,8 @@
     "typecheck": "pnpm -r --if-present typecheck",
     "bots": "pnpm --filter @iedc/arena bots",
     "pack:arena": "node scripts/pack-arena.mjs",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "content:build": "pnpm --filter @iedc/shared content:build"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1",

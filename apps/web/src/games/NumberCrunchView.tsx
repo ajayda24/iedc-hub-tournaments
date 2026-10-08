@@ -4,6 +4,7 @@ import type { CrunchProgress, CrunchPub } from "@iedc/shared/games/numbercrunch/
 import { cx } from "@/lib/format";
 import { sfx } from "@/ui/sfx";
 import type { ViewProps } from "./types";
+import { gameText as G } from "@iedc/data/copy/games";
 
 type Op = "+" | "-" | "×" | "÷";
 interface NumTile {
@@ -24,11 +25,11 @@ function apply(a: number, op: Op, b: number): number | string {
     case "+":
       return a + b;
     case "-":
-      return a - b > 0 ? a - b : "No negatives or zero.";
+      return a - b > 0 ? a - b : G.numbercrunch.noNegatives;
     case "×":
       return a * b;
     case "÷":
-      return b !== 0 && a % b === 0 ? a / b : "Must divide evenly.";
+      return b !== 0 && a % b === 0 ? a / b : G.numbercrunch.divideEvenly;
   }
 }
 
@@ -58,11 +59,11 @@ export default function NumberCrunchView({ pub, progress, done, frozen, submit }
         if (p?.best) setBest(p.best);
         if (res.status === "solved") setMsg(null);
         else {
-          setMsg(res.message ?? res.error ?? "Hmm.");
+          setMsg(res.message ?? res.error ?? G.wordhunt.hmm);
           if (res.status === "invalid" || !res.ok) setShake((n) => n + 1);
         }
       } catch {
-        setMsg("Lost the arena for a sec — try again.");
+        setMsg(G.lostConnection);
       } finally {
         setBusy(false);
       }
@@ -123,7 +124,7 @@ export default function NumberCrunchView({ pub, progress, done, frozen, submit }
   return (
     <div className="no-copy mx-auto flex w-full max-w-md flex-col items-center gap-4">
       <div className="slip taped flex flex-col items-center px-8 pb-3 pt-4" style={{ background: "var(--color-sky)", transform: "rotate(-1.5deg)" }}>
-        <span className="hand text-lg">make this</span>
+        <span className="hand text-lg">{G.numbercrunch.makeThis}</span>
         <span className="text-6xl font-black tabular-nums">{pub.target}</span>
       </div>
 
@@ -163,7 +164,7 @@ export default function NumberCrunchView({ pub, progress, done, frozen, submit }
       </div>
 
       <p className="hand h-6 text-center text-lg">
-        {msg ? <span className="text-stamp">{msg}</span> : !first ? "tap a number" : !op ? "now an operation" : "now another number"}
+        {msg ? <span className="text-stamp">{msg}</span> : !first ? G.numbercrunch.tapNumber : !op ? G.numbercrunch.tapOperation : G.numbercrunch.tapAnother}
       </p>
 
       {steps.length > 0 && (
@@ -178,18 +179,18 @@ export default function NumberCrunchView({ pub, progress, done, frozen, submit }
 
       <div className="flex w-full gap-2">
         <button type="button" disabled={locked || !steps.length} onClick={undo} className="sticker flex-1 !bg-card">
-          Undo
+          {G.numbercrunch.undoButton}
         </button>
         <button type="button" disabled={locked} onClick={reset} className="sticker flex-1 !bg-card">
-          Reset
+          {G.numbercrunch.resetButton}
         </button>
         <button type="button" disabled={locked || !candidate} onClick={() => candidate && send(candidate)} className="sticker flex-[1.4]" style={{ background: "var(--color-mint)" }}>
-          Submit {candidate?.value ?? ""}
+          {G.numbercrunch.submitButton(candidate?.value ?? "")}
         </button>
       </div>
       {best && (
         <p className="text-sm text-pencil">
-          Closest so far: <b className="text-ink">{best.value}</b> ({Math.abs(best.value - pub.target)} away)
+          {G.numbercrunch.closest} <b className="text-ink">{best.value}</b> {G.numbercrunch.away(Math.abs(best.value - pub.target))}
         </p>
       )}
     </div>

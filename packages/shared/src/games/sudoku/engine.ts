@@ -3,6 +3,7 @@ import { createRng, type Rng } from "../../rng";
 import { GAME_META } from "../meta";
 import type { Difficulty, GameDefinition } from "../types";
 import { candidates, conflicts, peers } from "./grid";
+import { gameText } from "@iedc/data/copy/games";
 
 export { conflicts };
 
@@ -115,13 +116,13 @@ export const sudoku: GameDefinition<SudokuPub, SudokuSecret, SudokuSub, SudokuPr
   check(pub, secret, progress, sub) {
     const n = pub.size * pub.size;
     if (sub.grid.length !== n || sub.grid.some((v) => v > pub.size)) {
-      return { status: "invalid", progress, message: "That grid doesn't fit." };
+      return { status: "invalid", progress, message: gameText.sudoku.gridMismatch };
     }
     // givens are not editable, whatever the client says
     const grid = sub.grid.map((v, i) => (pub.givens[i] ? pub.givens[i] : v));
     const next = { grid };
     if (!sub.final) return { status: "progress", progress: next };
-    if (grid.some((v) => v === 0)) return { status: "invalid", progress: next, message: "Fill every cell first." };
+    if (grid.some((v) => v === 0)) return { status: "invalid", progress: next, message: gameText.sudoku.fillEveryCell };
     let wrong = 0;
     for (let i = 0; i < n; i++) if (grid[i] !== secret.solution[i]) wrong++;
     if (wrong === 0) return { status: "solved", progress: next };
@@ -130,7 +131,7 @@ export const sudoku: GameDefinition<SudokuPub, SudokuSecret, SudokuSub, SudokuPr
       progress: next,
       penalty: true,
       feedback: { wrongCount: wrong },
-      message: wrong === 1 ? "One cell is lying to you." : `${wrong} cells are wrong.`,
+      message: gameText.sudoku.wrongCells(wrong),
     };
   },
   partialCredit(pub, secret, progress) {

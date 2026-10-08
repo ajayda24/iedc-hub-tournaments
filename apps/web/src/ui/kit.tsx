@@ -1,6 +1,7 @@
 import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from "react";
 import type { GameColor } from "@iedc/shared/games/types";
 import { cx } from "@/lib/format";
+import { common } from "@iedc/data/copy/common";
 
 export const COLOR: Record<GameColor | "paper" | "ink", string> = {
   yellow: "var(--color-yellow)",
@@ -81,7 +82,7 @@ export function ConnDot({ conn }: { conn: string }) {
   return (
     <span className="inline-flex items-center gap-1.5 text-xs font-bold" title={conn}>
       <span className="inline-block h-2.5 w-2.5 rounded-full border-2 border-ink" style={{ background: color }} />
-      {conn === "online" ? "live" : conn === "connecting" ? "connecting…" : "offline"}
+      {conn === "online" ? common.connection.online : conn === "connecting" ? common.connection.connecting : common.connection.offline}
     </span>
   );
 }

@@ -30,6 +30,10 @@ import {
   type RoundStatus,
   type SubmitAck,
 } from "@iedc/shared";
+import { errors } from "@iedc/data/copy/errors";
+import { feed } from "@iedc/data/copy/feed";
+import { anticheat } from "@iedc/data/copy/anticheat";
+import { LIVE_LEADERBOARD_SIZE } from "@iedc/data/rules";
 
 /* ------------------------------------------------------------------ */
 /* Types                                                               */
@@ -113,7 +117,7 @@ export interface ArenaSnapshot {
   flags: CheatFlag[];
 }
 
-const LB_TOP_LIVE = 10;
+const LB_TOP_LIVE = LIVE_LEADERBOARD_SIZE;
 const SUBMIT_MIN_GAP_MS = 120;
 const END_GRACE_MS = 600;
 
@@ -170,12 +174,12 @@ export class Arena {
 
   join(payload: JoinPayload, socketId: string, ip: string): JoinAck & { previousSocket?: string | null } {
     const existing = this.byToken(payload.token);
-    if (existing?.kicked) return { ok: false, error: "The host removed you from this event." };
+    if (existing?.kicked) return { ok: false, error: errors.removedByHost };
     const name = payload.name.replace(/\s+/g, " ").trim();
     const clash = [...this.players.values()].find(
       (p) => !p.kicked && p.token !== payload.token && p.name.toLowerCase() === name.toLowerCase() && p.dept === payload.dept,
     );
-    if (clash) return { ok: false, error: "Someone with that exact name and department already joined. Add an initial?" };
+    if (clash) return { ok: false, error: errors.duplicateName };
 
     let previousSocket: string | null = null;
     let p = existing;
@@ -208,7 +212,7 @@ export class Arena {
         roundPoints: {},
       };
       this.players.set(p.id, p);
-      this.pushFeed("join", `${firstName(p.name)} (${p.dept}) joined the chaos`);
+      this.pushFeed("join", feed.joined(firstName(p.name), p.dept));
       this.out.log("join", { id: p.id, name: p.name, sem: p.sem, dept: p.dept, ip });
     }
     p.online = true;
@@ -245,11 +249,11 @@ export class Arena {
   /* ---------------- round lifecycle ---------------- */
 
   startRound(index?: number): { ok: boolean; error?: string } {
-    if (this.phase === "countdown" || this.phase === "playing") return { ok: false, error: "A round is already running." };
+    if (this.phase === "countdown" || this.phase === "playing") return { ok: false, error: errors.roundAlreadyRunning };
     const i = index ?? this.roundIndex + 1;
     const cfg = this.config.rounds[i];
-    if (!cfg) return { ok: false, error: "No round left in the playlist. Add one, or show the podium." };
-    if (this.activePlayers().length === 0) return { ok: false, error: "Nobody has joined yet." };
+    if (!cfg) return { ok: false, error: errors.playlistFinished };
+    if (this.activePlayers().length === 0) return { ok: false, error: errors.nobodyJoined };
 
     const game = getGame(cfg.game);
     const seed = randomSeed();
@@ -278,7 +282,7 @@ export class Arena {
     this.clearTimers();
     this.timers.push(setTimeout(() => this.beginPlaying(), COUNTDOWN_MS));
     this.out.log("round:start", { id: this.round.id, game: cfg.game, difficulty: cfg.difficulty, seed });
-    this.pushFeed("info", `Round ${i + 1}: ${game.title} — get ready!`);
+    this.pushFeed("info", feed.roundStarting(i + 1, game.title));
     this.touch({ state: true, host: true, allMe: true, lb: true });
     return { ok: true };
   }
@@ -297,17 +301,17 @@ export class Arena {
 
   pause(): { ok: boolean; error?: string } {
     const r = this.round;
-    if (!r || this.phase !== "playing" || r.pausedRemainingMs !== null) return { ok: false, error: "Nothing to pause." };
+    if (!r || this.phase !== "playing" || r.pausedRemainingMs !== null) return { ok: false, error: errors.nothingToPause };
     r.pausedRemainingMs = Math.max(0, r.endsAt - this.now());
     this.clearTimers();
-    this.pushFeed("info", "Host hit pause. Hands off the screen!");
+    this.pushFeed("info", feed.paused);
     this.touch({ state: true, host: true });
     return { ok: true };
   }
 
   resume(): { ok: boolean; error?: string } {
     const r = this.round;
-    if (!r || r.pausedRemainingMs === null) return { ok: false, error: "Not paused." };
+    if (!r || r.pausedRemainingMs === null) return { ok: false, error: errors.notPaused };
     r.endsAt = this.now() + r.pausedRemainingMs;
     r.pausedRemainingMs = null;
     this.scheduleEnd(r.endsAt - this.now());
@@ -317,7 +321,7 @@ export class Arena {
 
   endRound(): { ok: boolean; error?: string } {
     const r = this.round;
-    if (!r || (this.phase !== "playing" && this.phase !== "countdown")) return { ok: false, error: "No running round." };
+    if (!r || (this.phase !== "playing" && this.phase !== "countdown")) return { ok: false, error: errors.noRunningRound };
     this.clearTimers();
     const game = getGame(r.config.game);
     for (const p of this.activePlayers()) {
@@ -356,19 +360,19 @@ export class Arena {
     if (cut <= 0) return;
     const out = alive.slice(-cut);
     for (const p of out) p.eliminated = true;
-    this.pushFeed("out", `${cut} player${cut > 1 ? "s" : ""} knocked out. ${alive.length - cut} still standing.`);
+    this.pushFeed("out", feed.knockedOut(cut, alive.length - cut));
   }
 
   showPodium() {
     if (this.phase === "countdown" || this.phase === "playing") this.endRound();
     this.phase = "podium";
-    this.pushFeed("info", "And the winners are…");
+    this.pushFeed("info", feed.podium);
     this.touch({ state: true, host: true, allMe: true, lb: true });
     return { ok: true };
   }
 
   toLobby() {
-    if (this.phase === "countdown" || this.phase === "playing") return { ok: false, error: "End the round first." };
+    if (this.phase === "countdown" || this.phase === "playing") return { ok: false, error: errors.endRoundFirst };
     this.phase = "lobby";
     this.touch({ state: true, host: true, allMe: true, lb: true });
     return { ok: true };
@@ -388,7 +392,7 @@ export class Arena {
         Object.assign(p, { score: 0, solves: 0, streak: 0, totalSolveMs: 0, strikes: 0, eliminated: false, roundPoints: {} });
       }
     } else {
-      for (const p of this.players.values()) if (p.online) this.out.kicked(p.id, "The host started a fresh event. Join again!");
+      for (const p of this.players.values()) if (p.online) this.out.kicked(p.id, errors.freshEvent);
       this.players.clear();
     }
     this.out.log("reset", { keepPlayers });
@@ -401,24 +405,24 @@ export class Arena {
   submit(playerId: string, roundId: string, rawSub: unknown): SubmitAck {
     const p = this.players.get(playerId);
     const r = this.round;
-    if (!p || p.kicked) return { ok: false, error: "Not in this event." };
-    if (!r || r.id !== roundId) return { ok: false, error: "That round is over." };
-    if (this.phase !== "playing") return { ok: false, error: "Hold on — the round isn't live." };
-    if (r.pausedRemainingMs !== null) return { ok: false, error: "Paused." };
+    if (!p || p.kicked) return { ok: false, error: errors.notInEvent };
+    if (!r || r.id !== roundId) return { ok: false, error: errors.roundOver };
+    if (this.phase !== "playing") return { ok: false, error: errors.roundNotLive };
+    if (r.pausedRemainingMs !== null) return { ok: false, error: errors.paused };
     const now = this.now();
-    if (now > r.endsAt + END_GRACE_MS) return { ok: false, error: "Time's up!" };
-    if (p.eliminated) return { ok: false, error: "You're spectating this one." };
-    if (p.internet && this.config.blockInternet) return { ok: false, error: "Turn off mobile data to keep playing." };
+    if (now > r.endsAt + END_GRACE_MS) return { ok: false, error: errors.timesUp };
+    if (p.eliminated) return { ok: false, error: errors.spectating };
+    if (p.internet && this.config.blockInternet) return { ok: false, error: errors.internetOn };
 
     const game = getGame(r.config.game);
     const pr = (r.players[p.id] ??= this.freshPlayerRound(game.initialProgress(r.pub)));
-    if (pr.status === "locked") return { ok: false, error: "Locked for this round. Ask the host." };
-    if (pr.status !== "playing" && pr.status !== "idle") return { ok: false, error: "You're done with this one." };
-    if (now - pr.lastSubmitAt < SUBMIT_MIN_GAP_MS) return { ok: false, error: "Slow down, speedrunner." };
+    if (pr.status === "locked") return { ok: false, error: errors.lockedOut };
+    if (pr.status !== "playing" && pr.status !== "idle") return { ok: false, error: errors.alreadyDone };
+    if (now - pr.lastSubmitAt < SUBMIT_MIN_GAP_MS) return { ok: false, error: errors.tooFast };
     pr.lastSubmitAt = now;
 
     const parsed = game.subSchema.safeParse(rawSub);
-    if (!parsed.success) return { ok: false, error: "Bad move." };
+    if (!parsed.success) return { ok: false, error: errors.badMove };
     const res = game.check(r.pub, r.secret, pr.progress, parsed.data);
     pr.progress = res.progress;
     pr.status = "playing";
@@ -443,11 +447,11 @@ export class Arena {
       p.totalSolveMs += elapsed;
       if (first) {
         r.firstSolver = p.id;
-        this.pushFeed("firstblood", `First blood! ${firstName(p.name)} (${p.dept}) cracked it in ${fmtSecs(elapsed)}`);
+        this.pushFeed("firstblood", feed.firstBlood(firstName(p.name), p.dept, fmtSecs(elapsed)));
       } else {
-        this.pushFeed("solve", `${firstName(p.name)} solved it — ${fmtSecs(elapsed)}`);
+        this.pushFeed("solve", feed.solved(firstName(p.name), fmtSecs(elapsed)));
       }
-      if (p.streak === 3 || p.streak === 5) this.pushFeed("streak", `${firstName(p.name)} is on a ${p.streak}-round streak!`);
+      if ((feed.streakAt as readonly number[]).includes(p.streak)) this.pushFeed("streak", feed.streak(firstName(p.name), p.streak));
     } else if (res.status === "failed") {
       pr.status = "failed";
       pr.points = partialPoints(game.partialCredit(r.pub, r.secret, pr.progress), pr.wrong);
@@ -521,8 +525,8 @@ export class Arena {
   private addFlag(p: Player, c: CheatPayload, action: CheatAction) {
     const detail =
       c.kind === "internet"
-        ? c.detail ?? "Device reached the internet"
-        : `Left the game for ${fmtSecs(c.ms ?? 0)}${c.detail ? ` (${c.detail})` : ""}`;
+        ? c.detail ?? anticheat.flagInternet
+        : anticheat.flagLeft(fmtSecs(c.ms ?? 0), c.detail);
     this.flags.unshift({ at: this.now(), playerId: p.id, name: p.name, kind: c.kind, detail, action });
     if (this.flags.length > 300) this.flags.length = 300;
     this.out.log("cheat", { p: p.id, kind: c.kind, detail, action, strikes: p.strikes });
@@ -532,10 +536,10 @@ export class Arena {
 
   kick(id: string) {
     const p = this.players.get(id);
-    if (!p) return { ok: false, error: "No such player." };
+    if (!p) return { ok: false, error: errors.noSuchPlayer };
     p.kicked = true;
     p.online = false;
-    this.out.kicked(p.id, "The host removed you from this event.");
+    this.out.kicked(p.id, errors.removedByHost);
     p.socketId = null;
     this.touch({ host: true, state: true, lb: true });
     return { ok: true };
@@ -544,7 +548,7 @@ export class Arena {
   /** Clears strikes, the internet flag, a round lock and a kick. */
   unblock(id: string) {
     const p = this.players.get(id);
-    if (!p) return { ok: false, error: "No such player." };
+    if (!p) return { ok: false, error: errors.noSuchPlayer };
     p.strikes = 0;
     p.internet = false;
     p.kicked = false;
@@ -556,9 +560,9 @@ export class Arena {
 
   adjust(id: string, delta: number) {
     const p = this.players.get(id);
-    if (!p) return { ok: false, error: "No such player." };
+    if (!p) return { ok: false, error: errors.noSuchPlayer };
     p.score += delta;
-    this.pushFeed("info", `Host ${delta >= 0 ? "blessed" : "fined"} ${firstName(p.name)} ${delta >= 0 ? "+" : ""}${delta}`);
+    this.pushFeed("info", feed.hostAdjusted(firstName(p.name), delta));
     this.touch({ me: [id], host: true, lb: true });
     return { ok: true };
   }
