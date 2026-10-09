@@ -1,4 +1,192 @@
 {
-  "updatedAt": "2026-10-08T00:00:00.000Z",
-  "months": {}
+  "updatedAt": "2026-10-09T08:43:15.211Z",
+  "months": {
+    "2026-10": {
+      "tournaments": [
+        {
+          "name": "Weekly Series",
+          "date": 1791534454606,
+          "players": 15
+        }
+      ],
+      "standings": [
+        {
+          "key": "18pfugc",
+          "name": "Sneha P",
+          "dept": "EC",
+          "sem": "S3",
+          "points": 3526,
+          "played": 1,
+          "wins": 1,
+          "best": 3526
+        },
+        {
+          "key": "ovxutm",
+          "name": "FATHIMA MUNAZZA CK",
+          "dept": "CSE",
+          "sem": "S3",
+          "points": 2981,
+          "played": 1,
+          "wins": 0,
+          "best": 2981
+        },
+        {
+          "key": "13xrklq",
+          "name": "ADITHYA EK",
+          "dept": "ME",
+          "sem": "S3",
+          "points": 1834,
+          "played": 1,
+          "wins": 0,
+          "best": 1834
+        },
+        {
+          "key": "duj4xm",
+          "name": "Aksa Das",
+          "dept": "EEE",
+          "sem": "S3",
+          "points": 1756,
+          "played": 1,
+          "wins": 0,
+          "best": 1756
+        },
+        {
+          "key": "129bzc9",
+          "name": "Akshay k Ramesh",
+          "dept": "ME",
+          "sem": "S3",
+          "points": 1609,
+          "played": 1,
+          "wins": 0,
+          "best": 1609
+        },
+        {
+          "key": "76w5r2",
+          "name": "Fathima Jumana",
+          "dept": "EC",
+          "sem": "S1",
+          "points": 1553,
+          "played": 1,
+          "wins": 0,
+          "best": 1553
+        },
+        {
+          "key": "147r6ap",
+          "name": "Advaidh Mohan P",
+          "dept": "ME",
+          "sem": "S3",
+          "points": 1543,
+          "played": 1,
+          "wins": 0,
+          "best": 1543
+        },
+        {
+          "key": "oly94n",
+          "name": "Fathima Raja NK",
+          "dept": "CSE",
+          "sem": "S3",
+          "points": 1504,
+          "played": 1,
+          "wins": 0,
+          "best": 1504
+        },
+        {
+          "key": "12jtk4v",
+          "name": "ADHARSH CR",
+          "dept": "ME",
+          "sem": "S3",
+          "points": 1220,
+          "played": 1,
+          "wins": 0,
+          "best": 1220
+        },
+        {
+          "key": "12tb6q7",
+          "name": "Aswin KM",
+          "dept": "ME",
+          "sem": "S3",
+          "points": 1188,
+          "played": 1,
+          "wins": 0,
+          "best": 1188
+        },
+        {
+          "key": "nihtge",
+          "name": "Pooja S",
+          "dept": "CSE",
+          "sem": "S3",
+          "points": 322,
+          "played": 1,
+          "wins": 0,
+          "best": 322
+        },
+        {
+          "key": "11pcryb",
+          "name": "Anantha Krishnan",
+          "dept": "ME",
+          "sem": "S3",
+          "points": 317,
+          "played": 1,
+          "wins": 0,
+          "best": 317
+        },
+        {
+          "key": "5suzs8",
+          "name": "LEVIN SEBASTIAN",
+          "dept": "ME",
+          "sem": "S3",
+          "points": 280,
+          "played": 1,
+          "wins": 0,
+          "best": 280
+        },
+        {
+          "key": "1oem541",
+          "name": "Anjali Krishna M S",
+          "dept": "CSE",
+          "sem": "S3",
+          "points": 0,
+          "played": 1,
+          "wins": 0,
+          "best": 0
+        },
+        {
+          "key": "wtg6an",
+          "name": "FATHIMA MUNAZZA C K",
+          "dept": "CSE",
+          "sem": "S3",
+          "points": 0,
+          "played": 1,
+          "wins": 0,
+          "best": 0
+        }
+      ],
+      "depts": [
+        {
+          "dept": "EC",
+          "players": 2,
+          "points": 5079,
+          "avg": 2540
+        },
+        {
+          "dept": "EEE",
+          "players": 1,
+          "points": 1756,
+          "avg": 1756
+        },
+        {
+          "dept": "ME",
+          "players": 7,
+          "points": 7991,
+          "avg": 1142
+        },
+        {
+          "dept": "CSE",
+          "players": 5,
+          "points": 4807,
+          "avg": 961
+        }
+      ]
+    }
+  }
 }
