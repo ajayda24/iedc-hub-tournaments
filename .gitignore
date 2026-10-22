@@ -15,3 +15,4 @@ playwright-report/
 next-env.d.ts
 .e2e-data/
 apps/web/AGENTS.md
+backups/

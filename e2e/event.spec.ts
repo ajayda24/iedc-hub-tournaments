@@ -92,6 +92,35 @@ test("a full anagram round: synced start, scoring, results on every device", asy
   await expect(anjali.getByText("1st", { exact: true })).toBeVisible();
 });
 
+test("a live N-Queen round: host picks it, a phone solves it", async ({ browser }) => {
+  const host = await hostPage(browser);
+  const priya = await player(browser, "Priya S", "IT");
+
+  await host.locator("select").first().selectOption({ label: "N-Queen" });
+  await host.getByRole("button", { name: "Save changes" }).click();
+  await host.getByRole("button", { name: /Start R1/ }).click();
+  await expect(priya.getByText(/\/ \d+ queens/)).toBeVisible({ timeout: 6000 });
+
+  const { solution } = secret() as { solution: number[] };
+  const queenCell = (cell: number, size: number) => priya.getByRole("button", { name: `row ${Math.floor(cell / size) + 1} column ${(cell % size) + 1} empty` });
+  const size = solution.length;
+  for (const cell of solution) {
+    const empty = queenCell(cell, size);
+    if (!(await empty.count())) continue; // the fixed queen
+    await empty.click(); // ✕ note
+    await priya.getByRole("button", { name: new RegExp(`^row ${Math.floor(cell / size) + 1} column ${(cell % size) + 1} marked`) }).click(); // queen
+  }
+  await expect(priya.getByText("SOLVED", { exact: true })).toBeVisible();
+  // the round may already have closed itself once everyone solved
+  const end = host.getByRole("button", { name: "End round now" });
+  if (await end.isVisible()) await end.click();
+  await expect(priya.getByText("Nailed it.")).toBeVisible();
+
+  // put the default playlist back for the other tests
+  await host.locator("select").first().selectOption({ label: "Anagram Blitz" });
+  await host.getByRole("button", { name: "Save changes" }).click();
+});
+
 test("anti-cheat: internet freezes play, leaving the tab is a strike", async ({ browser }) => {
   let online = false;
   const host = await hostPage(browser);

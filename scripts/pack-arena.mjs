@@ -1,4 +1,5 @@
 // Produces dist/brain-arena/: everything the event laptop needs, no install step.
+// Safe to re-run on a kit that was already used: arena-data/ is left untouched.
 //   arena.mjs  web/  start-arena.bat  start-arena.sh  setup-hotspot.ps1  start-hotspot.ps1  README.txt
 import { execSync } from "node:child_process";
 import fs from "node:fs";
@@ -9,8 +10,11 @@ const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const out = path.join(root, "dist", "brain-arena");
 const run = (cmd) => execSync(cmd, { stdio: "inherit", cwd: root });
 
-fs.rmSync(out, { recursive: true, force: true });
+// Only replace what this script builds. Never wipe the whole folder: the laptop's
+// live data (arena-data/: PINs, tournament history, results) lives inside it.
+const BUILT = ["arena.mjs", "web", "start-arena.bat", "start-arena.sh", "setup-hotspot.ps1", "start-hotspot.ps1", "README.txt"];
 fs.mkdirSync(out, { recursive: true });
+for (const f of BUILT) fs.rmSync(path.join(out, f), { recursive: true, force: true });
 
 if (!process.argv.includes("--skip-web")) run("pnpm --filter @iedc/web build");
 run(`node apps/arena/build.mjs "${path.join(out, "arena.mjs")}"`);
