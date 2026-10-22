@@ -2,9 +2,9 @@ import { z } from "zod";
 import { createRng } from "../../rng";
 import { GAME_META } from "../meta";
 import type { GameDefinition } from "../types";
-import answersJson from "@iedc/data/words/generated/wordhunt-answers.json";
-import words5Json from "@iedc/data/words/generated/words5.json";
-import { gameText } from "@iedc/data/copy/games";
+import answersJson from "@iedc/config/words/generated/wordhunt-answers.json";
+import words5Json from "@iedc/config/words/generated/words5.json";
+import { gameText } from "@iedc/config/copy/games";
 
 /** g = right spot, y = in the word, x = nope */
 export type Tile = "g" | "y" | "x";

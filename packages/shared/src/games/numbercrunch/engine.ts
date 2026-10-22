@@ -2,7 +2,7 @@ import { z } from "zod";
 import { createRng } from "../../rng";
 import { GAME_META } from "../meta";
 import type { Difficulty, GameDefinition } from "../types";
-import { gameText } from "@iedc/data/copy/games";
+import { gameText } from "@iedc/config/copy/games";
 
 export interface CrunchPub {
   numbers: number[];

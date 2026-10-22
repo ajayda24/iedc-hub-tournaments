@@ -1,7 +1,7 @@
 import os from "node:os";
 import QRCode from "qrcode";
 import type { NetIface } from "@iedc/shared";
-import { NETWORK_LABELS } from "@iedc/data/network";
+import { NETWORK_LABELS } from "@iedc/config/network";
 
 /** Friendly names for the subnets hotspots hand out. */
 function labelFor(address: string, name: string): string {

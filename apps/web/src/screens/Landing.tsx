@@ -2,8 +2,8 @@
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
 import { GAME_META, GAME_ORDER } from "@iedc/shared/games/meta";
-import { site } from "@iedc/data/site";
-import { landing as t } from "@iedc/data/copy/landing";
+import { site } from "@iedc/config/site";
+import { landing as t } from "@iedc/config/copy/landing";
 import { isArenaOrigin } from "@/lib/arena";
 import { store } from "@/lib/storage";
 import { Btn, COLOR, DoodleArrow, Hand, Slip, Squiggle, Star } from "@/ui/kit";

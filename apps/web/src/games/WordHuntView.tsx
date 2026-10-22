@@ -4,7 +4,7 @@ import type { Tile, WordHuntProgress, WordHuntPub } from "@iedc/shared/games/wor
 import { cx } from "@/lib/format";
 import { sfx } from "@/ui/sfx";
 import type { ViewProps } from "./types";
-import { gameText as G } from "@iedc/data/copy/games";
+import { gameText as G } from "@iedc/config/copy/games";
 
 const ROWS = ["qwertyuiop", "asdfghjkl", "zxcvbnm"];
 const TILE_BG: Record<Tile, string> = { g: "var(--color-mint)", y: "var(--color-yellow)", x: "#d8d1c2" };

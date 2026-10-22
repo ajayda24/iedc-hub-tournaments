@@ -1,7 +1,7 @@
-// Rebuilds data/words/generated/*.json from the editable sources in data/words/
+// Rebuilds config/words/generated/*.json from the editable sources in config/words/
 // plus the MIT `word-list` package.
-//   data/words/wordhunt-answers.txt      Word Hunt answers (one word per line)
-//   data/words/anagram-packs.source.json Anagram packs ({ id, title, words })
+//   config/words/wordhunt-answers.txt      Word Hunt answers (one word per line)
+//   config/words/anagram-packs.source.json Anagram packs ({ id, title, words })
 // Usage: pnpm content:build
 import fs from "node:fs";
 import path from "node:path";
@@ -9,7 +9,7 @@ import dictPath from "word-list";
 import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const wordsDir = path.join(here, "..", "..", "..", "data", "words");
+const wordsDir = path.join(here, "..", "..", "..", "config", "words");
 const outDir = path.join(wordsDir, "generated");
 fs.mkdirSync(outDir, { recursive: true });
 

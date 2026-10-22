@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Gochi_Hand } from "next/font/google";
 import { RegisterSW } from "@/pwa/RegisterSW";
 import "./globals.css";
-import { site } from "@iedc/data/site";
+import { site } from "@iedc/config/site";
 
 const bricolage = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-bricolage", display: "swap" });
 const gochi = Gochi_Hand({ subsets: ["latin"], weight: "400", variable: "--font-gochi", display: "swap" });

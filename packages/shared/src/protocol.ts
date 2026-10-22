@@ -1,5 +1,5 @@
-import { COUNTDOWN_MS, DEFAULT_EVENT } from "@iedc/data/rules";
-import { site } from "@iedc/data/site";
+import { COUNTDOWN_MS, DEFAULT_EVENT } from "@iedc/config/rules";
+import { site } from "@iedc/config/site";
 import type { CheckStatus, Difficulty, GameId, Reveal, RoundOptions } from "./games/types";
 
 /* ------------------------------------------------------------------ */
@@ -56,8 +56,8 @@ export type EventFormat = "classic" | "knockout";
 export type Role = "player" | "host" | "screen";
 export type RoundStatus = "idle" | "playing" | "solved" | "failed" | "locked" | "timeout" | "out";
 
-/** Edit these lists in data/people.ts */
-export { DEPARTMENTS, SEMESTERS } from "@iedc/data/people";
+/** Edit these lists in config/people.ts */
+export { DEPARTMENTS, SEMESTERS } from "@iedc/config/people";
 
 export interface RoundConfig {
   id: string;
@@ -293,10 +293,10 @@ export interface CheatPayload {
   ms?: number;
 }
 
-/** Edit the defaults in data/rules.ts and data/site.ts */
+/** Edit the defaults in config/rules.ts and config/site.ts */
 export const DEFAULT_CONFIG: EventConfig = { eventName: site.defaultEventName, ...DEFAULT_EVENT };
 
-/** Round countdown before a puzzle appears (data/rules.ts). */
+/** Round countdown before a puzzle appears (config/rules.ts). */
 export { COUNTDOWN_MS };
 
 /* ------------------------------------------------------------------ */

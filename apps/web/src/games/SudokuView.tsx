@@ -5,7 +5,7 @@ import { conflicts } from "@iedc/shared/games/sudoku/grid";
 import { cx } from "@/lib/format";
 import { sfx } from "@/ui/sfx";
 import type { ViewProps } from "./types";
-import { gameText as G } from "@iedc/data/copy/games";
+import { gameText as G } from "@iedc/config/copy/games";
 
 export default function SudokuView({ pub, progress, done, frozen, submit }: ViewProps<SudokuPub, SudokuProgress>) {
   const { size, boxR, boxC, givens } = pub;

@@ -30,10 +30,10 @@ import {
   type RoundStatus,
   type SubmitAck,
 } from "@iedc/shared";
-import { errors } from "@iedc/data/copy/errors";
-import { feed } from "@iedc/data/copy/feed";
-import { anticheat } from "@iedc/data/copy/anticheat";
-import { LIVE_LEADERBOARD_SIZE } from "@iedc/data/rules";
+import { errors } from "@iedc/config/copy/errors";
+import { feed } from "@iedc/config/copy/feed";
+import { anticheat } from "@iedc/config/copy/anticheat";
+import { LIVE_LEADERBOARD_SIZE } from "@iedc/config/rules";
 
 /* ------------------------------------------------------------------ */
 /* Types                                                               */

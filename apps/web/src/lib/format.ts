@@ -1,4 +1,4 @@
-import { common } from "@iedc/data/copy/common";
+import { common } from "@iedc/config/copy/common";
 
 export const fmtClock = (ms: number) => {
   const s = Math.max(0, Math.ceil(ms / 1000));

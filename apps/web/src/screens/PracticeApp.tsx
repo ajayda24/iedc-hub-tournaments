@@ -14,9 +14,9 @@ import { Mascot } from "@/ui/Mascot";
 import { Reveal } from "@/ui/Reveal";
 import { sfx } from "@/ui/sfx";
 import { TimerBar } from "@/ui/Timer";
-import { DIFFICULTY_LABEL } from "@iedc/data/games";
-import { errors } from "@iedc/data/copy/errors";
-import { practice as P } from "@iedc/data/copy/practice";
+import { DIFFICULTY_LABEL } from "@iedc/config/games";
+import { errors } from "@iedc/config/copy/errors";
+import { practice as P } from "@iedc/config/copy/practice";
 import { Credits } from "@/ui/Credits";
 
 interface Session {

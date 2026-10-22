@@ -19,10 +19,10 @@ import { Reveal } from "@/ui/Reveal";
 import { setSound, sfx, soundOn } from "@/ui/sfx";
 import { TimerBar } from "@/ui/Timer";
 import { JoinForm } from "./JoinForm";
-import { leaderboard as LB } from "@iedc/data/copy/leaderboard";
-import { DIFFICULTY_LABEL } from "@iedc/data/games";
-import { common } from "@iedc/data/copy/common";
-import { play as t } from "@iedc/data/copy/play";
+import { leaderboard as LB } from "@iedc/config/copy/leaderboard";
+import { DIFFICULTY_LABEL } from "@iedc/config/games";
+import { common } from "@iedc/config/copy/common";
+import { play as t } from "@iedc/config/copy/play";
 
 export function PlayApp() {
   const { conn, helloDone, state, me, kicked, bumped } = useArena();

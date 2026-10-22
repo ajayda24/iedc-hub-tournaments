@@ -12,7 +12,7 @@ import { hasInternet } from "./net/internetCheck";
 import { Store } from "./persist/store";
 import { Students } from "./students";
 import { History } from "./history";
-import { site } from "@iedc/data/site";
+import { site } from "@iedc/config/site";
 
 const VERSION = "0.1.0";
 

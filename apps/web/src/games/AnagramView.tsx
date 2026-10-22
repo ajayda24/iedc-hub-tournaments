@@ -4,7 +4,7 @@ import type { AnagramProgress, AnagramPub } from "@iedc/shared/games/anagram/eng
 import { cx } from "@/lib/format";
 import { sfx } from "@/ui/sfx";
 import type { ViewProps } from "./types";
-import { gameText as G } from "@iedc/data/copy/games";
+import { gameText as G } from "@iedc/config/copy/games";
 
 export default function AnagramView({ pub, progress, done, frozen, submit }: ViewProps<AnagramPub, AnagramProgress>) {
   const [answers, setAnswers] = useState<(string | null)[]>(progress?.answers ?? pub.scrambles.map(() => null));

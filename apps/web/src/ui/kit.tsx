@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from "react";
 import type { GameColor } from "@iedc/shared/games/types";
 import { cx } from "@/lib/format";
-import { common } from "@iedc/data/copy/common";
+import { common } from "@iedc/config/copy/common";
 
 export const COLOR: Record<GameColor | "paper" | "ink", string> = {
   yellow: "var(--color-yellow)",

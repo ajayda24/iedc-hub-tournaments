@@ -2,8 +2,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { EV, type StudentInfo } from "@iedc/shared/protocol";
 import type { HistoryTournament, MonthlyFile } from "@iedc/shared/monthly";
-import { host as H } from "@iedc/data/copy/host";
-import { leaderboard as L } from "@iedc/data/copy/leaderboard";
+import { host as H } from "@iedc/config/copy/host";
+import { leaderboard as L } from "@iedc/config/copy/leaderboard";
 import { emitAck } from "@/net/arena";
 import { cx } from "@/lib/format";
 import { Btn, Hand } from "@/ui/kit";

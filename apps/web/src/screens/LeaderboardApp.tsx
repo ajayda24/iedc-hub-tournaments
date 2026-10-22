@@ -2,8 +2,8 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type { MonthlyFile, MonthlyRow } from "@iedc/shared/monthly";
-import bundled from "@iedc/data/leaderboard/monthly.json";
-import { leaderboard as L } from "@iedc/data/copy/leaderboard";
+import bundled from "@iedc/config/leaderboard/monthly.json";
+import { leaderboard as L } from "@iedc/config/copy/leaderboard";
 import { arenaUrl, isArenaOrigin } from "@/lib/arena";
 import { cx } from "@/lib/format";
 import { Avatar } from "@/ui/Avatar";

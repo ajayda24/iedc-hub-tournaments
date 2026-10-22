@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { STUDENT_ID } from "@iedc/data/rules";
+import { STUDENT_ID } from "@iedc/config/rules";
 import type { CheatPayload, EventConfig, HelloPayload, JoinPayload } from "./protocol";
 
 /* ------------------------------------------------------------------ */
@@ -14,7 +14,7 @@ export const helloSchema: z.ZodType<HelloPayload> = z.object({
   pin: z.string().max(12).optional(),
 });
 
-/** Student ID: trimmed, spaces removed, upper-cased; only the max length is checked (data/rules.ts) */
+/** Student ID: trimmed, spaces removed, upper-cased; only the max length is checked (config/rules.ts) */
 export const studentIdSchema = z
   .string()
   .transform((v) => v.replace(/\s+/g, "").toUpperCase())

@@ -13,9 +13,9 @@ import { DeptBoard, Leaderboard } from "@/ui/Leaderboard";
 import { Mascot } from "@/ui/Mascot";
 import { TimerBar } from "@/ui/Timer";
 import { MonthlyTab, StudentsTab } from "./host/HostExtras";
-import { ANAGRAM_PACK_OPTIONS, DEFAULT_CUSTOM_WORDS, DIFFICULTY_LABEL } from "@iedc/data/games";
-import { SCORING } from "@iedc/data/rules";
-import { host as H } from "@iedc/data/copy/host";
+import { ANAGRAM_PACK_OPTIONS, DEFAULT_CUSTOM_WORDS, DIFFICULTY_LABEL } from "@iedc/config/games";
+import { SCORING } from "@iedc/config/rules";
+import { host as H } from "@iedc/config/copy/host";
 
 const PACKS = ANAGRAM_PACK_OPTIONS;
 const DIFF_LABEL = DIFFICULTY_LABEL;
