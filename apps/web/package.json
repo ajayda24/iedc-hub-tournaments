@@ -13,7 +13,7 @@
     "@iedc/data": "workspace:*",
     "@iedc/shared": "workspace:*",
     "@serwist/next": "^9.5.13",
-    "next": "16.4.0",
+    "next": "16.4.2",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "socket.io-client": "^4.8.1",
