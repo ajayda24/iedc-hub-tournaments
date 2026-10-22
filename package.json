@@ -15,6 +15,7 @@
     "test": "pnpm -r --if-present test",
     "typecheck": "pnpm -r --if-present typecheck",
     "bots": "pnpm --filter @iedc/arena bots",
+    "recover:first": "pnpm --filter @iedc/arena recover:first",
     "pack:arena": "node scripts/pack-arena.mjs",
     "test:e2e": "playwright test",
     "content:build": "pnpm --filter @iedc/shared content:build"

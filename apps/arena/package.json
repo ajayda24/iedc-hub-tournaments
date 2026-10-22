@@ -10,7 +10,8 @@
     "build": "node build.mjs",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "bots": "tsx scripts/bots.ts"
+    "bots": "tsx scripts/bots.ts",
+    "recover:first": "tsx scripts/recover-first-tournament.ts"
   },
   "dependencies": {
     "@fastify/static": "^10.1.5",
