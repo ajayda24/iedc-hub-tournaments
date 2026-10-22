@@ -7,18 +7,19 @@
     "node": ">=20.11"
   },
   "scripts": {
-    "dev": "pnpm --parallel --filter @iedc/arena --filter @iedc/web dev",
-    "dev:arena": "pnpm --filter @iedc/arena dev",
-    "dev:web": "pnpm --filter @iedc/web dev",
-    "build": "pnpm --filter @iedc/web build && pnpm --filter @iedc/arena build",
-    "start": "pnpm --filter @iedc/arena start",
-    "test": "pnpm -r --if-present test",
-    "typecheck": "pnpm -r --if-present typecheck",
+    "dev": "node scripts/use-college.mjs && pnpm --parallel --filter @iedc/arena --filter @iedc/web dev",
+    "dev:arena": "node scripts/use-college.mjs && pnpm --filter @iedc/arena dev",
+    "dev:web": "node scripts/use-college.mjs && pnpm --filter @iedc/web dev",
+    "build": "node scripts/use-college.mjs && pnpm --filter @iedc/web build && pnpm --filter @iedc/arena build",
+    "start": "node scripts/use-college.mjs && pnpm --filter @iedc/arena start",
+    "test": "node scripts/use-college.mjs && pnpm -r --if-present test",
+    "typecheck": "node scripts/use-college.mjs && pnpm -r --if-present typecheck",
     "bots": "pnpm --filter @iedc/arena bots",
     "recover:first": "pnpm --filter @iedc/arena recover:first",
-    "pack:arena": "node scripts/pack-arena.mjs",
-    "test:e2e": "playwright test",
-    "content:build": "pnpm --filter @iedc/shared content:build"
+    "pack:arena": "node scripts/use-college.mjs && node scripts/pack-arena.mjs",
+    "test:e2e": "node scripts/use-college.mjs && playwright test",
+    "content:build": "pnpm --filter @iedc/shared content:build",
+    "postinstall": "node scripts/use-college.mjs --quiet"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1",

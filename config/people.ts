@@ -1,10 +1,13 @@
 /**
  * Choices students pick on the join form. Also used to group "Dept wars".
- * Add, remove or rename freely. "Other" lets students type their own.
+ * The lists live in the college profile: colleges/<id>/college.ts.
+ * Add "Other" to a college's departments to let students type their own.
  */
-export const DEPARTMENTS: string[] = ["CSE", "EC", "EEE", "ME", "CE", "IT", "EP","PT"];
+import { college } from "./college";
 
-/** The "Other" option above, which shows a free-text box */
+export const DEPARTMENTS: string[] = college.departments;
+
+/** The "Other" option, which shows a free-text box when it's in the list */
 export const OTHER_DEPARTMENT = "Other";
 
-export const SEMESTERS: string[] = ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8"];
+export const SEMESTERS: string[] = college.semesters;

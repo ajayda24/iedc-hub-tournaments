@@ -3,11 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Every text, label and constant used by Brain Arena. Edit these files to change wording.",
+  "description": "Settings and text shared by every college. College names and lists live in colleges/<id>/.",
   "exports": {
     "./*": "./*.ts",
-    "./words/*": "./words/*",
-    "./leaderboard/*": "./leaderboard/*"
+    "./words/*": "./words/*"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"

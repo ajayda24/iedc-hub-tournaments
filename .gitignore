@@ -16,3 +16,7 @@ next-env.d.ts
 .e2e-data/
 apps/web/AGENTS.md
 backups/
+
+# active college profile, written by scripts/use-college.mjs
+config/college.ts
+.env

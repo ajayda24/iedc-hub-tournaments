@@ -17,7 +17,7 @@ import { recoverTournament } from "../src/recover";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 const { values: args } = parseArgs({
   options: {
-    monthly: { type: "string", default: path.join(root, "data", "leaderboard", "monthly.json") },
+    monthly: { type: "string", default: path.join(root, "colleges", "iedc", "monthly.json") },
     students: { type: "string", default: path.join(root, "dist", "brain-arena", "arena-data", "students.json") },
     month: { type: "string", default: "2026-10" },
   },
