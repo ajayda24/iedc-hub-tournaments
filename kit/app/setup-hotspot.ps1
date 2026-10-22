@@ -1,6 +1,6 @@
 <#
-  Brain Arena — one-time laptop setup for Windows 10/11 Mobile Hotspot.
-  Right-click → "Run with PowerShell" (it asks for admin), or from an admin prompt:
+  One-time event laptop setup for Windows 10/11 Mobile Hotspot.
+  Double-click 1-FIRST-TIME-SETUP.bat in the kit (it asks for admin), or from an admin prompt:
       powershell -ExecutionPolicy Bypass -File .\setup-hotspot.ps1
 
   What it does:
@@ -43,7 +43,7 @@ New-ItemProperty -Path $key -Name "PeerlessTimeoutEnabled" -PropertyType DWord -
 New-ItemProperty -Path $key -Name "PeerlessTimeout" -PropertyType DWord -Value 120 -Force | Out-Null
 Write-Host "    (also turn off Settings > Network > Mobile hotspot > Power saving, if you see it)"
 
-Step "Allowing Brain Arena through Windows Firewall (TCP $Port)"
+Step "Allowing the arena through Windows Firewall (TCP $Port)"
 Get-NetFirewallRule -DisplayName "Brain Arena" -ErrorAction SilentlyContinue | Remove-NetFirewallRule
 New-NetFirewallRule -DisplayName "Brain Arena" -Direction Inbound -Protocol TCP -LocalPort $Port -Action Allow -Profile Any | Out-Null
 Write-Host "    rule 'Brain Arena' added"
@@ -69,6 +69,6 @@ try {
   Write-Host "    couldn't restart icssvc now (it starts on demand) — a reboot also works" -ForegroundColor DarkYellow
 }
 
-Write-Host "`nAll set. On event day: double-click start-arena.bat." -ForegroundColor Green
+Write-Host "`nAll set. On event day: double-click 2-START-EVENT.bat." -ForegroundColor Green
 Write-Host "In Settings > Mobile hotspot choose 'Share my connection from: <the loopback adapter>' once." -ForegroundColor Green
 Read-Host "`nPress Enter to close"

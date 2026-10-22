@@ -1,6 +1,6 @@
 <#
   Turns on Windows Mobile Hotspot (no clicking around in Settings) and prints
-  the Wi-Fi name and password to tell students. Called by start-arena.bat.
+  the Wi-Fi name and password to tell students. Called by 2-START-EVENT.bat.
   Prefers sharing the KM-TEST loopback adapter so the hotspot has no internet.
 #>
 $ErrorActionPreference = "SilentlyContinue"

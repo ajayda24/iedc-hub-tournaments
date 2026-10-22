@@ -19,7 +19,7 @@ const VERSION = "0.1.0";
 const { values: args } = parseArgs({
   options: {
     port: { type: "string", default: process.env.ARENA_PORT ?? String(site.defaultPort) },
-    data: { type: "string", default: process.env.ARENA_DATA ?? "arena-data" },
+    data: { type: "string", default: process.env.ARENA_DATA },
     web: { type: "string", default: process.env.ARENA_WEB },
     pin: { type: "string", default: process.env.ARENA_PIN },
     fresh: { type: "boolean", default: false },
@@ -32,6 +32,24 @@ const port = Number(args.port);
 const pin = args.pin ?? String(1000 + Math.floor(Math.random() * 9000));
 const here = path.dirname(fileURLToPath(import.meta.url));
 
+/**
+ * Where this laptop keeps its data (scores, PINs, history), when --data / ARENA_DATA
+ * isn't given. Found from where the code lives, not the current folder, so
+ * double-clicking from anywhere finds the same data.
+ *   source checkout → <repo>/arena-data (or the older apps/arena/arena-data if that's what exists)
+ *   event kit       → <kit>/arena-data  (arena.mjs is in <kit>/app/, or <kit>/ in older kits)
+ */
+function defaultDataDir(): string {
+  const repoRoot = path.join(here, "..", "..", "..");
+  if (fs.existsSync(path.join(repoRoot, "pnpm-workspace.yaml"))) {
+    const root = path.join(repoRoot, "arena-data");
+    const legacy = path.join(here, "..", "arena-data");
+    return !fs.existsSync(root) && fs.existsSync(legacy) ? legacy : root;
+  }
+  return path.join(path.basename(here) === "app" ? path.dirname(here) : here, "arena-data");
+}
+const dataDir = path.resolve(args.data ?? defaultDataDir());
+
 /** The static web build: next to the bundle (packed) or in the monorepo (dev). */
 function findWebDir(): string | null {
   const candidates = [args.web, path.join(here, "web"), path.join(here, "..", "web"), path.join(here, "..", "..", "web", "out")];
@@ -40,14 +58,13 @@ function findWebDir(): string | null {
 }
 
 async function main() {
-  const store = new Store(path.resolve(args.data!));
+  const store = new Store(dataDir);
   const app = Fastify({ logger: false, trustProxy: false });
 
   let interfaces: NetIface[] = [];
   let internet: boolean | null = null;
   const network = (): NetworkInfo => ({ port, interfaces, internet, groups: [] });
 
-  const dataDir = path.resolve(args.data!);
   const students = new Students(dataDir);
   const history = new History(dataDir);
   const rt = createRealtime(app.server, { pin, onExport: () => store.exportCsv(arena), students, history });
@@ -138,6 +155,7 @@ async function main() {
     console.log(`   Big screen    http://localhost:${port}/screen/`);
     if (interfaces.length === 0) console.log(`   Students      (no network yet — turn on the hotspot)`);
     for (const i of interfaces) console.log(`   Students      ${i.url.padEnd(34)} ${i.label}`);
+    console.log(`   Data folder   ${dataDir}`);
     if (!web) console.log(`\n   (no web build found — dev mode: web app on http://localhost:3000)`);
     if (snap) console.log(`\n   Restored previous event: ${arena.players.size} players, ${arena.roundsPlayed} rounds played. Use --fresh to start clean.`);
     console.log(`  ${line}\n`);

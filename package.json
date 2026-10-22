@@ -12,11 +12,12 @@
     "dev:web": "node scripts/use-college.mjs && pnpm --filter @iedc/web dev",
     "build": "node scripts/use-college.mjs && pnpm --filter @iedc/web build && pnpm --filter @iedc/arena build",
     "start": "node scripts/use-college.mjs && pnpm --filter @iedc/arena start",
+    "kit": "node scripts/use-college.mjs && node scripts/build-kit.mjs",
+    "pack:arena": "pnpm kit",
     "test": "node scripts/use-college.mjs && pnpm -r --if-present test",
     "typecheck": "node scripts/use-college.mjs && pnpm -r --if-present typecheck",
     "bots": "pnpm --filter @iedc/arena bots",
     "recover:first": "pnpm --filter @iedc/arena recover:first",
-    "pack:arena": "node scripts/use-college.mjs && node scripts/pack-arena.mjs",
     "test:e2e": "node scripts/use-college.mjs && playwright test",
     "content:build": "pnpm --filter @iedc/shared content:build",
     "postinstall": "node scripts/use-college.mjs --quiet"
