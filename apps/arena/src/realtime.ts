@@ -14,6 +14,7 @@ import {
   studentRefSchema,
   historyEditSchema,
   historyImportSchema,
+  collegeSettingsSchema,
   submitSchema,
   type HelloAck,
   type Role,
@@ -22,6 +23,7 @@ import type { Arena, ArenaOutput } from "./arena";
 import { errors } from "@iedc/config/copy/errors";
 import type { Students } from "./students";
 import type { History } from "./history";
+import type { CollegeSettings } from "./college";
 
 interface SocketData {
   role?: Role;
@@ -37,6 +39,7 @@ export interface RealtimeOptions {
   onExport?: () => string;
   students: Students;
   history: History;
+  college: CollegeSettings;
 }
 
 /** Socket.IO transport. Builds the ArenaOutput the Arena talks to. */
@@ -262,6 +265,14 @@ export function createRealtime(http: HttpServer, opts: RealtimeOptions) {
         if (!p.success) return { ok: false, error: errors.badBackup };
         const added = opts.history.import(p.data.tournaments);
         return { ...historyView(), added };
+      });
+      hostOnly(EV.hostCollege, (raw) => {
+        if (raw == null) return { ok: true, college: opts.college.get() };
+        const p = collegeSettingsSchema.safeParse(raw);
+        if (!p.success) return { ok: false, error: errors.badCollege };
+        if ("reset" in p.data) opts.college.reset();
+        else opts.college.set(p.data);
+        return { ok: true, college: opts.college.get() };
       });
 
       socket.on("disconnect", () => {

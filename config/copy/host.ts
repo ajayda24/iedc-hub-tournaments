@@ -23,6 +23,7 @@ export const host = {
   tabBoard: "Leaderboard",
   tabStudents: "Students",
   tabMonthly: "Monthly",
+  tabCollege: "College",
   monthlyLink: "Monthly board ↗",
 
   // round controls
@@ -133,7 +134,7 @@ export const host = {
   publishTitle: "Publish to the website",
   publishSteps: [
     "Click \"Download for website\" — you get monthly.json (names, departments and points only; no Student IDs).",
-    "Replace data/leaderboard/monthly.json in the GitHub repo with it, commit and push.",
+    "In the project folder run: pnpm leaderboard <that file>, then commit and push (it refuses files that would drop tournaments).",
     "Vercel rebuilds the site; /leaderboard shows the new standings and the update time.",
   ],
   downloadWebsite: "Download for website",
@@ -142,6 +143,20 @@ export const host = {
   imported: (n: number) => `Imported ${n} tournament${n === 1 ? "" : "s"}.`,
   importFailed: "That file isn't a Brain Arena history backup.",
   backupNote: "The backup includes Student IDs. Keep it private (don't commit it).",
+
+  // college tab
+  collegeIntro: "Your college's name and the join-form lists. Saved on this laptop only; phones pick it up when they open the join page.",
+  collegeLogoLeft: "Logo, first part",
+  collegeLogoRight: "Logo, second part",
+  collegeOrganiser: "Sticker next to the logo",
+  collegeDepartments: "Departments (one per line or comma-separated). Add \"Other\" to let students type their own.",
+  collegeSemesters: "Semesters / years (one per line or comma-separated)",
+  collegeSave: "Save",
+  collegeSaved: "Saved. New phones see it straight away; phones already on the join page see it after a refresh.",
+  collegeReset: "Back to the built-in values",
+  confirmCollegeReset: "Forget the changes made here and use the built-in college values?",
+  collegeCustom: "changed on this laptop",
+  collegeBuiltIn: "built-in",
 
   // board tab
   boardPlayers: "Players",

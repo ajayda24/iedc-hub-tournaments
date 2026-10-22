@@ -12,6 +12,7 @@ import { hasInternet } from "./net/internetCheck";
 import { Store } from "./persist/store";
 import { Students } from "./students";
 import { History } from "./history";
+import { CollegeSettings } from "./college";
 import { site } from "@iedc/config/site";
 
 const VERSION = "0.1.0";
@@ -67,7 +68,8 @@ async function main() {
 
   const students = new Students(dataDir);
   const history = new History(dataDir);
-  const rt = createRealtime(app.server, { pin, onExport: () => store.exportCsv(arena), students, history });
+  const college = new CollegeSettings(dataDir);
+  const rt = createRealtime(app.server, { pin, onExport: () => store.exportCsv(arena), students, history, college });
   const arena = new Arena({ out: { ...rt.output, log: (t, d) => store.log(t, d) }, network });
   rt.attach(arena);
 
@@ -107,6 +109,8 @@ async function main() {
   app.get("/api/health", async () => ({ ok: true, app: "brain-arena", version: VERSION, now: Date.now() }));
   // live monthly leaderboard for /leaderboard on the event Wi-Fi (no Student IDs inside)
   app.get("/api/leaderboard", async (_req, reply) => reply.header("Cache-Control", "no-store").send(history.exportMonthly()));
+  // college name and join-form lists, as set in Host console → College
+  app.get("/api/college", async (_req, reply) => reply.header("Cache-Control", "no-store").send(college.get()));
 
   const refreshNetwork = async () => {
     try {

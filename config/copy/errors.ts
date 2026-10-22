@@ -32,6 +32,7 @@ export const errors = {
   nothingToRecord: "Nobody with a Student ID played this tournament.",
   noSuchTournament: "No such tournament.",
   badBackup: "That file isn't a Brain Arena history backup.",
+  badCollege: "Fill in the name, at least one department and at least one semester.",
 
   // submitting answers
   notInEvent: "Not in this event.",

@@ -37,6 +37,7 @@ export const EV = {
   hostExportMonthly: "host:exportMonthly",
   hostBackupHistory: "host:backupHistory",
   hostImportHistory: "host:importHistory",
+  hostCollege: "host:college",
   // server → client
   state: "state",
   me: "me",
@@ -323,4 +324,18 @@ export interface StudentInfo {
   pinResetAt: number | null;
   lastSeenAt: number;
   lockedUntil: number | null;
+}
+
+/**
+ * The college's name and join-form lists. Built into the app from
+ * colleges/<id>/college.ts; the host can change them on the laptop
+ * (Host console → College), which is saved in arena-data/college.json.
+ */
+export interface CollegeInfo {
+  /** logo text, written as left/right */
+  brand: { left: string; right: string };
+  /** "by ..." sticker */
+  organiser: string;
+  departments: string[];
+  semesters: string[];
 }

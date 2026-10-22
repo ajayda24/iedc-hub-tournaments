@@ -103,3 +103,21 @@ export const historyImportSchema = z.object({
     )
     .max(5000),
 });
+
+const list = (max: number, itemMax: number) =>
+  z
+    .array(trimmed(itemMax))
+    .min(1)
+    .max(max)
+    .transform((xs) => [...new Set(xs)]);
+
+/** Host console → College. `reset: true` goes back to the built-in profile. */
+export const collegeSettingsSchema = z.union([
+  z.object({ reset: z.literal(true) }),
+  z.object({
+    brand: z.object({ left: trimmed(24), right: z.string().trim().max(24) }),
+    organiser: trimmed(40),
+    departments: list(40, 24),
+    semesters: list(20, 12),
+  }),
+]);

@@ -12,7 +12,7 @@ import { Btn, COLOR, ConnDot, Hand, Slip } from "@/ui/kit";
 import { DeptBoard, Leaderboard } from "@/ui/Leaderboard";
 import { Mascot } from "@/ui/Mascot";
 import { TimerBar } from "@/ui/Timer";
-import { MonthlyTab, StudentsTab } from "./host/HostExtras";
+import { CollegeTab, MonthlyTab, StudentsTab } from "./host/HostExtras";
 import { ANAGRAM_PACK_OPTIONS, DEFAULT_CUSTOM_WORDS, DIFFICULTY_LABEL } from "@iedc/config/games";
 import { SCORING } from "@iedc/config/rules";
 import { host as H } from "@iedc/config/copy/host";
@@ -85,7 +85,7 @@ async function act(event: string, payload?: unknown): Promise<Ack> {
 
 function Console({ host, state }: { host: HostState; state: PublicState }) {
   const conn = useArena((s) => s.conn);
-  const [tab, setTab] = useState<"players" | "flags" | "students" | "monthly" | "network" | "board">("players");
+  const [tab, setTab] = useState<"players" | "flags" | "students" | "monthly" | "college" | "network" | "board">("players");
   const flagsNew = host.flags.filter((f) => Date.now() - f.at < 5 * 60_000).length;
 
   const exportCsv = async () => {
@@ -137,6 +137,7 @@ function Console({ host, state }: { host: HostState; state: PublicState }) {
                 ["flags", H.tabFlags(flagsNew)],
                 ["students", H.tabStudents],
                 ["monthly", H.tabMonthly],
+                ["college", H.tabCollege],
                 ["network", H.tabNetwork],
                 ["board", H.tabBoard],
               ] as const
@@ -157,6 +158,7 @@ function Console({ host, state }: { host: HostState; state: PublicState }) {
           {tab === "board" && <Board />}
           {tab === "students" && <StudentsTab />}
           {tab === "monthly" && <MonthlyTab />}
+          {tab === "college" && <CollegeTab />}
         </div>
       </div>
     </div>

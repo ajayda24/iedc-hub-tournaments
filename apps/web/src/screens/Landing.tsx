@@ -5,6 +5,7 @@ import { GAME_META, GAME_ORDER } from "@iedc/shared/games/meta";
 import { site } from "@iedc/config/site";
 import { landing as t } from "@iedc/config/copy/landing";
 import { isArenaOrigin } from "@/lib/arena";
+import { useCollege } from "@/lib/college";
 import { store } from "@/lib/storage";
 import { Btn, COLOR, DoodleArrow, Hand, Slip, Squiggle, Star } from "@/ui/kit";
 import { Mascot } from "@/ui/Mascot";
@@ -13,6 +14,7 @@ import { Credits } from "@/ui/Credits";
 const TILTS = [-2, 1.5, -1, 2];
 
 export function Landing() {
+  const college = useCollege();
   const [onLan, setOnLan] = useState(false);
   const [addr, setAddr] = useState<string>(site.defaultArenaAddress);
   useEffect(() => {
@@ -31,11 +33,11 @@ export function Landing() {
     <main className="mx-auto flex max-w-5xl flex-col gap-10 px-5 pb-16 pt-6 md:pl-20">
       <nav className="flex items-center gap-3">
         <span className="text-2xl font-black tracking-tight">
-          {site.brand.left}
+          {college.brand.left}
           <span className="text-coral">/</span>
-          {site.brand.right}
+          {college.brand.right}
         </span>
-        <span className="chip -rotate-3 !bg-sky text-xs">{site.organiser}</span>
+        <span className="chip -rotate-3 !bg-sky text-xs">{college.organiser}</span>
         <Link href="/leaderboard/" className="ml-auto text-sm font-bold underline decoration-2 underline-offset-4">
           {t.leaderboardLink}
         </Link>

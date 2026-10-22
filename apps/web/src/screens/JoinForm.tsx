@@ -1,13 +1,14 @@
 "use client";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { EV, type JoinAck, type StudentCheckAck } from "@iedc/shared/protocol";
-import { DEPARTMENTS, OTHER_DEPARTMENT, SEMESTERS } from "@iedc/config/people";
+import { OTHER_DEPARTMENT } from "@iedc/config/people";
 import { PIN, STUDENT_ID } from "@iedc/config/rules";
 import { site } from "@iedc/config/site";
 import { join as t } from "@iedc/config/copy/join";
 import { emitAck, useArena } from "@/net/arena";
 import { deviceToken, store, type Profile } from "@/lib/storage";
 import { cx } from "@/lib/format";
+import { useCollege } from "@/lib/college";
 import { Avatar, randomAvatar } from "@/ui/Avatar";
 import { Btn, Hand, Slip } from "@/ui/kit";
 import { Mascot } from "@/ui/Mascot";
@@ -23,14 +24,26 @@ export function JoinForm() {
   const [studentId, setStudentId] = useState(saved?.studentId ?? "");
   const [name, setName] = useState(saved?.name ?? "");
   const [sem, setSem] = useState(saved?.sem ?? "");
-  const [dept, setDept] = useState(saved?.dept && DEPARTMENTS.includes(saved.dept) ? saved.dept : saved?.dept ? OTHER_DEPARTMENT : "");
-  const [otherDept, setOtherDept] = useState(saved?.dept && !DEPARTMENTS.includes(saved.dept) ? saved.dept : "");
+  const { departments: DEPARTMENTS, semesters: SEMESTERS } = useCollege();
+  const [dept, setDept] = useState(saved?.dept ?? "");
+  const [otherDept, setOtherDept] = useState("");
   const [avatar, setAvatar] = useState(saved?.avatar ?? randomAvatar());
   const [hasPin, setHasPin] = useState(false);
   const [pin, setPin] = useState("");
   const [pin2, setPin2] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  // keep a remembered choice only while it is still on the list (the host can change the lists)
+  useEffect(() => {
+    if (sem && !SEMESTERS.includes(sem)) setSem("");
+    if (!dept || dept === OTHER_DEPARTMENT || DEPARTMENTS.includes(dept)) return;
+    if (DEPARTMENTS.includes(OTHER_DEPARTMENT)) {
+      setOtherDept(dept);
+      setDept(OTHER_DEPARTMENT);
+    } else setDept("");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [DEPARTMENTS, SEMESTERS]);
 
   const finalDept = dept === OTHER_DEPARTMENT ? otherDept.trim() : dept;
 

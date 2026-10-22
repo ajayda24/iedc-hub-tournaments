@@ -200,3 +200,24 @@ test("student ID + PIN: rejoin on another phone keeps the score, host can reset 
   await expect(board.getByTestId("last-updated")).toContainText("Last updated");
   await expect(board.getByText("Meera Joseph").first()).toBeVisible();
 });
+
+test("host College tab: new departments reach the join form and are saved on the laptop", async ({ browser }) => {
+  const host = await hostPage(browser);
+  await host.getByRole("button", { name: "College", exact: true }).click();
+  await host.getByLabel(/Departments/).fill("Robotics\nAI & DS\nOther");
+  await host.getByLabel(/Sticker next to the logo/).fill("by Test Club");
+  await host.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(host.getByText("changed on this laptop")).toBeVisible();
+  expect(JSON.parse(fs.readFileSync(".e2e-data/college.json", "utf8")).departments).toEqual(["Robotics", "AI & DS", "Other"]);
+
+  const page = await phone(browser);
+  await expect(page.getByRole("button", { name: "AI & DS", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "CSE", exact: true })).toHaveCount(0);
+  await page.goto("/");
+  await expect(page.getByText("by Test Club")).toBeVisible();
+
+  // back to the built-in values for the other tests
+  await host.getByRole("button", { name: "Back to the built-in values" }).click();
+  await expect(host.getByText("built-in", { exact: true })).toBeVisible();
+  expect(fs.existsSync(".e2e-data/college.json")).toBe(false);
+});

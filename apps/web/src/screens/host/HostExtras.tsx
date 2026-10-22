@@ -1,11 +1,12 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { EV, type StudentInfo } from "@iedc/shared/protocol";
+import { EV, type CollegeInfo, type StudentInfo } from "@iedc/shared/protocol";
 import type { HistoryTournament, MonthlyFile } from "@iedc/shared/monthly";
 import { host as H } from "@iedc/config/copy/host";
 import { leaderboard as L } from "@iedc/config/copy/leaderboard";
 import { emitAck } from "@/net/arena";
 import { cx } from "@/lib/format";
+import { refreshCollege } from "@/lib/college";
 import { Btn, Hand } from "@/ui/kit";
 import { Mascot } from "@/ui/Mascot";
 
@@ -251,6 +252,77 @@ export function MonthlyTab() {
         </div>
         <Hand className="mt-2 block text-sm">{H.backupNote}</Hand>
       </section>
+    </div>
+  );
+}
+
+/* ------------------------------ college ------------------------------ */
+
+type CollegeAck = Ack & { college: CollegeInfo & { custom: boolean } };
+const splitList = (s: string) => s.split(/[\n,]+/).map((x) => x.trim()).filter(Boolean);
+
+export function CollegeTab() {
+  const [info, setInfo] = useState<CollegeAck["college"] | null>(null);
+  const [left, setLeft] = useState("");
+  const [right, setRight] = useState("");
+  const [organiser, setOrganiser] = useState("");
+  const [depts, setDepts] = useState("");
+  const [sems, setSems] = useState("");
+  const [saved, setSaved] = useState(false);
+  const show = (c: CollegeAck["college"]) => {
+    setInfo(c);
+    setLeft(c.brand.left);
+    setRight(c.brand.right);
+    setOrganiser(c.organiser);
+    setDepts(c.departments.join("\n"));
+    setSems(c.semesters.join(", "));
+    refreshCollege(c);
+  };
+  useEffect(() => {
+    void call<CollegeAck>(EV.hostCollege).then((r) => r?.ok && show(r.college));
+  }, []);
+  const save = async (payload: unknown) => {
+    const r = await call<CollegeAck>(EV.hostCollege, payload);
+    if (r?.ok) {
+      show(r.college);
+      setSaved(true);
+    }
+  };
+  if (!info) return null;
+  const field = (label: string, value: string, set: (v: string) => void, multi = false) => (
+    <label className="flex flex-col gap-1 text-sm font-bold">
+      {label}
+      {multi ? (
+        <textarea className="field min-h-[6rem] !py-1.5 font-normal" value={value} onChange={(e) => (set(e.target.value), setSaved(false))} />
+      ) : (
+        <input className="field !py-1.5 font-normal" value={value} onChange={(e) => (set(e.target.value), setSaved(false))} />
+      )}
+    </label>
+  );
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex items-start gap-2">
+        <Hand className="flex-1 text-base">{H.collegeIntro}</Hand>
+        <span className={cx("chip text-xs", info.custom ? "!bg-yellow" : "!bg-card")}>{info.custom ? H.collegeCustom : H.collegeBuiltIn}</span>
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        {field(H.collegeLogoLeft, left, setLeft)}
+        {field(H.collegeLogoRight, right, setRight)}
+      </div>
+      {field(H.collegeOrganiser, organiser, setOrganiser)}
+      {field(H.collegeDepartments, depts, setDepts, true)}
+      {field(H.collegeSemesters, sems, setSems)}
+      {saved && <Hand className="text-base !text-ok">{H.collegeSaved}</Hand>}
+      <div className="flex flex-wrap gap-2">
+        <Btn tone="mint" onClick={() => save({ brand: { left, right }, organiser, departments: splitList(depts), semesters: splitList(sems) })}>
+          {H.collegeSave}
+        </Btn>
+        {info.custom && (
+          <Btn tone="paper" onClick={() => confirm(H.confirmCollegeReset) && save({ reset: true })}>
+            {H.collegeReset}
+          </Btn>
+        )}
+      </div>
     </div>
   );
 }
