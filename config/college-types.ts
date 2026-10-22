@@ -1,6 +1,6 @@
 /**
  * What every college profile (colleges/<id>/college.ts) fills in.
- * Run `pnpm setup` to create one by answering a few questions.
+ * Run `pnpm new-college` to create one by answering a few questions.
  */
 export interface College {
   /** folder name under colleges/, lowercase, no spaces (e.g. "iedc", "mec") */

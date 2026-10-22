@@ -1,7 +1,7 @@
 import type { College } from "../../config/college-types";
 
 /**
- * The neutral starter profile. Run `pnpm setup` to make your own college's
+ * The neutral starter profile. Run `pnpm new-college` to make your own college's
  * profile instead of editing this one.
  */
 export const college: College = {

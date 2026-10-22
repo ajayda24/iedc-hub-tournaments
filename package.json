@@ -7,6 +7,7 @@
     "node": ">=20.11"
   },
   "scripts": {
+    "new-college": "node scripts/new-college.mjs",
     "dev": "node scripts/use-college.mjs && pnpm --parallel --filter @iedc/arena --filter @iedc/web dev",
     "dev:arena": "node scripts/use-college.mjs && pnpm --filter @iedc/arena dev",
     "dev:web": "node scripts/use-college.mjs && pnpm --filter @iedc/web dev",
@@ -14,8 +15,12 @@
     "start": "node scripts/use-college.mjs && pnpm --filter @iedc/arena start",
     "kit": "node scripts/use-college.mjs && node scripts/build-kit.mjs",
     "pack:arena": "pnpm kit",
+    "check-setup": "node scripts/check-setup.mjs",
+    "backup": "node scripts/backup.mjs",
+    "leaderboard": "node scripts/leaderboard.mjs",
     "test": "node scripts/use-college.mjs && pnpm -r --if-present test",
     "typecheck": "node scripts/use-college.mjs && pnpm -r --if-present typecheck",
+    "check": "pnpm typecheck && pnpm test",
     "bots": "pnpm --filter @iedc/arena bots",
     "recover:first": "pnpm --filter @iedc/arena recover:first",
     "test:e2e": "node scripts/use-college.mjs && playwright test",
