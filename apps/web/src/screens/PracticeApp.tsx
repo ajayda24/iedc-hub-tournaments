@@ -90,7 +90,7 @@ export function PracticeApp() {
               type="button"
               onClick={() => setGame(g)}
               className={cx("slip text-left transition-transform", game === g ? "-translate-y-1 !shadow-[6px_6px_0_0_var(--color-ink)]" : "")}
-              style={{ background: game === g ? COLOR[m.color] : "var(--color-card)", transform: `rotate(${[-1.2, 0.8, 1.1, -0.7][i]}deg)` }}
+              style={{ background: game === g ? COLOR[m.color] : "var(--color-card)", transform: `rotate(${[-1.2, 0.8, 1.1, -0.7, 0.9][i % 5]}deg)` }}
             >
               <div className="px-4 py-3">
                 <div className="text-xl font-black">{m.title}</div>

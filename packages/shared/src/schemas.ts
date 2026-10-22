@@ -50,7 +50,7 @@ const roundOptionsSchema = z
 
 export const roundConfigSchema = z.object({
   id: z.string().min(1).max(40),
-  game: z.enum(["sudoku", "wordhunt", "anagram", "numbercrunch"]),
+  game: z.enum(["sudoku", "wordhunt", "anagram", "numbercrunch", "queens"]),
   difficulty: z.enum(["easy", "med", "hard"]),
   timeLimitSec: z.number().int().min(20).max(1800),
   options: roundOptionsSchema,

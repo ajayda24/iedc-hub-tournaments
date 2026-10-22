@@ -1,7 +1,7 @@
 /**
  * Load / dry-run simulator: N fake students join the arena and actually play.
- * They solve puzzles with the same engines (Sudoku solver, Wordle filtering,
- * dictionary anagram lookup, Countdown search), at human-ish speeds, and some
+ * They solve puzzles with the same engines (Sudoku and N-Queens solvers, Wordle
+ * filtering, dictionary anagram lookup, Countdown search), at human-ish speeds, and some
  * drop and reconnect to exercise rejoin.
  *
  *   pnpm bots --n 80 --url http://localhost:4000 [--skill 0.7] [--churn 0.05]
@@ -16,6 +16,7 @@ import {
   EV,
   SEMESTERS,
   WORDHUNT_ANSWERS,
+  countQueens,
   createRng,
   scoreGuess,
   solveCrunch,
@@ -165,6 +166,21 @@ async function bot(i: number, stats: BotStats) {
       if (!live(id)) return;
       const best = solveCrunch(pub.numbers, pub.target, good() ? 1500 : 30);
       await submit(id, { expr: best.expr });
+    } else if (r.config.game === "queens") {
+      let sol: number[] = [];
+      countQueens(pub.size, pub.givens, pub.blocked, 1, undefined, (s) => (sol = s));
+      const placed: number[] = pub.givens.slice();
+      for (const q of rng.shuffle(sol.filter((c) => !pub.givens.includes(c)))) {
+        if (!live(id)) return;
+        await think(pub.size >= 10 ? 4000 : 2500);
+        // a weaker bot sometimes drops a queen one column off first, then fixes it
+        if (!good()) {
+          await submit(id, { queens: [...placed, q % pub.size ? q - 1 : q + 1], final: false });
+          await think(2000);
+        }
+        placed.push(q);
+        await submit(id, { queens: placed, final: placed.length === pub.size });
+      }
     }
   }
 

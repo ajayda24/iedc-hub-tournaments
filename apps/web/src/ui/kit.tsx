@@ -8,6 +8,7 @@ export const COLOR: Record<GameColor | "paper" | "ink", string> = {
   mint: "var(--color-mint)",
   coral: "var(--color-coral)",
   sky: "var(--color-sky)",
+  lilac: "var(--color-lilac)",
   paper: "var(--color-card)",
   ink: "var(--color-ink)",
 };

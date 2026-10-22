@@ -22,12 +22,13 @@ The host taps **Start** and every connected phone gets the same puzzle at the sa
 | **Mini Sudoku** | 6×6 (easy and medium) or 9×9 (hard), with pencil marks, undo and conflict highlighting | Every puzzle has exactly one solution |
 | **Word Hunt** | Wordle-style: 5 letters, 6 tries, the same word for everyone | Colours are computed on the server, so the word never reaches phones |
 | **Number Crunch** | Reach the target with + − × ÷ by tapping tiles, Countdown style | Every target is guaranteed reachable |
+| **N-Queen** | Classic N-Queens on 6×6 (easy), 8×8 (medium) or 10×10 (hard), with a fixed queen and blocked cells, ✕ notes and clash highlighting | Every board has exactly one completion, so a memorised textbook answer doesn't help |
 
 **Scoring:**
 - Solve: 1000 × difficulty.
 - Speed bonus: up to +500.
 - **First blood**: +100.
-- Wrong Sudoku check: −25.
+- Wrong Sudoku or N-Queen check: −25.
 - Partial credit (up to 300) when time runs out.
 - Ties go to whoever was faster overall.
 

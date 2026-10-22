@@ -96,7 +96,7 @@ export function Landing() {
           <h2 className="text-3xl font-black">{t.practiceTitle}</h2>
           <Squiggle className="mb-2 h-3 w-24 text-coral" />
         </div>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {GAME_ORDER.map((g, i) => {
             const m = GAME_META[g];
             return (

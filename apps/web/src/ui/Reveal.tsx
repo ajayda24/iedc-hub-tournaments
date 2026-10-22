@@ -21,6 +21,22 @@ export function Reveal({ reveal, big }: { reveal: RevealT; big?: boolean }) {
       </div>
     );
   }
+  if (reveal.kind === "queens") {
+    const { size, queens, givens, blocked } = reveal;
+    const cell = big ? (size >= 10 ? "h-9 w-9 text-xl" : "h-10 w-10 text-2xl") : "h-6 w-6 text-sm";
+    return (
+      <div className="mx-auto inline-grid border-[3px] border-ink bg-card" style={{ gridTemplateColumns: `repeat(${size}, auto)` }}>
+        {Array.from({ length: size * size }, (_, i) => {
+          const dark = (Math.floor(i / size) + (i % size)) % 2 === 1;
+          return (
+            <span key={i} className={cx("grid place-items-center border border-ink/20", cell, dark ? "bg-paper-2" : "bg-card", blocked.includes(i) && "!bg-ink/15 text-ink/50")}>
+              {queens.includes(i) ? <span className={givens.includes(i) ? "text-ink" : "text-coral"}>♛</span> : blocked.includes(i) ? "✕" : ""}
+            </span>
+          );
+        })}
+      </div>
+    );
+  }
   const { size, boxR, boxC, grid, givens } = reveal;
   const cell = big ? "h-10 w-10 text-2xl" : "h-7 w-7 text-base";
   return (

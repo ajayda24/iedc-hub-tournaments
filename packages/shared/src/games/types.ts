@@ -3,8 +3,8 @@ import type { z } from "zod";
 export type Difficulty = "easy" | "med" | "hard";
 export const DIFFICULTIES: Difficulty[] = ["easy", "med", "hard"];
 
-export type GameId = "sudoku" | "wordhunt" | "anagram" | "numbercrunch";
-export type GameColor = "yellow" | "mint" | "coral" | "sky";
+export type GameId = "sudoku" | "wordhunt" | "anagram" | "numbercrunch" | "queens";
+export type GameColor = "yellow" | "mint" | "coral" | "sky" | "lilac";
 
 /**
  * Result of checking one submission.
@@ -63,4 +63,5 @@ export interface GameDefinition<Pub = any, Secret = any, Sub = any, Prog = any, 
 export type Reveal =
   | { kind: "grid"; size: number; boxR: number; boxC: number; grid: number[]; givens: number[] }
   | { kind: "words"; words: string[] }
-  | { kind: "expression"; target: number; expression: string };
+  | { kind: "expression"; target: number; expression: string }
+  | { kind: "queens"; size: number; queens: number[]; givens: number[]; blocked: number[] };

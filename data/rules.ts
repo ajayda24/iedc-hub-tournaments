@@ -11,7 +11,7 @@ export const SCORING = {
   speedMax: 500,
   /** extra for the very first solver of a round */
   firstBlood: 100,
-  /** lost per wrong Sudoku check */
+  /** lost per wrong Sudoku / N-Queen check */
   wrongPenalty: 25,
   /** most you can get without solving (partial credit) */
   partialMax: 300,

@@ -2,9 +2,9 @@
  * Everything players read about each game: names, one-liners, rules, colours,
  * default round lengths, and the order games appear in lists.
  */
-export type GameKey = "sudoku" | "wordhunt" | "anagram" | "numbercrunch";
+export type GameKey = "sudoku" | "wordhunt" | "anagram" | "numbercrunch" | "queens";
 export type DifficultyKey = "easy" | "med" | "hard";
-export type ColorKey = "yellow" | "mint" | "coral" | "sky";
+export type ColorKey = "yellow" | "mint" | "coral" | "sky" | "lilac";
 
 export interface GameText {
   id: GameKey;
@@ -50,10 +50,18 @@ export const GAMES: Record<GameKey, GameText> = {
     color: "sky",
     defaultTimeSec: { easy: 90, med: 120, hard: 150 },
   },
+  queens: {
+    id: "queens",
+    title: "N-Queen",
+    tagline: "Royalty, but make it socially distanced.",
+    howTo: "Place one queen in every row and column so no two share a diagonal either. Crowns are fixed, ✕ cells are off-limits. Tap once for your own ✕, twice for a queen. A full, clash-free board finishes it.",
+    color: "lilac",
+    defaultTimeSec: { easy: 90, med: 150, hard: 240 },
+  },
 };
 
 /** Order of games on the landing page, practice room and host "add round" buttons */
-export const GAME_ORDER: GameKey[] = ["anagram", "sudoku", "wordhunt", "numbercrunch"];
+export const GAME_ORDER: GameKey[] = ["anagram", "sudoku", "wordhunt", "numbercrunch", "queens"];
 
 /** How difficulties are written everywhere */
 export const DIFFICULTY_LABEL: Record<DifficultyKey, string> = { easy: "easy", med: "medium", hard: "hard" };

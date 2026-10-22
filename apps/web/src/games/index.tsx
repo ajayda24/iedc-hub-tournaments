@@ -13,4 +13,5 @@ export const VIEWS: Record<GameId, ComponentType<ViewProps<any, any>>> = {
   wordhunt: dynamic(() => import("./WordHuntView"), { ssr: false, loading: Loading }),
   anagram: dynamic(() => import("./AnagramView"), { ssr: false, loading: Loading }),
   numbercrunch: dynamic(() => import("./NumberCrunchView"), { ssr: false, loading: Loading }),
+  queens: dynamic(() => import("./QueensView"), { ssr: false, loading: Loading }),
 };

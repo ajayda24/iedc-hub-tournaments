@@ -60,6 +60,17 @@ export const gameText = {
     closest: "Closest so far:",
     away: (d: number) => `(${d} away)`,
   },
+  queens: {
+    needQueens: (n: number) => `Exactly ${n} queens, please.`,
+    clashing: (n: number) => `${n} queens are fighting.`,
+    notQuite: "Not quite.",
+    undoButton: "Undo",
+    clearButton: "Clear",
+    /** counter under the board */
+    placed: (have: number, need: number) => `${have} / ${need} queens`,
+    /** screen-reader label for each cell */
+    cellLabel: (row: number, col: number, what: string) => `row ${row} column ${col} ${what}`,
+  },
   /** shown while a game screen downloads */
   loading: "sharpening pencils…",
   /** shown when the connection drops mid-move */
