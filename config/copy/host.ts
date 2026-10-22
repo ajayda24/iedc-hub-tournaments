@@ -98,7 +98,7 @@ export const host = {
   perIpWarnAt: 12,
   cheatSheet: "Hotspot cheat-sheet",
   cheatSheetTips: [
-    "Windows: run setup-hotspot.ps1 once as admin (raises the client limit to 128), then start-arena.bat.",
+    "Windows: run 1-FIRST-TIME-SETUP.bat once (raises the client limit to 128), then 2-START-EVENT.bat.",
     "The laptop hotspot is always 192.168.137.1, so print the QR before the event.",
     "Overflow: a phone with \"Wi-Fi sharing\" joins the laptop hotspot and re-shares it. Same URL works.",
     "Any phone hotspot used must have mobile data OFF.",

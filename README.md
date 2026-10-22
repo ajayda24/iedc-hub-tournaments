@@ -1,6 +1,6 @@
-# Brain Arena · IEDC Hub Tournaments
+# Brain Arena · offline logic-game tournaments for colleges
 
-Live, offline, tournament-style logic games for college events.
+Live, offline, tournament-style logic games for college events. Built for IEDC, ready for any college.
 
 The host taps **Start** and every connected phone gets the same puzzle at the same moment. Speed and correctness feed a live leaderboard that every device can see, along with a department-vs-department board. It all runs on **one laptop's Wi-Fi hotspot with no internet**, so nobody can ask an AI for the answer.
 
@@ -9,6 +9,56 @@ The host taps **Start** and every connected phone gets the same puzzle at the sa
 | Big screen (projector) | Host console |
 |---|---|
 | ![Projector](docs/screens/projector-playing.png) | ![Host](docs/screens/host-console.png) |
+
+---
+
+## Start here
+
+**1. I just want to run an event** (no coding)
+Download `event-kit-example.zip` from the [latest release](../../releases/latest) and unzip it on a Windows laptop with [Node.js 20+](https://nodejs.org). Double-click **`1-FIRST-TIME-SETUP.bat`** once, and **`2-START-EVENT.bat`** on the day. Put your college's name and departments in the host console's **College** tab. The full checklist is [docs/EVENT_DAY.md](docs/EVENT_DAY.md) (also `README.txt` inside the kit).
+
+**2. I want it to be my college's** (own name, website and monthly leaderboard)
+Fork this repo, then:
+
+```bash
+pnpm install
+pnpm new-college     # answer a few questions: name, departments, semesters
+pnpm dev             # try it: http://localhost:3000
+pnpm kit             # build your event kit: dist/event-kit-<your-college>/
+```
+
+Step by step, including the free website on Vercel: [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md).
+
+**3. I want to change the code** (new games, features)
+See [Development](#development) below and [docs/ADD_A_GAME.md](docs/ADD_A_GAME.md).
+
+### Everyday commands
+
+| Command | What it does |
+|---|---|
+| `pnpm new-college` | Set up your college (name, departments, semesters) |
+| `pnpm dev` | Run everything on this computer |
+| `pnpm kit` | Build the event-laptop kit (folder + zip) |
+| `pnpm check-setup` | Check that everything is installed, and show where your data is |
+| `pnpm backup` | Copy all event data (PINs, history) to `backups/<date-time>/` |
+| `pnpm leaderboard <file>` | Publish the monthly leaderboard you downloaded from the host console |
+| `pnpm check` | Typecheck and unit tests |
+
+### Where things are
+
+```
+colleges/<id>/    your college: name, departments, semesters (college.ts) and the published monthly.json
+config/           text, rules, scoring, timings and word lists shared by every college
+kit/              the launchers that go into the event kit (.bat files, hotspot scripts)
+apps/web          the website and phone app (Next.js)
+apps/arena        the laptop server (Fastify + Socket.IO)
+packages/shared   game engines, scoring, protocol
+scripts/          the commands above
+docs/             guides
+arena-data/       (not in git) this computer's event data when running from source
+```
+
+More: [docs/CUSTOMIZE.md](docs/CUSTOMIZE.md) has a "change X → edit file Y" table, and [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) covers common problems.
 
 ---
 
@@ -53,7 +103,7 @@ The host taps **Start** and every connected phone gets the same puzzle at the sa
 **Monthly leaderboard** (`/leaderboard`):
 - Every tournament is recorded on the laptop when the host shows the podium. The **Monthly** tab lets the host include/exclude, rename or delete them.
 - Points add up per Student ID across the month; this month and previous months are shown, with a "Last updated" time.
-- On the event Wi-Fi the page is live from the laptop. Online it shows `data/leaderboard/monthly.json`: download it from the Monthly tab, commit, push, and Vercel rebuilds ([how](data/README.md#publishing-the-monthly-leaderboard)). No Student IDs are published.
+- On the event Wi-Fi the page is live from the laptop. Online it shows `colleges/<id>/monthly.json`: download it from the Monthly tab, run `pnpm leaderboard <file>`, commit and push ([how](docs/LEADERBOARD.md)). No Student IDs are published.
 
 **Host console:**
 - Playlist builder.
@@ -61,6 +111,7 @@ The host taps **Start** and every connected phone gets the same puzzle at the sa
 - Kick, unblock or adjust points.
 - Cheat-flag feed.
 - **Network doctor**: QR per network, players per IP, and a warning if the laptop itself has internet.
+- **College** tab: change the college name, departments and semesters on the laptop, no code.
 - CSV export.
 
 **Robustness:**
@@ -78,23 +129,20 @@ The host taps **Start** and every connected phone gets the same puzzle at the sa
 
 ---
 
-## Changing text and settings
-
-All wording (titles, descriptions, buttons, funny messages), the department list, scoring numbers, timings and word lists live in **[`data/`](data/README.md)**. Edit a file there and every screen updates. No app code to touch. `data/README.md` has a "change X → edit file Y" table.
-
----
-
 ## Running an event
 
 👉 **Read [docs/EVENT_DAY.md](docs/EVENT_DAY.md)**. It's the checklist for hosts.
 
 Short version (Windows laptop):
 
-1. `pnpm pack:arena` on a dev machine, then copy `dist/brain-arena/` to the laptop. The laptop only needs Node.js 20+.
-2. Once, as admin: run **`setup-hotspot.ps1`**. It raises the Mobile Hotspot limit to **128** (`WifiMaxPeers`), keeps the hotspot awake, opens the firewall and sets up the loopback adapter, so the hotspot has no internet.
-3. On the day, double-click **`start-arena.bat`**. It turns on the hotspot and starts the server.
+1. Run `pnpm kit`, then copy `dist/event-kit-<college>/` (or the zip) to the laptop. The laptop only needs Node.js 20+.
+2. Once: double-click **`1-FIRST-TIME-SETUP.bat`** (it asks for admin). It raises the Mobile Hotspot limit to **128** (`WifiMaxPeers`), keeps the hotspot awake, opens the firewall and sets up the loopback adapter, so the hotspot has no internet.
+3. On the day, double-click **`2-START-EVENT.bat`**. It turns on the hotspot and starts the server.
 4. Students join the Wi-Fi and open **`http://192.168.137.1:4000`** (the address never changes, so print the QR).
-5. Host: `http://localhost:4000/host/` (the PIN is in the terminal). Projector: `http://localhost:4000/screen/`.
+5. Host: `http://localhost:4000/host/` (the PIN is in the window). Projector: `http://localhost:4000/screen/`.
+6. After the event, double-click **`BACKUP-DATA.bat`** and copy `backups/` to a pen drive or Google Drive.
+
+**Your data lives in `arena-data/` next to the .bat files.** That's students' PINs (`students.json`), every tournament (`history.json`), the current event and the CSV results. Rebuilding or replacing the kit never touches it. To move to a new kit, copy the old `arena-data` folder into it.
 
 For more phones than the laptop's Wi-Fi card can handle, you can add *Wi-Fi sharing* repeater phones (same URL) or USB Wi-Fi dongles (one QR per network). The guide covers both.
 
@@ -102,12 +150,14 @@ For more phones than the laptop's Wi-Fi card can handle, you can add *Wi-Fi shar
 
 ## Deploy the online site (Vercel)
 
-The web app is a static export, so Vercel can host the **online half**: the landing page, solo practice and the installable PWA. Live events still run on the laptop. Vercel can't host the arena server, because it needs a long-running WebSocket process.
+The web app is a static export, so Vercel can host the **online half**: the landing page, solo practice, the monthly leaderboard and the installable PWA. Live events still run on the laptop.
 
-1. In Vercel, choose **Add New → Project** and import `ajayda24/iedc-hub-tournaments`.
-2. Set **Root Directory** to `apps/web` and leave "Include files outside the root directory" on. Everything else comes from `apps/web/vercel.json`: a pnpm workspace install, `next build --webpack` and output `out/`, deployed as a plain static site (framework "Other").
-3. If an old deploy fails with `routes-manifest.json couldn't be found`, set **Settings → Build & Deployment → Framework Preset** to **Other** and redeploy.
-4. No environment variables are needed. Every push to `main` redeploys.
+1. In Vercel, choose **Add New → Project** and import your fork.
+2. Set **Root Directory** to `apps/web` and leave "Include files outside the root directory" on. Everything else comes from `apps/web/vercel.json`.
+3. **Settings → Environment Variables:** add `COLLEGE` = your college id (the folder name under `colleges/`, e.g. `iedc`). Without it, the build stops with a clear message, so the site never goes live as the placeholder college.
+4. If an old deploy fails with `routes-manifest.json couldn't be found`, set **Framework Preset** to **Other** and redeploy.
+
+Every push to `main` redeploys.
 
 ---
 
@@ -117,30 +167,20 @@ The web app is a static export, so Vercel can host the **online half**: the land
 pnpm install
 pnpm dev            # arena on :4000 + Next dev server on :3000
                     # open http://localhost:3000/host/ (PIN printed by the arena), /screen/, /play/
-pnpm test           # engine + arena unit tests (Vitest)
+pnpm check          # typecheck + engine/arena unit tests (Vitest)
 pnpm build          # static web export (apps/web/out, precompressed) + arena bundle
 pnpm start          # arena serving the built app on :4000
-pnpm test:e2e       # Playwright: real arena + browsers (needs `pnpm build` first)
+pnpm test:e2e       # Playwright: real arena + browsers (needs pnpm build, and pnpm kit for the kit test)
 pnpm bots --n 80    # 80 simulated students who actually solve puzzles (dry run / load test)
-pnpm pack:arena     # dist/brain-arena: single-folder build for the event laptop
+COLLEGE=iedc pnpm build   # build for one college without changing .env
 ```
+
+**Which college is active?** The `COLLEGE` environment variable, else `COLLEGE=` in `.env` (written by `pnpm new-college`), else `example`. `scripts/use-college.mjs` writes `config/college.ts` for it on install and before dev, build, test and kit.
 
 Measured locally with `pnpm bots --n 80` over four rounds:
 - the arena process used **~2% CPU and ~140 MB RAM**,
 - the leaderboard reflected a submit after **p50 ~300 ms / p95 < 500 ms** (updates are throttled to 2 per second),
 - first load on a phone is about **165 KB of gzipped JS**, and game screens are split into their own chunks.
-
-### Layout
-
-```
-data              ALL text, labels, constants and word lists (edit here)
-packages/shared   protocol types, zod schemas, seeded RNG, scoring, the 4 game engines (+ tests)
-apps/arena        Fastify + Socket.IO server: Arena state machine, anti-cheat, persistence, network info
-apps/web          Next.js (App Router, static export) + Serwist PWA: /play /host /screen /practice /leaderboard
-scripts           precompress, pack-arena, Windows hotspot scripts
-e2e               Playwright end-to-end tests
-docs              EVENT_DAY.md, screenshots
-```
 
 ### How it works
 
@@ -152,12 +192,8 @@ docs              EVENT_DAY.md, screenshots
   - Puzzles are generated with a fresh seed when the host starts a round.
   - Players only get the public part, and only once the countdown ends.
   - Every move is checked and timestamped by the arena.
-- **Adding a game.**
-  - Write an engine that implements `GameDefinition` in `packages/shared/src/games/<id>/engine.ts`: `generate`, `check`, `partialCredit`, `reveal`.
-  - Add metadata to `games/meta.ts`.
-  - Add a view in `apps/web/src/games/`.
-  - Register it in the two registries.
-- **Content.** All text and constants live in `data/` (see above). Word lists come from the MIT [`word-list`](https://github.com/sindresorhus/word-list) package. Edit `data/words/wordhunt-answers.txt` or `data/words/anagram-packs.source.json`, then run `pnpm content:build`.
+- **Adding a game:** see [docs/ADD_A_GAME.md](docs/ADD_A_GAME.md).
+- **Content.** All text and constants live in `config/`. Word lists come from the MIT [`word-list`](https://github.com/sindresorhus/word-list) package. Edit `config/words/wordhunt-answers.txt` or `config/words/anagram-packs.source.json`, then run `pnpm content:build`.
 
 ---
 
