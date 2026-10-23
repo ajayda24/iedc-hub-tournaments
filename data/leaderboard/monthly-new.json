@@ -1,0 +1,410 @@
+{
+  "updatedAt": "2026-10-23T08:53:44.142Z",
+  "months": {
+    "2026-10": {
+      "tournaments": [
+        {
+          "name": "Weekly Series",
+          "date": 1792745428166,
+          "players": 35
+        }
+      ],
+      "standings": [
+        {
+          "key": "18pfugc",
+          "name": "Sneha P",
+          "dept": "EC",
+          "sem": "S3",
+          "points": 5716,
+          "played": 1,
+          "wins": 1,
+          "best": 5716
+        },
+        {
+          "key": "1sa9l90",
+          "name": "Zainaba ASHIQUA",
+          "dept": "IT",
+          "sem": "S7",
+          "points": 4651,
+          "played": 1,
+          "wins": 0,
+          "best": 4651
+        },
+        {
+          "key": "9k2u7k",
+          "name": "Gopika T P",
+          "dept": "CSE",
+          "sem": "S5",
+          "points": 4585,
+          "played": 1,
+          "wins": 0,
+          "best": 4585
+        },
+        {
+          "key": "1hqytyo",
+          "name": "Abhinav B Kumar",
+          "dept": "CSE",
+          "sem": "S3",
+          "points": 3962,
+          "played": 1,
+          "wins": 0,
+          "best": 3962
+        },
+        {
+          "key": "1ewp32c",
+          "name": "Punnya Raj Krishnan",
+          "dept": "CSE",
+          "sem": "S5",
+          "points": 3916,
+          "played": 1,
+          "wins": 0,
+          "best": 3916
+        },
+        {
+          "key": "147r6ap",
+          "name": "Advaidh Mohan P",
+          "dept": "ME",
+          "sem": "S3",
+          "points": 3672,
+          "played": 1,
+          "wins": 0,
+          "best": 3672
+        },
+        {
+          "key": "13xrklq",
+          "name": "ADITHYA EK",
+          "dept": "ME",
+          "sem": "S3",
+          "points": 3581,
+          "played": 1,
+          "wins": 0,
+          "best": 3581
+        },
+        {
+          "key": "v9ekpd",
+          "name": "Minha Sherin. K. V.",
+          "dept": "IT",
+          "sem": "S7",
+          "points": 3538,
+          "played": 1,
+          "wins": 0,
+          "best": 3538
+        },
+        {
+          "key": "1rgdxo2",
+          "name": "Fahima K",
+          "dept": "IT",
+          "sem": "S7",
+          "points": 2998,
+          "played": 1,
+          "wins": 0,
+          "best": 2998
+        },
+        {
+          "key": "e5x215",
+          "name": "Aflah bin",
+          "dept": "ME",
+          "sem": "S1",
+          "points": 2829,
+          "played": 1,
+          "wins": 0,
+          "best": 2829
+        },
+        {
+          "key": "1qmbz36",
+          "name": "SREEMINNIKA",
+          "dept": "IT",
+          "sem": "S7",
+          "points": 2756,
+          "played": 1,
+          "wins": 0,
+          "best": 2756
+        },
+        {
+          "key": "76w5r2",
+          "name": "Fathima Jumana",
+          "dept": "EC",
+          "sem": "S1",
+          "points": 2719,
+          "played": 1,
+          "wins": 0,
+          "best": 2719
+        },
+        {
+          "key": "tldt1k",
+          "name": "Fathima Lazi",
+          "dept": "IT",
+          "sem": "S7",
+          "points": 2705,
+          "played": 1,
+          "wins": 0,
+          "best": 2705
+        },
+        {
+          "key": "13dvipr",
+          "name": "Hrishikesh",
+          "dept": "IT",
+          "sem": "S7",
+          "points": 2703,
+          "played": 1,
+          "wins": 0,
+          "best": 2703
+        },
+        {
+          "key": "13dae45",
+          "name": "Ashin s s",
+          "dept": "ME",
+          "sem": "S3",
+          "points": 2702,
+          "played": 1,
+          "wins": 0,
+          "best": 2702
+        },
+        {
+          "key": "duj4xm",
+          "name": "Aksa Das",
+          "dept": "EEE",
+          "sem": "S3",
+          "points": 2612,
+          "played": 1,
+          "wins": 0,
+          "best": 2612
+        },
+        {
+          "key": "n8i7rf",
+          "name": "Rahan Ali Ahamed",
+          "dept": "CSE",
+          "sem": "S3",
+          "points": 2602,
+          "played": 1,
+          "wins": 0,
+          "best": 2602
+        },
+        {
+          "key": "pgi6t6",
+          "name": "Nandhana. K",
+          "dept": "CSE",
+          "sem": "S3",
+          "points": 2444,
+          "played": 1,
+          "wins": 0,
+          "best": 2444
+        },
+        {
+          "key": "1q2fx77",
+          "name": "Sugannya k",
+          "dept": "IT",
+          "sem": "S7",
+          "points": 2096,
+          "played": 1,
+          "wins": 0,
+          "best": 2096
+        },
+        {
+          "key": "dby8y8",
+          "name": "Ken",
+          "dept": "PT",
+          "sem": "S1",
+          "points": 1773,
+          "played": 1,
+          "wins": 0,
+          "best": 1773
+        },
+        {
+          "key": "12j8fj9",
+          "name": "MUHAMMED MUBASHIR CN",
+          "dept": "ME",
+          "sem": "S3",
+          "points": 1487,
+          "played": 1,
+          "wins": 0,
+          "best": 1487
+        },
+        {
+          "key": "1rwvx61",
+          "name": "Fathima Sana pk",
+          "dept": "CSE",
+          "sem": "S3",
+          "points": 1361,
+          "played": 1,
+          "wins": 0,
+          "best": 1361
+        },
+        {
+          "key": "nihtge",
+          "name": "Pooja S",
+          "dept": "CSE",
+          "sem": "S3",
+          "points": 1341,
+          "played": 1,
+          "wins": 0,
+          "best": 1341
+        },
+        {
+          "key": "10lb7og",
+          "name": "Akash",
+          "dept": "IT",
+          "sem": "S7",
+          "points": 1241,
+          "played": 1,
+          "wins": 0,
+          "best": 1241
+        },
+        {
+          "key": "1pidkba",
+          "name": "Theertha M",
+          "dept": "IT",
+          "sem": "S7",
+          "points": 1235,
+          "played": 1,
+          "wins": 0,
+          "best": 1235
+        },
+        {
+          "key": "1numxq3",
+          "name": "ARDRA K B",
+          "dept": "CSE",
+          "sem": "S3",
+          "points": 1187,
+          "played": 1,
+          "wins": 0,
+          "best": 1187
+        },
+        {
+          "key": "133srit",
+          "name": "ABHINAV M",
+          "dept": "ME",
+          "sem": "S3",
+          "points": 626,
+          "played": 1,
+          "wins": 0,
+          "best": 626
+        },
+        {
+          "key": "9tzaek",
+          "name": "Fadil Yusuf",
+          "dept": "CSE",
+          "sem": "S5",
+          "points": 453,
+          "played": 1,
+          "wins": 0,
+          "best": 453
+        },
+        {
+          "key": "11zucqx",
+          "name": "Sami",
+          "dept": "EEE",
+          "sem": "S1",
+          "points": 360,
+          "played": 1,
+          "wins": 0,
+          "best": 360
+        },
+        {
+          "key": "1c0tyj6",
+          "name": "Nitha Mohan V",
+          "dept": "CSE",
+          "sem": "S3",
+          "points": 300,
+          "played": 1,
+          "wins": 0,
+          "best": 300
+        },
+        {
+          "key": "196cy79",
+          "name": "Sharun krishna T",
+          "dept": "EP",
+          "sem": "S5",
+          "points": 163,
+          "played": 1,
+          "wins": 0,
+          "best": 163
+        },
+        {
+          "key": "199f1ua",
+          "name": "Sravan Mukesh A",
+          "dept": "EC",
+          "sem": "S3",
+          "points": 129,
+          "played": 1,
+          "wins": 0,
+          "best": 129
+        },
+        {
+          "key": "d2fovl",
+          "name": "Diya Fathima. P",
+          "dept": "EC",
+          "sem": "S3",
+          "points": 120,
+          "played": 1,
+          "wins": 0,
+          "best": 120
+        },
+        {
+          "key": "129bzc9",
+          "name": "Akshay k Ramesh",
+          "dept": "ME",
+          "sem": "S3",
+          "points": 60,
+          "played": 1,
+          "wins": 0,
+          "best": 60
+        },
+        {
+          "key": "1oem541",
+          "name": "Anjali Krishna M S",
+          "dept": "CSE",
+          "sem": "S3",
+          "points": 0,
+          "played": 1,
+          "wins": 0,
+          "best": 0
+        }
+      ],
+      "depts": [
+        {
+          "dept": "IT",
+          "players": 9,
+          "points": 23923,
+          "avg": 2658
+        },
+        {
+          "dept": "EC",
+          "players": 4,
+          "points": 8684,
+          "avg": 2171
+        },
+        {
+          "dept": "ME",
+          "players": 7,
+          "points": 14957,
+          "avg": 2137
+        },
+        {
+          "dept": "CSE",
+          "players": 11,
+          "points": 22151,
+          "avg": 2014
+        },
+        {
+          "dept": "PT",
+          "players": 1,
+          "points": 1773,
+          "avg": 1773
+        },
+        {
+          "dept": "EEE",
+          "players": 2,
+          "points": 2972,
+          "avg": 1486
+        },
+        {
+          "dept": "EP",
+          "players": 1,
+          "points": 163,
+          "avg": 163
+        }
+      ]
+    }
+  }
+}
