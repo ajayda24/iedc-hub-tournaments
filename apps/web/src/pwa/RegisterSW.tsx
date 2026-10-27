@@ -1,6 +1,6 @@
 "use client";
 import { useEffect } from "react";
-import { isArenaOrigin } from "@/lib/arena";
+import { isArenaOrigin } from "@/lib/arenaUrl";
 
 /**
  * The service worker only makes sense on the online site: it caches the app

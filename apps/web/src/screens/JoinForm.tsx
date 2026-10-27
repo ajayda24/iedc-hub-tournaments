@@ -1,10 +1,10 @@
 "use client";
 import { useState, type FormEvent } from "react";
 import { EV, type JoinAck, type StudentCheckAck } from "@iedc/shared/protocol";
-import { DEPARTMENTS, OTHER_DEPARTMENT, SEMESTERS } from "@iedc/data/people";
-import { PIN, STUDENT_ID } from "@iedc/data/rules";
-import { site } from "@iedc/data/site";
-import { join as t } from "@iedc/data/copy/join";
+import { DEPARTMENTS, OTHER_DEPARTMENT, SEMESTERS } from "@iedc/config/people";
+import { PIN, STUDENT_ID } from "@iedc/config/rules";
+import { site } from "@iedc/config/site";
+import { join as t } from "@iedc/config/copy/join";
 import { emitAck, useArena } from "@/net/arena";
 import { deviceToken, store, type Profile } from "@/lib/storage";
 import { cx } from "@/lib/format";

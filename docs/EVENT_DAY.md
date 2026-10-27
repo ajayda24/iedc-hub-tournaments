@@ -49,7 +49,7 @@ Everything runs from **one laptop**. Nobody needs internet, and students install
 | Results | Read out first blood; the screen rotates the answer, top round results, overall board and dept wars | Their points, the answer and the full leaderboard |
 | Finale | **Show podium** (this also records the tournament for the monthly leaderboard) | Podium, final rank and a funny title |
 | After | **Export CSV** (also saved in `arena-data/` on the laptop) | — |
-| End of the day | **Monthly** tab → **Download for website** → replace `data/leaderboard/monthly.json` in the repo, commit, push | The website's `/leaderboard` updates after Vercel rebuilds |
+| End of the day | **Monthly** tab → **Download for website** → replace `config/leaderboard/monthly.json` in the repo, commit, push | The website's `/leaderboard` updates after Vercel rebuilds |
 
 - **Knockout mode** (Event settings): the bottom X% are eliminated after each round and keep watching as spectators.
 - **Anagram custom words**: pick "Custom words" in the round to use your own (event themes, sponsor names, inside jokes).

@@ -1,4 +1,4 @@
-# `data/` — every word and setting in Brain Arena
+# `config/`: every word and setting in Brain Arena
 
 Want to change some wording, a list or a number? Edit the right file here. **You never need to touch the app code.** Every screen (phones, host console, big screen, practice, landing page) and the arena server read from this folder.
 
@@ -61,7 +61,7 @@ roundOf: (n: number, total: number) => `round ${n} of ${total}`,
 There's no database. The event laptop keeps every tournament in `arena-data/history.json`, and the website shows `leaderboard/monthly.json`:
 
 1. Host console → **Monthly** tab → tick or untick tournaments → **Download for website**.
-2. Replace `data/leaderboard/monthly.json` with the downloaded file, commit and push to `main`.
+2. Replace `config/leaderboard/monthly.json` with the downloaded file, commit and push to `main`.
 3. Vercel rebuilds; `/leaderboard` shows the new standings and the "Last updated" time.
 
 The file has names, departments, semesters and points only, never Student IDs or PINs. **Backup history** (in the same tab) does include Student IDs, so keep it private and never commit it.

@@ -7,7 +7,9 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-const out = path.join(root, "dist", "brain-arena");
+// --out <folder> builds somewhere else (handy for testing without touching the real kit)
+const outArg = process.argv.indexOf("--out");
+const out = outArg > 0 ? path.resolve(process.argv[outArg + 1]) : path.join(root, "dist", "brain-arena");
 const run = (cmd) => execSync(cmd, { stdio: "inherit", cwd: root });
 
 // Only replace what this script builds. Never wipe the whole folder: the laptop's
@@ -22,7 +24,7 @@ fs.cpSync(path.join(root, "apps", "web", "out"), path.join(out, "web"), { recurs
 // the service worker is only for the online site; the LAN copy doesn't need it
 for (const f of fs.readdirSync(path.join(out, "web"))) if (/^(sw|swe-worker)/.test(f)) fs.rmSync(path.join(out, "web", f));
 for (const f of ["start-arena.bat", "start-arena.sh", "setup-hotspot.ps1", "start-hotspot.ps1"]) {
-  fs.copyFileSync(path.join(root, "scripts", "windows", f), path.join(out, f));
+  fs.copyFileSync(path.join(root, "scripts", "event-kit", f), path.join(out, f));
 }
 fs.chmodSync(path.join(out, "start-arena.sh"), 0o755);
 fs.copyFileSync(path.join(root, "docs", "EVENT_DAY.md"), path.join(out, "README.txt"));

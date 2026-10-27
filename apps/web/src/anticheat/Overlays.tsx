@@ -4,8 +4,8 @@ import { Mascot } from "@/ui/Mascot";
 import { Btn } from "@/ui/kit";
 import { sfx } from "@/ui/sfx";
 import type { Strike } from "./useAntiCheat";
-import { anticheat as A } from "@iedc/data/copy/anticheat";
-import { common } from "@iedc/data/copy/common";
+import { anticheat as A } from "@iedc/config/copy/anticheat";
+import { common } from "@iedc/config/copy/common";
 
 export function InternetBlock() {
   useEffect(() => sfx.alarm(), []);

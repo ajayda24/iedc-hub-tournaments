@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Mascot } from "@/ui/Mascot";
-import { common } from "@iedc/data/copy/common";
+import { common } from "@iedc/config/copy/common";
 
 export const metadata = { title: common.pageTitles.offline };
 

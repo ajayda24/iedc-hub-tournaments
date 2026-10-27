@@ -133,7 +133,7 @@ export const host = {
   publishTitle: "Publish to the website",
   publishSteps: [
     "Click \"Download for website\" — you get monthly.json (names, departments and points only; no Student IDs).",
-    "Replace data/leaderboard/monthly.json in the GitHub repo with it, commit and push.",
+    "Replace config/leaderboard/monthly.json in the GitHub repo with it, commit and push.",
     "Vercel rebuilds the site; /leaderboard shows the new standings and the update time.",
   ],
   downloadWebsite: "Download for website",

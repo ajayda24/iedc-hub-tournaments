@@ -1,4 +1,4 @@
-import { site } from "@iedc/data/site";
+import { site } from "@iedc/config/site";
 import { cx } from "@/lib/format";
 
 /** "developed by" name tag at the bottom of the browsing pages. */

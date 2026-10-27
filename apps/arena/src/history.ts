@@ -1,8 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import { buildMonthlyFile, computeMonth, mergeHistory, monthKey, type HistoryTournament, type MonthlyFile } from "@iedc/shared";
-import { MONTHLY } from "@iedc/data/rules";
-import { errors } from "@iedc/data/copy/errors";
+import { MONTHLY } from "@iedc/config/rules";
+import { errors } from "@iedc/config/copy/errors";
 
 /**
  * Every finished tournament on this laptop, kept in arena-data/history.json

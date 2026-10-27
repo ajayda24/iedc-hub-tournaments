@@ -4,7 +4,7 @@ import { cx } from "@/lib/format";
 import { Avatar } from "./Avatar";
 import { Hand } from "./kit";
 import { useFlip } from "./useFlip";
-import { common } from "@iedc/data/copy/common";
+import { common } from "@iedc/config/copy/common";
 
 const RANK_BG = ["var(--color-yellow)", "#e9e4d8", "#f3c9a2"];
 

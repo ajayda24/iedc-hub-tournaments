@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "zod": "^4.3.5",
-    "@iedc/data": "workspace:*"
+    "@iedc/config": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.9.3",

@@ -1,7 +1,7 @@
 packages:
   - "apps/*"
   - "packages/*"
-  - "data"
+  - "config"
 onlyBuiltDependencies:
   - esbuild
   - sharp

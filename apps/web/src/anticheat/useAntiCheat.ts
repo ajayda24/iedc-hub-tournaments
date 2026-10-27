@@ -2,12 +2,12 @@
 import { useEffect, useRef, useState } from "react";
 import { EV, type CheatAction, type CheatKind } from "@iedc/shared/protocol";
 import { emit, emitAck } from "@/net/arena";
-import { PHONE_PROBE_URLS } from "@iedc/data/network";
-import { ANTICHEAT } from "@iedc/data/rules";
-import { anticheat as A } from "@iedc/data/copy/anticheat";
+import { PHONE_PROBE_URLS } from "@iedc/config/network";
+import { ANTICHEAT } from "@iedc/config/rules";
+import { anticheat as A } from "@iedc/config/copy/anticheat";
 
 /**
- * Public endpoints that answer instantly when a device has internet (see data/network.ts).
+ * Public endpoints that answer instantly when a device has internet (see config/network.ts).
  * On the event Wi-Fi every probe fails; a success means mobile data, a VPN or a
  * second network is on — exactly what someone asking an AI needs.
  */

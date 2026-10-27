@@ -1,7 +1,7 @@
-import { DIFFICULTY_MULTIPLIER, SCORING } from "@iedc/data/rules";
+import { DIFFICULTY_MULTIPLIER, SCORING } from "@iedc/config/rules";
 import type { Difficulty } from "./games/types";
 
-/** Edit the numbers in data/rules.ts */
+/** Edit the numbers in config/rules.ts */
 export const DIFF_MULT: Record<Difficulty, number> = DIFFICULTY_MULTIPLIER;
 export { SCORING };
 

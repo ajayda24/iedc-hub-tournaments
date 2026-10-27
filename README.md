@@ -53,7 +53,7 @@ The host taps **Start** and every connected phone gets the same puzzle at the sa
 **Monthly leaderboard** (`/leaderboard`):
 - Every tournament is recorded on the laptop when the host shows the podium. The **Monthly** tab lets the host include/exclude, rename or delete them.
 - Points add up per Student ID across the month; this month and previous months are shown, with a "Last updated" time.
-- On the event Wi-Fi the page is live from the laptop. Online it shows `data/leaderboard/monthly.json`: download it from the Monthly tab, commit, push, and Vercel rebuilds ([how](data/README.md#publishing-the-monthly-leaderboard)). No Student IDs are published.
+- On the event Wi-Fi the page is live from the laptop. Online it shows `config/leaderboard/monthly.json`: download it from the Monthly tab, commit, push, and Vercel rebuilds ([how](config/README.md#publishing-the-monthly-leaderboard)). No Student IDs are published.
 
 **Host console:**
 - Playlist builder.
@@ -80,7 +80,7 @@ The host taps **Start** and every connected phone gets the same puzzle at the sa
 
 ## Changing text and settings
 
-All wording (titles, descriptions, buttons, funny messages), the department list, scoring numbers, timings and word lists live in **[`data/`](data/README.md)**. Edit a file there and every screen updates. No app code to touch. `data/README.md` has a "change X → edit file Y" table.
+All wording (titles, descriptions, buttons, funny messages), the department list, scoring numbers, timings and word lists live in **[`config/`](config/README.md)**. Edit a file there and every screen updates. No app code to touch. `config/README.md` has a "change X → edit file Y" table.
 
 ---
 
@@ -117,6 +117,7 @@ The web app is a static export, so Vercel can host the **online half**: the land
 pnpm install
 pnpm dev            # arena on :4000 + Next dev server on :3000
                     # open http://localhost:3000/host/ (PIN printed by the arena), /screen/, /play/
+pnpm check          # typecheck + unit tests: run before every push
 pnpm test           # engine + arena unit tests (Vitest)
 pnpm build          # static web export (apps/web/out, precompressed) + arena bundle
 pnpm start          # arena serving the built app on :4000
@@ -130,17 +131,41 @@ Measured locally with `pnpm bots --n 80` over four rounds:
 - the leaderboard reflected a submit after **p50 ~300 ms / p95 < 500 ms** (updates are throttled to 2 per second),
 - first load on a phone is about **165 KB of gzipped JS**, and game screens are split into their own chunks.
 
-### Layout
+### Project map
 
 ```
-data              ALL text, labels, constants and word lists (edit here)
-packages/shared   protocol types, zod schemas, seeded RNG, scoring, the 4 game engines (+ tests)
-apps/arena        Fastify + Socket.IO server: Arena state machine, anti-cheat, persistence, network info
-apps/web          Next.js (App Router, static export) + Serwist PWA: /play /host /screen /practice /leaderboard
-scripts           precompress, pack-arena, Windows hotspot scripts
-e2e               Playwright end-to-end tests
-docs              EVENT_DAY.md, screenshots
+config/            ✏️  ALL text, settings, word lists and the published leaderboard (edit here, no code)
+  copy/                words on every screen, one file per screen
+  leaderboard/         monthly.json, what the website's /leaderboard shows
+  words/               Word Hunt and Anagram word lists
+apps/
+  web/             📱  everything on a screen: phones, host console, projector, practice, leaderboard
+    app/               one folder per URL (/play, /host, /screen, …)
+    src/screens/       the page screens        src/games/   one view per game
+    src/ui/            shared pieces           src/net/     connection to the arena
+  arena/           💻  the laptop server: rounds, scoring, PINs, history, crash safety
+packages/shared/   🧩  game engines + rules shared by both: protocol, scoring, monthly board
+scripts/           🛠️  build helpers; scripts/event-kit/ holds the .bat/.ps1 files for the laptop
+e2e/               ✅  end-to-end tests (a real arena + browser)
+docs/              📖  EVENT_DAY.md (host checklist), ADD_A_GAME.md, screenshots
+dist/brain-arena/  📦  the built event kit (gitignored). Its arena-data/ is the real event data
 ```
+
+Each folder has a short README with a file-by-file map: [config](config/README.md), [apps/web](apps/web/README.md), [apps/arena](apps/arena/README.md), [packages/shared](packages/shared/README.md), [scripts](scripts/README.md).
+
+**Where does a change go?**
+
+| I want to… | Go to |
+|---|---|
+| Change wording, departments, points, timings | `config/` |
+| Change how a page looks or behaves | `apps/web/src/screens/` (page) or `apps/web/src/ui/` (shared piece) |
+| Change a game's puzzles or answer checking | `packages/shared/src/games/<id>/` |
+| Change a game's look on the phone | `apps/web/src/games/<Name>View.tsx` |
+| Change round flow, scoring rules in play, PINs, history | `apps/arena/src/` |
+| Add a game | [docs/ADD_A_GAME.md](docs/ADD_A_GAME.md) |
+| Change the laptop start/hotspot scripts | `scripts/event-kit/` |
+
+**Keeping it working:** run `pnpm check` before pushing (GitHub also runs it on every push, see `.github/workflows/ci.yml`). For bigger changes, also `pnpm build` and `pnpm test:e2e`.
 
 ### How it works
 
@@ -152,12 +177,8 @@ docs              EVENT_DAY.md, screenshots
   - Puzzles are generated with a fresh seed when the host starts a round.
   - Players only get the public part, and only once the countdown ends.
   - Every move is checked and timestamped by the arena.
-- **Adding a game.**
-  - Write an engine that implements `GameDefinition` in `packages/shared/src/games/<id>/engine.ts`: `generate`, `check`, `partialCredit`, `reveal`.
-  - Add metadata to `games/meta.ts`.
-  - Add a view in `apps/web/src/games/`.
-  - Register it in the two registries.
-- **Content.** All text and constants live in `data/` (see above). Word lists come from the MIT [`word-list`](https://github.com/sindresorhus/word-list) package. Edit `data/words/wordhunt-answers.txt` or `data/words/anagram-packs.source.json`, then run `pnpm content:build`.
+- **Adding a game.** An engine in `packages/shared/src/games/<id>/` plus a view in `apps/web/src/games/`. The full checklist is in [docs/ADD_A_GAME.md](docs/ADD_A_GAME.md).
+- **Content.** All text and constants live in `config/` (see above). Word lists come from the MIT [`word-list`](https://github.com/sindresorhus/word-list) package. Edit `config/words/wordhunt-answers.txt` or `config/words/anagram-packs.source.json`, then run `pnpm content:build`.
 
 ---
 

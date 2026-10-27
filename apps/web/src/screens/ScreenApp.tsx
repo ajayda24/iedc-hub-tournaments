@@ -15,9 +15,9 @@ import { Podium } from "@/ui/Podium";
 import { Reveal } from "@/ui/Reveal";
 import { setSound, sfx, soundOn } from "@/ui/sfx";
 import { TimerBar } from "@/ui/Timer";
-import { DIFFICULTY_LABEL } from "@iedc/data/games";
-import { common } from "@iedc/data/copy/common";
-import { screen as S } from "@iedc/data/copy/screen";
+import { DIFFICULTY_LABEL } from "@iedc/config/games";
+import { common } from "@iedc/config/copy/common";
+import { screen as S } from "@iedc/config/copy/screen";
 
 /** The projector view. Big type, no controls, everything readable from the back row. */
 export function ScreenApp() {

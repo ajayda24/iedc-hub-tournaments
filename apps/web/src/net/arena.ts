@@ -11,7 +11,7 @@ import {
   type PublicState,
   type Role,
 } from "@iedc/shared/protocol";
-import { arenaUrl } from "@/lib/arena";
+import { arenaUrl } from "@/lib/arenaUrl";
 import { deviceToken } from "@/lib/storage";
 
 export type Conn = "idle" | "connecting" | "online" | "offline";

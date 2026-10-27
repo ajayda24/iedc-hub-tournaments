@@ -19,7 +19,7 @@ import {
   type Role,
 } from "@iedc/shared";
 import type { Arena, ArenaOutput } from "./arena";
-import { errors } from "@iedc/data/copy/errors";
+import { errors } from "@iedc/config/copy/errors";
 import type { Students } from "./students";
 import type { History } from "./history";
 

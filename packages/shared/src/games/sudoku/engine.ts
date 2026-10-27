@@ -3,7 +3,7 @@ import { createRng, type Rng } from "../../rng";
 import { GAME_META } from "../meta";
 import type { Difficulty, GameDefinition } from "../types";
 import { candidates, conflicts, peers } from "./grid";
-import { gameText } from "@iedc/data/copy/games";
+import { gameText } from "@iedc/config/copy/games";
 
 export { conflicts };
 

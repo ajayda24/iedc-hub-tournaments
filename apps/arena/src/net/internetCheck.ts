@@ -1,4 +1,4 @@
-import { LAPTOP_PROBE_URLS } from "@iedc/data/network";
+import { LAPTOP_PROBE_URLS } from "@iedc/config/network";
 
 /**
  * Does this laptop reach the internet? If it does, the hotspot is probably

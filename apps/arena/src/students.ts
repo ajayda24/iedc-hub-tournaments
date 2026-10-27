@@ -1,8 +1,8 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
-import { PIN } from "@iedc/data/rules";
-import { errors } from "@iedc/data/copy/errors";
+import { PIN } from "@iedc/config/rules";
+import { errors } from "@iedc/config/copy/errors";
 import type { StudentInfo } from "@iedc/shared";
 
 export type { StudentInfo };

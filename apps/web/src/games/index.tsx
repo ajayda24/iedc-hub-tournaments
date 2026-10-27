@@ -3,7 +3,7 @@ import dynamic from "next/dynamic";
 import type { ComponentType } from "react";
 import type { GameId } from "@iedc/shared/games/types";
 import type { ViewProps } from "./types";
-import { gameText as G } from "@iedc/data/copy/games";
+import { gameText as G } from "@iedc/config/copy/games";
 
 const Loading = () => <p className="hand py-16 text-center text-xl text-pencil">{G.loading}</p>;
 

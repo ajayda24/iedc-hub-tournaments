@@ -5,7 +5,7 @@ import { queenConflicts } from "@iedc/shared/games/queens/engine";
 import { cx } from "@/lib/format";
 import { sfx } from "@/ui/sfx";
 import type { ViewProps } from "./types";
-import { gameText as G } from "@iedc/data/copy/games";
+import { gameText as G } from "@iedc/config/copy/games";
 
 /** cell state on the phone: 0 empty, 1 my ✕ note, 2 queen */
 type Mark = 0 | 1 | 2;

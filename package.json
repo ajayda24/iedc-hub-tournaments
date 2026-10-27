@@ -10,15 +10,16 @@
     "dev": "pnpm --parallel --filter @iedc/arena --filter @iedc/web dev",
     "dev:arena": "pnpm --filter @iedc/arena dev",
     "dev:web": "pnpm --filter @iedc/web dev",
-    "build": "pnpm --filter @iedc/web build && pnpm --filter @iedc/arena build",
-    "start": "pnpm --filter @iedc/arena start",
+    "check": "pnpm typecheck && pnpm test",
     "test": "pnpm -r --if-present test",
     "typecheck": "pnpm -r --if-present typecheck",
-    "bots": "pnpm --filter @iedc/arena bots",
-    "recover:first": "pnpm --filter @iedc/arena recover:first",
-    "pack:arena": "node scripts/pack-arena.mjs",
     "test:e2e": "playwright test",
-    "content:build": "pnpm --filter @iedc/shared content:build"
+    "build": "pnpm --filter @iedc/web build && pnpm --filter @iedc/arena build",
+    "start": "pnpm --filter @iedc/arena start",
+    "pack:arena": "node scripts/pack-arena.mjs",
+    "bots": "pnpm --filter @iedc/arena bots",
+    "content:build": "pnpm --filter @iedc/shared content:build",
+    "recover:first": "pnpm --filter @iedc/arena recover:first"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1",

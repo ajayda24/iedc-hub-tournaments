@@ -1,4 +1,4 @@
-import { site } from "@iedc/data/site";
+import { site } from "@iedc/config/site";
 
 /** Where is the arena server? Same origin when the laptop serves the app. */
 export function arenaUrl(): string {

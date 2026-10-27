@@ -4,7 +4,7 @@ import type { CrunchProgress, CrunchPub } from "@iedc/shared/games/numbercrunch/
 import { cx } from "@/lib/format";
 import { sfx } from "@/ui/sfx";
 import type { ViewProps } from "./types";
-import { gameText as G } from "@iedc/data/copy/games";
+import { gameText as G } from "@iedc/config/copy/games";
 
 type Op = "+" | "-" | "×" | "÷";
 interface NumTile {

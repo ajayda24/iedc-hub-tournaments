@@ -2,8 +2,8 @@ import { z } from "zod";
 import { createRng, type Rng } from "../../rng";
 import { GAME_META } from "../meta";
 import type { Difficulty, GameDefinition } from "../types";
-import packsJson from "@iedc/data/words/generated/anagram-packs.json";
-import { gameText } from "@iedc/data/copy/games";
+import packsJson from "@iedc/config/words/generated/anagram-packs.json";
+import { gameText } from "@iedc/config/copy/games";
 
 export interface AnagramPack {
   id: string;

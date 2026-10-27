@@ -3,7 +3,7 @@ import type { LbEntry } from "@iedc/shared/protocol";
 import { Avatar } from "./Avatar";
 import { Mascot } from "./Mascot";
 import { cx } from "@/lib/format";
-import { podiumTitles } from "@iedc/data/copy/podium";
+import { podiumTitles } from "@iedc/config/copy/podium";
 
 /** Funny titles handed out on the podium. Deterministic per player. */
 export function titleFor(e: LbEntry, index: number, total: number): string {
