@@ -54,7 +54,7 @@
         "cd-hours": "the number of hours left (just the number)",
         "cd-minutes": "the number of minutes left (just the number)",
         "cd-seconds": "the number of seconds left (just the number)",
-        "cd-message": "a message element that is only filled in when the countdown is over"
+        "cd-message": "a message element that stays empty until the countdown is over, then says the fest is happening now"
       },
       "simpleHooks": ["cd-days", "cd-hours", "cd-minutes"],
       "aiNotes": "The fest starts at new Date(\"2026-12-15T09:00:00+05:30\"). Put each number in its own element, next to a text label (Days, Hours, Minutes, Seconds).",

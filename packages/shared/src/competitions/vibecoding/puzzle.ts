@@ -30,13 +30,15 @@ export function slide(board: readonly number[], cell: number): number[] | null {
   return next;
 }
 
-/** Fewest moves to solve (BFS from the solved state; 181,440 reachable states). */
-export function optimalMoves(board: readonly number[]): number {
-  const target = SOLVED.join("");
-  const start = board.join("");
-  if (start === target) return 0;
-  const seen = new Set([start]);
-  let frontier = [board.slice()];
+const encode = (b: readonly number[]) => b.reduce((n, v) => n * 9 + v, 0);
+
+let DIST: Map<number, number> | null = null;
+
+/** Distance from solved for every reachable board (181,440 states), built once by BFS. */
+function distances(): Map<number, number> {
+  if (DIST) return DIST;
+  const dist = new Map<number, number>([[encode(SOLVED), 0]]);
+  let frontier = [SOLVED.slice()];
   for (let depth = 1; frontier.length; depth++) {
     const next: number[][] = [];
     for (const b of frontier) {
@@ -45,17 +47,22 @@ export function optimalMoves(board: readonly number[]): number {
         const c = b.slice();
         c[e] = c[n];
         c[n] = 0;
-        const key = c.join("");
-        if (key === target) return depth;
-        if (!seen.has(key)) {
-          seen.add(key);
+        const key = encode(c);
+        if (!dist.has(key)) {
+          dist.set(key, depth);
           next.push(c);
         }
       }
     }
     frontier = next;
   }
-  return -1;
+  DIST = dist;
+  return dist;
+}
+
+/** Fewest moves to solve; -1 if unreachable. */
+export function optimalMoves(board: readonly number[]): number {
+  return distances().get(encode(board)) ?? -1;
 }
 
 /**
