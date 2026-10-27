@@ -15,7 +15,8 @@ export default defineConfig({
   },
   projects: [{ name: "chromium", use: { ...devices["Pixel 7"], launchOptions: process.env.PW_CHROMIUM ? { executablePath: process.env.PW_CHROMIUM } : undefined } }],
   webServer: {
-    command: "node apps/arena/node_modules/tsx/dist/cli.mjs apps/arena/src/index.ts --port 4100 --pin 2468 --fresh --data .e2e-data",
+    // competitions keep their own data (not cleared by --fresh): start them empty too
+    command: "node -e \"require('fs').rmSync('.e2e-data/competitions',{recursive:true,force:true})\" && node apps/arena/node_modules/tsx/dist/cli.mjs apps/arena/src/index.ts --port 4100 --pin 2468 --fresh --data .e2e-data",
     url: "http://localhost:4100/api/health",
     reuseExistingServer: false,
     timeout: 30_000,

@@ -18,13 +18,13 @@ async function qrSvg(url: string): Promise<string> {
 }
 
 /** Every IPv4 address students could reach this laptop on, laptop hotspot first. */
-export async function listInterfaces(port: number): Promise<NetIface[]> {
+export async function listInterfaces(port: number, pathname = "/play/"): Promise<NetIface[]> {
   const out: NetIface[] = [];
   for (const [name, addrs] of Object.entries(os.networkInterfaces())) {
     for (const a of addrs ?? []) {
       if (a.family !== "IPv4" || a.internal) continue;
       if (a.address.startsWith("169.254.")) continue; // link-local, nobody can use it
-      const url = `http://${a.address}:${port}/play/`;
+      const url = `http://${a.address}:${port}${pathname}`;
       out.push({ name, label: labelFor(a.address, name), address: a.address, url, qrSvg: await qrSvg(url) });
     }
   }

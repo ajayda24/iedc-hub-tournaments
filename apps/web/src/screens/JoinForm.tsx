@@ -16,8 +16,16 @@ import { Credits } from "@/ui/Credits";
 const cleanId = (v: string) => v.replace(/\s+/g, "").toUpperCase().slice(0, STUDENT_ID.maxLength);
 const pinOk = (v: string) => new RegExp(`^\\d{${PIN.length}}$`).test(v);
 
-export function JoinForm() {
-  const eventName = useArena((s) => s.state?.eventName ?? site.defaultEventName);
+/** Lets another socket (e.g. a competition's) reuse this form. The weekly game uses the default. */
+export interface JoinTransport {
+  title: string;
+  check(studentId: string): Promise<StudentCheckAck>;
+  join(payload: { token: string; studentId: string; pin: string; name: string; sem: string; dept: string; avatar: number }): Promise<{ ok: boolean; error?: string }>;
+}
+
+export function JoinForm({ via }: { via?: JoinTransport } = {}) {
+  const arenaEventName = useArena((s) => s.state?.eventName ?? site.defaultEventName);
+  const eventName = via?.title ?? arenaEventName;
   const saved = store.get<Profile | null>("ba:profile", null);
   const [step, setStep] = useState<"details" | "pin">("details");
   const [studentId, setStudentId] = useState(saved?.studentId ?? "");
@@ -43,7 +51,7 @@ export function JoinForm() {
     setError(null);
     store.set("ba:profile", { studentId: id, name: name.trim(), sem, dept: finalDept, avatar } satisfies Profile);
     try {
-      const res = await emitAck<StudentCheckAck>(EV.studentCheck, { studentId: id });
+      const res = via ? await via.check(id) : await emitAck<StudentCheckAck>(EV.studentCheck, { studentId: id });
       if (!res.ok) return setError(res.error ?? t.couldNotJoin);
       setStudentId(id);
       setHasPin(!!res.exists);
@@ -65,19 +73,12 @@ export function JoinForm() {
     setBusy(true);
     setError(null);
     try {
-      const res = await emitAck<JoinAck>(EV.join, {
-        token: deviceToken(),
-        studentId,
-        pin,
-        name: name.trim(),
-        sem,
-        dept: finalDept,
-        avatar,
-      });
+      const payload = { token: deviceToken(), studentId, pin, name: name.trim(), sem, dept: finalDept, avatar };
+      const res: { ok: boolean; error?: string; me?: JoinAck["me"] } = via ? await via.join(payload) : await emitAck<JoinAck>(EV.join, payload);
       if (!res.ok) {
         setError(res.error ?? t.couldNotJoin);
         setPin("");
-      } else useArena.setState({ me: res.me ?? null });
+      } else if (!via) useArena.setState({ me: res.me ?? null });
     } catch {
       setError(t.noAnswer);
     } finally {

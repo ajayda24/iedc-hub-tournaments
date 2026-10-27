@@ -1,0 +1,14 @@
+{
+  "id": "vibecoding",
+  "title": "Tile Rush",
+  "subtitle": "Build a real web page by asking an AI. Phones only.",
+  "projectName": "IEDC Fest Page",
+  "defaults": {
+    "buildMinutes": 100,
+    "glitch": true,
+    "minTeamSize": 2,
+    "maxTeamSize": 4,
+    "maxTeams": 15
+  },
+  "sitesPort": 4001
+}

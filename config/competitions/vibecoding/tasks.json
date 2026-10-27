@@ -1,0 +1,195 @@
+{
+  "event": {
+    "name": "IEDC Fest 2026",
+    "tagline": "Build. Break. Launch.",
+    "countdownTarget": "2026-12-15T09:00:00+05:30"
+  },
+  "pageOrder": ["hero", "countdown", "schedule", "register", "gallery", "feedback", "theme", "fixit"],
+  "genericHints": [
+    "Name each part you want (title, button, box).",
+    "Ask for one change at a time and say the colours or sizes."
+  ],
+  "tiles": [
+    {
+      "id": "warmup",
+      "title": "Warm-up: your team's page",
+      "emoji": "👋",
+      "brief": "Practise here. Make the heading show your team name, make a Save Point, change something, then Go Back.",
+      "par": 5,
+      "variant": "full",
+      "hint": "Ask: \"Make a big heading with our team name\".",
+      "hooks": { "warmup-title": "the main heading of this section" },
+      "items": [{ "id": "title", "text": "The page heading shows your team name." }]
+    },
+    {
+      "id": "hero",
+      "title": "Hero banner",
+      "emoji": "🚀",
+      "brief": "The big welcome banner at the top of the fest page.",
+      "par": 6,
+      "variant": "full",
+      "hint": "Tell the AI the heading, the tagline and the button text exactly.",
+      "hooks": {
+        "hero-title": "the main heading",
+        "hero-tagline": "the line under the heading",
+        "hero-cta": "the call-to-action link or button (link it to #register)"
+      },
+      "items": [
+        { "id": "title", "text": "The heading says \"IEDC Fest 2026\"." },
+        { "id": "tagline", "text": "The tagline says \"Build. Break. Launch.\"" },
+        { "id": "gradient", "text": "The background uses a colour gradient." },
+        { "id": "cta", "text": "There is a \"Register now\" button." }
+      ]
+    },
+    {
+      "id": "countdown",
+      "title": "Countdown",
+      "emoji": "⏳",
+      "brief": "A live countdown to the fest: 15 Dec 2026, 9:00 AM.",
+      "par": 10,
+      "variant": "full",
+      "hint": "Say what it counts down to, and ask for a message when the time is over.",
+      "hooks": {
+        "cd-days": "the number of days left (just the number)",
+        "cd-hours": "the number of hours left (just the number)",
+        "cd-minutes": "the number of minutes left (just the number)",
+        "cd-seconds": "the number of seconds left (just the number)",
+        "cd-message": "a message element that is only filled in when the countdown is over"
+      },
+      "simpleHooks": ["cd-days", "cd-hours", "cd-minutes"],
+      "aiNotes": "The fest starts at new Date(\"2026-12-15T09:00:00+05:30\"). Put each number in its own element, next to a text label (Days, Hours, Minutes, Seconds).",
+      "items": [
+        { "id": "target", "text": "It counts down to 15 Dec 2026, 9:00 AM.", "simpleText": "It counts down to 15 Dec 2026, 9:00 AM in days, hours and minutes." },
+        { "id": "labels", "text": "Days, hours, minutes and seconds are in separate labelled boxes.", "full": true },
+        { "id": "ticking", "text": "It updates every second.", "full": true },
+        { "id": "message", "text": "A message shows when the time is up.", "full": true }
+      ]
+    },
+    {
+      "id": "schedule",
+      "title": "Schedule",
+      "emoji": "🗓️",
+      "brief": "The fest's sessions: 09:30 Opening (IEDC Team), 10:30 Idea Pitch (Student Founders), 12:00 Build Workshop (Industry Mentor), 14:00 Demo Time (Participating Teams).",
+      "par": 7,
+      "variant": "full",
+      "hint": "Give the AI all four sessions with their times and speakers.",
+      "hooks": {
+        "session-card": "one card per session",
+        "session-time": "the time inside a card",
+        "session-title": "the session title inside a card",
+        "session-speaker": "the speaker inside a card"
+      },
+      "items": [
+        { "id": "cards", "text": "There are 4 session cards, each with a time, a title and a speaker." },
+        { "id": "sessions", "text": "The four sessions are Opening, Idea Pitch, Build Workshop and Demo Time." },
+        { "id": "grid", "text": "The cards sit in a neat grid or row." }
+      ]
+    },
+    {
+      "id": "register",
+      "title": "Registration form",
+      "emoji": "📝",
+      "brief": "A form to register for the fest: name, email and department.",
+      "par": 12,
+      "variant": "full",
+      "hint": "Describe what should happen for an empty form, a wrong email, and a correct one.",
+      "hooks": {
+        "reg-form": "the <form> element",
+        "reg-name": "the name input",
+        "reg-email": "the email input",
+        "reg-dept": "the department dropdown (a <select>)",
+        "reg-error": "the error message element (empty or hidden when there is no error)",
+        "reg-success": "the success message element (empty or hidden until the form is sent)"
+      },
+      "aiNotes": "Handle the form's submit event in JavaScript and call preventDefault(); do not rely on the browser's built-in validation popups (add novalidate to the form).",
+      "items": [
+        { "id": "fields", "text": "It has name, email and department fields.", "simple": true },
+        { "id": "dept", "text": "The department list has at least 5 departments.", "full": true },
+        { "id": "empty", "text": "Sending an empty form shows an error." },
+        { "id": "bademail", "text": "A wrong email (like \"asha\") shows an error.", "full": true },
+        { "id": "success", "text": "A correct form shows \"Thanks, <name>!\"." }
+      ]
+    },
+    {
+      "id": "theme",
+      "title": "Dark/light switch",
+      "emoji": "🌗",
+      "brief": "A button that switches the whole page between dark and light colours.",
+      "par": 6,
+      "variant": "full",
+      "hint": "Ask the AI to use the page's colour variables.",
+      "hooks": { "theme-toggle": "the button that switches dark mode" },
+      "aiNotes": "This section only holds the button. Its JavaScript may change a class or data attribute on <html> or <body>, and its CSS may redefine --bg, --fg, --card and --accent for the dark mode.",
+      "items": [
+        { "id": "button", "text": "There is a button to switch dark mode." },
+        { "id": "dark", "text": "Clicking it switches the page to dark colours." },
+        { "id": "back", "text": "Clicking again switches back." }
+      ]
+    },
+    {
+      "id": "gallery",
+      "title": "Gallery",
+      "emoji": "🖼️",
+      "brief": "Six cards with an emoji or colour block and a caption: Hackathon, Workshop, Demo Day, Mentor Talk, Pitch Night, Networking.",
+      "par": 7,
+      "variant": "full",
+      "hint": "Name the six captions and say what should happen on hover.",
+      "hooks": { "gallery-card": "one card", "gallery-caption": "the caption inside a card" },
+      "items": [
+        { "id": "cards", "text": "There are 6 cards in a grid, each with a caption." },
+        { "id": "captions", "text": "The captions are Hackathon, Workshop, Demo Day, Mentor Talk, Pitch Night and Networking." },
+        { "id": "hover", "text": "Cards grow or glow when you hover." }
+      ]
+    },
+    {
+      "id": "feedback",
+      "title": "Feedback stars",
+      "emoji": "⭐",
+      "brief": "Let visitors rate the fest with 1 to 5 stars.",
+      "par": 10,
+      "variant": "full",
+      "hint": "Describe what happens when you tap star 3, then tap star 5.",
+      "hooks": {
+        "star": "each of the 5 stars, in order (selected stars also get data-active=\"true\", others data-active=\"false\")",
+        "rating-text": "the text that shows the rating",
+        "rating-thanks": "a thank-you message element (empty or hidden until rated)"
+      },
+      "simpleHooks": ["star", "rating-text"],
+      "items": [
+        { "id": "stars", "text": "There are 5 stars." },
+        { "id": "highlight", "text": "Tapping a star highlights that many stars." },
+        { "id": "text", "text": "The text shows \"You rated: N/5\"." },
+        { "id": "thanks", "text": "A thank-you message appears after rating.", "full": true }
+      ]
+    },
+    {
+      "id": "fixit",
+      "title": "Fix-it",
+      "emoji": "🔧",
+      "brief": "This section came with bugs. Find out what's broken and get the AI to fix it.",
+      "par": 12,
+      "variant": "full",
+      "hint": "Describe what you see going wrong, not the code.",
+      "hooks": {
+        "like-btn": "the Like button",
+        "like-count": "the like count",
+        "news-form": "the newsletter form",
+        "news-email": "the newsletter email input",
+        "news-error": "the newsletter error message",
+        "news-success": "the newsletter success message"
+      },
+      "simpleHooks": ["like-btn", "like-count"],
+      "items": [
+        { "id": "like", "text": "Clicking Like adds 1 to the count." },
+        { "id": "empty", "text": "An empty email shows \"Please enter an email\".", "full": true },
+        { "id": "valid", "text": "A valid email shows \"Subscribed!\".", "full": true },
+        { "id": "intact", "text": "The heading, the Like button and the email field are still there." }
+      ]
+    }
+  ],
+  "changeRequests": [
+    { "id": "A", "text": "Please add the line 'Free food for all participants!' to the page.", "phrase": "Free food for all participants!" },
+    { "id": "B", "text": "Please add the line 'Bring your ID card to enter' to the page.", "phrase": "Bring your ID card to enter" },
+    { "id": "C", "text": "Please add the line 'Registration closes on 10 Dec' to the page.", "phrase": "Registration closes on 10 Dec" }
+  ]
+}

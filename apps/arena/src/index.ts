@@ -12,6 +12,7 @@ import { hasInternet } from "./net/internetCheck";
 import { Store } from "./persist/store";
 import { Students } from "./students";
 import { History } from "./history";
+import { createCompetitions } from "./competitions";
 import { site } from "@iedc/config/site";
 
 const VERSION = "0.1.0";
@@ -45,6 +46,7 @@ async function main() {
 
   let interfaces: NetIface[] = [];
   let internet: boolean | null = null;
+  let competitionUrls: NetIface[] = [];
   const network = (): NetworkInfo => ({ port, interfaces, internet, groups: [] });
 
   const dataDir = path.resolve(args.data!);
@@ -53,6 +55,13 @@ async function main() {
   const rt = createRealtime(app.server, { pin, onExport: () => store.exportCsv(arena), students, history });
   const arena = new Arena({ out: { ...rt.output, log: (t, d) => store.log(t, d) }, network });
   rt.attach(arena);
+  // team competitions (Tile Rush…) on their own namespace and data folder; the weekly arena is untouched
+  const competitions = createCompetitions(rt.io, {
+    pin,
+    students,
+    dataDir,
+    network: () => ({ joinUrls: competitionUrls.map((i) => ({ label: i.label, url: i.url, qrSvg: i.qrSvg })), laptopInternet: internet }),
+  });
 
   const snap = args.fresh ? null : store.load();
   if (snap) arena.restore(snap);
@@ -96,6 +105,7 @@ async function main() {
       const next = await listInterfaces(port);
       const changed = next.map((i) => i.url).join() !== interfaces.map((i) => i.url).join();
       interfaces = next;
+      competitionUrls = await listInterfaces(port, "/competitions/vibecoding/");
       if (changed) arena.setConfig(arena.config); // re-broadcast join urls
     } catch {
       /* ignore */
@@ -120,6 +130,7 @@ async function main() {
   const shutdown = () => {
     console.log("\n  Saving and shutting down…");
     store.close(arena);
+    competitions.close();
     arena.dispose();
     rt.io.close();
     void app.close().then(() => process.exit(0));
@@ -136,6 +147,7 @@ async function main() {
     console.log(`   Host PIN      ${pin}`);
     console.log(`   Host console  http://localhost:${port}/host/`);
     console.log(`   Big screen    http://localhost:${port}/screen/`);
+    console.log(`   Tile Rush     http://localhost:${port}/competitions/vibecoding/host/  (big screen: …/vibecoding/screen/)`);
     if (interfaces.length === 0) console.log(`   Students      (no network yet — turn on the hotspot)`);
     for (const i of interfaces) console.log(`   Students      ${i.url.padEnd(34)} ${i.label}`);
     if (!web) console.log(`\n   (no web build found — dev mode: web app on http://localhost:3000)`);

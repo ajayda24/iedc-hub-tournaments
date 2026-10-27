@@ -1,0 +1,14 @@
+{
+  "_note": "Free-tier limits from the organiser's AI Studio (RPM / input TPM / RPD). Run `pnpm vibecoding:models` to see the exact ids your key can use.",
+  "maxInFlight": 6,
+  "timeoutMs": 45000,
+  "maxOutputTokens": 1200,
+  "errorPauseMs": 60000,
+  "errorsBeforePause": 3,
+  "models": [
+    { "id": "gemma-4-26b-it", "label": "Gemma 4 26B", "role": "primary", "rpm": 30, "tpm": 16000, "rpd": 14400 },
+    { "id": "gemma-4-31b-it", "label": "Gemma 4 31B", "role": "primary", "rpm": 30, "tpm": 16000, "rpd": 14400 },
+    { "id": "gemini-3.1-flash-lite", "label": "Gemini 3.1 Flash-Lite", "role": "overflow", "rpm": 15, "tpm": 250000, "rpd": 500 },
+    { "id": "gemini-3.5-flash-lite", "label": "Gemini 3.5 Flash-Lite", "role": "overflow", "rpm": 15, "tpm": 250000, "rpd": 500 }
+  ]
+}

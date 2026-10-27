@@ -1,0 +1,9 @@
+{
+  "ask": { "friendly": "Ask", "real": "Prompt" },
+  "notes": { "friendly": "Project Notes", "real": "Context" },
+  "save": { "friendly": "Save Point", "real": "Git commit" },
+  "goBack": { "friendly": "Go Back", "real": "Revert" },
+  "publish": { "friendly": "Publish", "real": "Deploy" },
+  "tile": { "friendly": "Tile", "real": "Feature / task" },
+  "check": { "friendly": "Check", "real": "Automated test" }
+}
