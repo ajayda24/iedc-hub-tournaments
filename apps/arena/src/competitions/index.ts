@@ -34,6 +34,7 @@ export function createCompetitions(io: Server, opts: CompetitionsOptions) {
   const nsp = io.of(COMPETITIONS_NAMESPACE);
   vibecoding.attach(nsp);
   vibecoding.start();
+  const sitesReady = vibecoding.serveSites();
 
   nsp.on("connection", (socket) => {
     socket.on("hello", (raw: unknown, ack: unknown) => {
@@ -51,6 +52,8 @@ export function createCompetitions(io: Server, opts: CompetitionsOptions) {
 
   return {
     rooms,
+    /** resolves to the sites port (or null) */
+    sitesReady,
     close() {
       vibecoding.stop();
     },

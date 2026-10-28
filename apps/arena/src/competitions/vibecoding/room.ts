@@ -43,6 +43,12 @@ import { MockProvider, mockOptionsFromEnv, type MockOptions } from "./ai/mock";
 import { buildPrompt } from "./ai/prompt";
 import { readKey, saveKey } from "./ai/key";
 import { CheckRunner } from "./checks/runner";
+import { SitesServer } from "./sites";
+import { EVENT, TASKS, TILE_IDS, tileConfig, type ScoredTileId, type Variant } from "@iedc/shared/competitions/vibecoding/config";
+import { compose } from "@iedc/shared/competitions/vibecoding/composer";
+import { slugify } from "@iedc/shared/competitions/vibecoding/rules";
+import type { PublishAck } from "@iedc/shared/competitions/vibecoding/protocol";
+import type { Fragment } from "@iedc/shared/competitions/vibecoding/state";
 
 type Ack = (res: unknown) => void;
 const safeAck = (ack: unknown): Ack => (typeof ack === "function" ? (ack as Ack) : () => {});
@@ -60,6 +66,8 @@ export interface RoomDeps {
   ai?: "auto" | "mock";
   mock?: MockOptions;
   checkWorkers?: number;
+  /** port for published sites (default 4001); false = don't serve them */
+  sitesPort?: number | false;
 }
 
 interface SocketData {
@@ -93,12 +101,16 @@ export class VibecodingRoom {
   readonly runner: CheckRunner;
   private gemini: GeminiProvider;
   private mock: MockProvider;
+  readonly sites: SitesServer;
+  private publishing = new Set<string>();
 
   constructor(private deps: RoomDeps) {
     this.now = deps.now ?? Date.now;
     this.store = new CompetitionStore(deps.dir);
     const loaded = this.store.load();
     this.restored = !!loaded;
+    // an Ask that was on its way to the AI when the arena stopped will never come back: free the team
+    if (loaded) for (const t of Object.values(loaded.teams)) t.askPending = null;
     this.state = loaded ?? createState(deps.seed ?? (Math.random() * 2 ** 32) >>> 0, this.now());
     this.gemini = new GeminiProvider(() => readKey(this.store.dir));
     this.mock = new MockProvider({ ...mockOptionsFromEnv(), ...deps.mock });
@@ -114,6 +126,27 @@ export class VibecodingRoom {
       usageFile: path.join(this.store.dir, "ai-usage.json"),
     });
     this.runner = new CheckRunner({ size: deps.checkWorkers ?? 2 });
+    this.sites = new SitesServer(
+      path.join(this.store.dir, "sites"),
+      () =>
+        this.state.teamOrder
+          .map((id) => this.state.teams[id])
+          .filter((t) => t?.publish)
+          .map((t) => ({ slug: t.publish!.slug, team: t.name, members: t.members.map((m) => m.name) })),
+      () => TASKS.event.name,
+    );
+  }
+
+  /** Start serving published sites (port 4001 unless told otherwise). */
+  async serveSites(host?: string) {
+    const port = this.deps.sitesPort ?? Number(process.env.VC_SITES_PORT || EVENT.sitesPort);
+    if (port === false) return null;
+    try {
+      return await this.sites.listen(port, host);
+    } catch (e) {
+      console.error(`  ⚠  Tile Rush sites could not start on port ${port}: ${e instanceof Error ? e.message : e}`);
+      return null;
+    }
   }
 
   /** Gemini when a key is set (and the mock isn't forced), else the mock AI. */
@@ -226,6 +259,7 @@ export class VibecodingRoom {
 
   stop() {
     void this.runner.close();
+    void this.sites.close();
     if (this.tickTimer) clearInterval(this.tickTimer);
     if (this.flushTimer) clearTimeout(this.flushTimer);
     this.store.close(this.state);
@@ -318,6 +352,8 @@ export class VibecodingRoom {
     /** A player action: parse, need a joined student, dispatch, ack the result. */
     const player = <T>(event: string, schema: { safeParse(v: unknown): { success: true; data: T } | { success: false } }, make: (studentId: string, d: T) => Action) => {
       socket.on(event, (raw: unknown, ack: unknown) => {
+        // emit(event, callback) with no payload: the callback comes first
+        if (typeof raw === "function") [raw, ack] = [{}, raw];
         const reply = safeAck(ack);
         const id = sid();
         if (!id) return reply({ ok: false, error: E.joinFirst });
@@ -328,6 +364,8 @@ export class VibecodingRoom {
     };
     const host = <T>(event: string, schema: { safeParse(v: unknown): { success: true; data: T } | { success: false } }, run: (d: T) => unknown) => {
       socket.on(event, (raw: unknown, ack: unknown) => {
+        // emit(event, callback) with no payload: the callback comes first
+        if (typeof raw === "function") [raw, ack] = [{}, raw];
         const reply = safeAck(ack);
         if (!isHost()) return reply({ ok: false, error: E.hostOnly });
         const p = schema.safeParse(raw ?? {});
@@ -381,6 +419,8 @@ export class VibecodingRoom {
     /** Like player(), for actions that wait on the AI or the check runner. */
     const playerAsync = <T>(event: string, schema: { safeParse(v: unknown): { success: true; data: T } | { success: false } }, run: (studentId: string, d: T) => Promise<unknown>) => {
       socket.on(event, (raw: unknown, ack: unknown) => {
+        // emit(event, callback) with no payload: the callback comes first
+        if (typeof raw === "function") [raw, ack] = [{}, raw];
         const reply = safeAck(ack);
         const id = sid();
         if (!id) return reply({ ok: false, error: E.joinFirst });
@@ -390,6 +430,7 @@ export class VibecodingRoom {
       });
     };
     playerAsync(EVC.askSend, askSchema, (id, d) => this.ask(id, d.tileId, d.text));
+    playerAsync(EVC.publishGo, empty, (id) => this.publish(id));
     playerAsync(EVC.checkRun, tileRefSchema, (id, d) => this.check(id, d.tileId));
     player(EVC.saveCreate, saveCreateSchema, (studentId, d) => ({ type: "save:create", studentId, tileId: d.tileId, note: d.note }));
     playerAsync(EVC.saveRestore, saveRestoreSchema, async (studentId, d) => {
@@ -533,6 +574,39 @@ export class VibecodingRoom {
     if (!delivered.ok) return { ok: false, error: delivered.error };
     const r = await this.autoCheck(teamId, tileId);
     return { ok: true, explanation, backup, glitched: !!delivered.glitched, check: r?.result };
+  }
+
+  /** Publish: the site check on the composed page, then live on the sites port. */
+  async publish(studentId: string): Promise<PublishAck> {
+    const begin = this.dispatch({ type: "publish:begin", studentId });
+    if (!begin.ok || !begin.teamId) return { ok: false, error: begin.error };
+    const teamId = begin.teamId;
+    if (this.publishing.has(teamId)) return { ok: false, error: E.publishBusy };
+    this.publishing.add(teamId);
+    try {
+      const t = this.state.teams[teamId];
+      const fragments = Object.fromEntries(TILE_IDS.map((id) => [id, t.tiles[id].fragment])) as Record<ScoredTileId, Fragment>;
+      const variants = Object.fromEntries(TILE_IDS.map((id) => [id, variantOf(this.state, id)])) as Record<ScoredTileId, Variant>;
+      const cr = t.changeRequest && t.changeRequest.doneAt == null ? TASKS.changeRequests.find((c) => c.id === t.changeRequest!.variant) : undefined;
+      const site = await this.runner.checkSite(fragments, variants, t.name, cr?.phrase);
+      const problems: NonNullable<PublishAck["problems"]> = [];
+      for (const id of TILE_IDS) {
+        const r = site.tiles[id];
+        if (r.passed === r.total) continue;
+        const items = checklist(id, variants[id]).filter((i) => !r.items[i.id]).map((i) => i.text);
+        problems.push({ tileId: id, title: tileConfig(id).title, items });
+      }
+      if (site.pageErrors.length) problems.push({ tileId: "page", title: "Page", items: site.pageErrors.slice(0, 3) });
+      if (!site.ok) return { ok: false, problems };
+      const slug = t.publish?.slug ?? `${slugify(t.name)}-${t.id}`;
+      this.sites.write(slug, compose(fragments, { title: `${t.name} · ${TASKS.event.name}`, csp: true }));
+      const res = this.dispatch({ type: "publish:result", teamId, changePassed: site.changePassed === true, slug });
+      if (!res.ok) return { ok: false, error: res.error };
+      if (cr && site.changePassed !== true) problems.push({ tileId: "change", title: "Change request", items: [cr.text] });
+      return { ok: true, sitePath: `/s/${slug}/`, problems };
+    } finally {
+      this.publishing.delete(teamId);
+    }
   }
 
   private logPrompt(entry: Record<string, unknown>) {

@@ -115,3 +115,33 @@ describe("Ask flow (mock AI)", () => {
     expect((await a.emitWithAck(EVC.autosolveUse, { tileId: "gallery" })).error).toMatch(/12 minutes/);
   });
 });
+
+describe("crash recovery mid-build (spec 16.3)", () => {
+  it("restores teams, tiles, Save Points, the clock and cooldowns; frees a stuck Ask", async () => {
+    const { a, t } = await team();
+    await a.emitWithAck(EVC.tileOpen, { tileId: "hero" });
+    await a.timeout(10_000).emitWithAck(EVC.askSend, { tileId: "hero", text: "x" });
+    await a.emitWithAck(EVC.saveCreate, { tileId: "hero", note: "good" });
+    await a.emitWithAck(EVC.notesUpdate, { notes: "purple and playful" });
+    const before = JSON.parse(JSON.stringify(t()));
+    const clock = { ...srv!.room.state.clock };
+    srv!.room.state.teams[before.id].askPending = { tileId: "gallery", by: "A1", since: Date.now() };
+    srv!.room.state.version++;
+    const dir = srv!.dataDir;
+    await srv!.close();
+
+    srv = await startServer(dir);
+    expect(srv.room.wasRestored).toBe(true);
+    expect(srv.room.state.phase).toBe("build");
+    expect(srv.room.state.clock).toEqual(clock);
+    const after = srv.room.state.teams[before.id];
+    expect(after.tiles.hero.doneAt).toBe(before.tiles.hero.doneAt);
+    expect(after.tiles.hero.saves[0].note).toBe("good");
+    expect(after.cooldownUntil).toBe(before.cooldownUntil);
+    expect(after.notes).toBe("purple and playful");
+    expect(after.askPending).toBeNull();
+    // the phone comes straight back by its device token
+    const back = await srv.client("player", { token: "tok-A1-xxxxxxxx" });
+    expect(back.hello.me?.teamId).toBe(before.id);
+  });
+});

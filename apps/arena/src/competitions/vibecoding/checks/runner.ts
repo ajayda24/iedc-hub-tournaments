@@ -72,7 +72,8 @@ export class CheckRunner {
     const worker = new Worker(file, {
       execArgv,
       resourceLimits: { maxOldGenerationSizeMb: this.opts.memoryMb ?? 192, maxYoungGenerationSizeMb: 48 },
-      env: {},
+      // the usual environment, minus the AI key (student code never sees process anyway)
+      env: Object.fromEntries(Object.entries(process.env).filter(([k]) => k !== "GEMINI_API_KEY")),
       stdout: true,
       stderr: true,
     });

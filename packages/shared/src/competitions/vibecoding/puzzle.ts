@@ -92,3 +92,18 @@ export function generatePuzzle(seed: number): { board: number[]; optimal: number
 export function piecesInPlace(board: readonly number[]): number {
   return board.reduce((n, v, i) => n + (v !== 0 && v === SOLVED[i] ? 1 : 0), 0);
 }
+
+/** The cells to tap, in order, to solve a board in the fewest moves (tests and bots). */
+export function solvePath(board: readonly number[]): number[] {
+  const out: number[] = [];
+  let b = board.slice();
+  for (let guard = 0; !isSolved(b) && guard < 40; guard++) {
+    const d = optimalMoves(b);
+    const e = b.indexOf(0);
+    const cell = neighbours(e).find((n) => optimalMoves(slide(b, n)!) === d - 1);
+    if (cell == null) break;
+    out.push(cell);
+    b = slide(b, cell)!;
+  }
+  return out;
+}

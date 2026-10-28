@@ -4,6 +4,7 @@ import { parseArgs } from "node:util";
 import { fileURLToPath } from "node:url";
 import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
+import QRCode from "qrcode";
 import type { NetIface, NetworkInfo } from "@iedc/shared";
 import { Arena } from "./arena";
 import { createRealtime } from "./realtime";
@@ -96,6 +97,13 @@ async function main() {
     );
   }
 
+  // QR codes for links phones show (e.g. a published Tile Rush site)
+  app.get<{ Querystring: { text?: string } }>("/api/qr", async (req, reply) => {
+    const text = String(req.query.text ?? "").slice(0, 300);
+    if (!text.startsWith("http://") && !text.startsWith("https://")) return reply.code(400).send({ ok: false });
+    const svg = await QRCode.toString(text, { type: "svg", margin: 1, errorCorrectionLevel: "M", color: { dark: "#1d1b16", light: "#ffffff" } });
+    return reply.type("image/svg+xml").header("Cache-Control", "public, max-age=3600").send(svg);
+  });
   app.get("/api/health", async () => ({ ok: true, app: "brain-arena", version: VERSION, now: Date.now() }));
   // live monthly leaderboard for /leaderboard on the event Wi-Fi (no Student IDs inside)
   app.get("/api/leaderboard", async (_req, reply) => reply.header("Cache-Control", "no-store").send(history.exportMonthly()));

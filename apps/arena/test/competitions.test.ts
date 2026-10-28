@@ -16,7 +16,8 @@ export async function startServer(dataDir = fs.mkdtempSync(path.join(os.tmpdir()
   const server = http.createServer();
   const io = new Server(server);
   const students = new Students(dataDir);
-  const comps = createCompetitions(io, { pin: "2468", students, dataDir, room: { ai: "mock", mock: { latencyMs: [5, 20], failRate: 0, badRate: 0, quality: 1 }, checkWorkers: 1, ...room } });
+  const comps = createCompetitions(io, { pin: "2468", students, dataDir, room: { ai: "mock", mock: { latencyMs: [5, 20], failRate: 0, badRate: 0, quality: 1 }, checkWorkers: 1, sitesPort: 0, ...room } });
+  const sitesPort = await comps.sitesReady;
   await new Promise<void>((r) => server.listen(0, "127.0.0.1", r));
   const url = `http://127.0.0.1:${(server.address() as AddressInfo).port}/competitions`;
   const clients: Socket[] = [];
@@ -33,7 +34,7 @@ export async function startServer(dataDir = fs.mkdtempSync(path.join(os.tmpdir()
     io.close();
     await new Promise((r) => server.close(r));
   };
-  return { url, io, comps, dataDir, client, close, room: comps.rooms.vibecoding };
+  return { url, io, comps, dataDir, client, close, room: comps.rooms.vibecoding, sitesPort };
 }
 
 export const joinPayload = (studentId: string, name = studentId) => ({

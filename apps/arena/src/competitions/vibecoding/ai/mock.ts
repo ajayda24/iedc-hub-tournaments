@@ -1,4 +1,5 @@
 import { TILES, referenceFragment } from "@iedc/shared/competitions/vibecoding/tiles/index";
+import { TASKS } from "@iedc/shared/competitions/vibecoding/config";
 import type { Fragment } from "@iedc/shared/competitions/vibecoding/state";
 import { ProviderError, type Provider, type ProviderReply, type ProviderRequest } from "./gemini";
 
@@ -45,7 +46,10 @@ export class MockProvider implements Provider {
       const bad = TILES[tileId].bad.filter((b) => (b.variant ?? "full") === "full");
       if (bad.length) f = bad[Math.floor(this.rnd() * bad.length)].fragment;
     }
-    return { text: `Done! Bulbu built it for you.\n<html>${f.html}</html>\n<css>${f.css}</css>\n<js>${f.js}</js>` };
+    // the client's change request: add the banner when the Ask quotes the phrase
+    const cr = req.prompt.system.includes('data-hook="cr-banner"') ? TASKS.changeRequests.find((c) => req.prompt.user.toLowerCase().includes(c.phrase.toLowerCase())) : undefined;
+    const html = cr ? `${f.html}\n<p data-hook="cr-banner">${cr.phrase}</p>` : f.html;
+    return { text: `Done! Bulbu built it for you.\n<html>${html}</html>\n<css>${f.css}</css>\n<js>${f.js}</js>` };
   }
 }
 
