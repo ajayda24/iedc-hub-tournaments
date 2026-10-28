@@ -262,6 +262,7 @@ export class VibecodingRoom {
   }
 
   stop() {
+    this.gateway.close();
     void this.runner.close();
     void this.sites.close();
     if (this.tickTimer) clearInterval(this.tickTimer);

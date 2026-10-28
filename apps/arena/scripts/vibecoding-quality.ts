@@ -131,7 +131,7 @@ const runs: Run[] = [];
 const groups: { label: string; models: ModelConfig[] }[] = args.gateway ? [{ label: "gateway", models: chosen }] : chosen.map((m) => ({ label: m.id, models: [m] }));
 for (const g of groups) {
   console.log(`\n${g.label}: ${corpus.length} prompts…`);
-  const gw = new AiGateway({ provider: gemini, models: g.models, retries: args.gateway ? 2 : 0, usageFile, maxInFlight: 4, failFast: false, timeoutMs: MODELS.timeoutMs, maxOutputTokens: MODELS.maxOutputTokens });
+  const gw = new AiGateway({ provider: gemini, models: g.models, retries: args.gateway ? 2 : 0, usageFile, maxInFlight: 4, failFast: false, keepAlive: true, timeoutMs: MODELS.timeoutMs, maxOutputTokens: MODELS.maxOutputTokens });
   runs.push(...(await pool(corpus, Number(args.concurrency), (p) => runOne(gw, g.label, p))));
   const errs = gw.health().map((m) => `${m.id}: ${m.errors} errors${m.lastError ? ` (last: ${m.lastError})` : ""}`);
   console.log(`  ${errs.join("; ")}`);

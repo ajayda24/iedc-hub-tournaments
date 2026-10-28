@@ -20,6 +20,8 @@ export interface GatewayOptions {
   usageFile?: string;
   /** when every model is out, fail waiting requests at once (live event) or wait for a paused model (quality tests) */
   failFast?: boolean;
+  /** keep the process alive while requests wait (scripts); the arena server stays up anyway */
+  keepAlive?: boolean;
 }
 
 export type CompleteResult<T> =
@@ -89,6 +91,7 @@ export class AiGateway {
       errorsBeforePause: o.errorsBeforePause ?? 3,
       retries: o.retries ?? 2,
       failFast: o.failFast ?? true,
+      keepAlive: o.keepAlive ?? false,
       usageFile: o.usageFile,
     };
     this.day = quotaDay(this.now());
@@ -252,6 +255,14 @@ export class AiGateway {
       this.wakeTimer = null;
       this.pump();
     }, ms);
+    if (!this.opts.keepAlive) this.wakeTimer.unref?.();
+  }
+
+  /** Stop: fail whatever is still waiting and forget the retry timer. */
+  close() {
+    if (this.wakeTimer) clearTimeout(this.wakeTimer);
+    this.wakeTimer = null;
+    for (const q of this.queues.values()) for (const j of q.splice(0)) j.resolve({ ok: false, reason: "closed", attempts: j.attempts });
   }
 
   private async dispatch(job: Job, m: ModelState) {
