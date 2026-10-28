@@ -72,7 +72,7 @@ export function wallView(s: CompetitionState, rt: Pick<RuntimeInfo, "now" | "hea
     health: { safeMode: rt.health.safeMode, asksPerMin: rt.health.asksPerMin, modelsOk: okModels, modelsTotal: rt.health.models.length },
     sitesPort: rt.sitesPort || EVENT.sitesPort,
     joinUrls: rt.joinUrls,
-    settings: { minTeamSize: s.settings.minTeamSize, maxTeamSize: s.settings.maxTeamSize, buildMinutes: s.settings.buildMinutes },
+    settings: { minTeamSize: s.settings.minTeamSize, maxTeamSize: s.settings.maxTeamSize, buildMinutes: s.settings.buildMinutes, allowCodeEdit: s.settings.allowCodeEdit !== false },
   };
 }
 
@@ -95,6 +95,7 @@ function tileView(s: CompetitionState, t: Team, id: TileId, now: number): TileVi
     done: tile.doneAt != null,
     autoSolved: tile.autoSolved || tile.hostUnlocked,
     asks: tile.asks,
+    edits: tile.edits ?? 0,
     hintsUsed: hints.slice(0, tile.hints),
     hintsLeft: LIMITS.hintMax - tile.hints,
     saves: [...tile.saves, ...tile.autos].sort((a, b) => b.at - a.at).map(({ fragment: _f, ...rest }) => rest),

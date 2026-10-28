@@ -293,7 +293,9 @@ function TeamDetail({ team }: { team: HostTeam }) {
                 </td>
                 <td>{t.done ? (t.autoSolved ? "done (help)" : "✅") : t.holder ? `✍ ${t.holder.name}` : t.firstOpenedAt != null ? "open" : "—"}</td>
                 <td>{t.checklist.filter((c) => c.pass).length}/{t.checklist.length}</td>
-                <td>{t.asks} asks</td>
+                <td>
+                  {t.asks} asks{t.edits ? ` · ${t.edits} edits` : ""}
+                </td>
                 <td>{t.hintsUsed.length} hints</td>
                 <td>{t.firstOpenedAt != null ? fmtMin((t.doneAt ?? 0) - t.firstOpenedAt > 0 ? (t.doneAt ?? 0) - t.firstOpenedAt : 0) : ""}</td>
                 <td>
@@ -395,9 +397,9 @@ function Setup({ host }: { host: HostView }) {
       <input className="field w-24 text-center" type="number" value={s[k]} onChange={(e) => setS({ ...s, [k]: Number(e.target.value) })} />
     </label>
   );
-  const box = (k: "glitch" | "logPrompts" | "allowHostInternet", label: string) => (
+  const box = (k: "glitch" | "logPrompts" | "allowHostInternet" | "allowCodeEdit", label: string) => (
     <label className="flex items-center gap-2 font-bold">
-      <input type="checkbox" checked={s[k]} onChange={(e) => setS({ ...s, [k]: e.target.checked })} /> {label}
+      <input type="checkbox" checked={s[k] !== false} onChange={(e) => setS({ ...s, [k]: e.target.checked })} /> {label}
     </label>
   );
   return (
@@ -409,6 +411,7 @@ function Setup({ host }: { host: HostView }) {
       {box("glitch", S.glitch)}
       {box("logPrompts", S.logPrompts)}
       {box("allowHostInternet", S.allowHostInternet)}
+      {box("allowCodeEdit", S.allowCodeEdit)}
       <div>
         <div className="font-bold">{S.variants}</div>
         <div className="mt-1 flex flex-wrap gap-3">
@@ -435,6 +438,7 @@ function Setup({ host }: { host: HostView }) {
             glitch: s.glitch,
             logPrompts: s.logPrompts,
             allowHostInternet: s.allowHostInternet,
+            allowCodeEdit: s.allowCodeEdit !== false,
             variants: s.variants,
           })
         }

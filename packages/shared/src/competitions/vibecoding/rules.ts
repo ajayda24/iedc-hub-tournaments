@@ -87,6 +87,7 @@ export type Action =
   | { type: "check:result"; teamId: string; tileId: TileId; result: CheckResult }
   | { type: "save:create"; studentId: string; tileId: TileId; note?: string }
   | { type: "save:restore"; studentId: string; tileId: TileId; saveId: string }
+  | { type: "code:edit"; studentId: string; tileId: TileId; fragment: Fragment }
   | { type: "notes:update"; studentId: string; notes: string }
   | { type: "hint:use"; studentId: string; tileId: TileId }
   | { type: "autosolve:use"; studentId: string; tileId: TileId; reference: Fragment; result: CheckResult }
@@ -632,6 +633,24 @@ export function applyAction(s: CompetitionState, a: Action, ctx: Ctx): Result {
       tile.saves.push({ id: `s${++tile.saveCounter}`, kind: "save", label: `Save Point ${n}`, note: a.note || undefined, at: now, fragment: { ...tile.fragment } });
       if (tile.doneAt == null) tile.savedBeforePass = true;
       if (tile.holder?.studentId === a.studentId) tile.holder.lastActive = now;
+      touch(s, t);
+      return ok({ teamId: t.id });
+    }
+
+    case "code:edit": {
+      const t = teamOf(s, a.studentId);
+      if (!t) return fail(E.notInTeam);
+      if (s.settings.allowCodeEdit === false) return fail(E.editOff);
+      const blocked = editable(s, a.tileId);
+      if (blocked) return fail(blocked);
+      const tile = t.tiles[a.tileId];
+      const g = holderGuard(s, t, tile, a.studentId);
+      if (g) return fail(g);
+      if (t.askPending?.tileId === a.tileId) return fail(E.askPending);
+      autoSave(tile, now);
+      tile.fragment = { html: a.fragment.html, css: a.fragment.css, js: a.fragment.js };
+      tile.edits = (tile.edits ?? 0) + 1;
+      tile.holder!.lastActive = now;
       touch(s, t);
       return ok({ teamId: t.id });
     }

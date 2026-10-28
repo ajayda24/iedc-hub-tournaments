@@ -51,6 +51,14 @@ function cleanHtml(html: string): string {
 /** <style> or <script> wrappers inside the css/js blocks. */
 const unwrap = (s: string, tag: string) => s.replace(new RegExp(`^\\s*<${tag}[^>]*>([\\s\\S]*)<\\/${tag}>\\s*$`, "i"), "$1").trim();
 
+/** The same safety rules for code a student edits by hand: size limit and the forbidden list. */
+export function validateFragment(fragment: Fragment): { ok: true } | { ok: false; reason: string } {
+  if (byteLength(fragment) > MAX_FRAGMENT_BYTES) return { ok: false, reason: "too big" };
+  const all = `${fragment.html}\n${fragment.css}\n${fragment.js}`;
+  const bad = FORBIDDEN.find((f) => f.re.test(all));
+  return bad ? { ok: false, reason: `forbidden: ${bad.label}` } : { ok: true };
+}
+
 export function parseAnswer(raw: string): ParseResult {
   const text = stripFences(raw ?? "");
   // the html block is named like the tag, so find it from the outside: first <html>, last </html>

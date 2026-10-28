@@ -24,6 +24,7 @@ export const EVC = {
   checkRun: "check:run",
   saveCreate: "save:create",
   saveRestore: "save:restore",
+  codeEdit: "code:edit",
   notesUpdate: "notes:update",
   hintUse: "hint:use",
   autosolveUse: "autosolve:use",
@@ -153,7 +154,7 @@ export interface WallView {
   health: Pick<HealthView, "safeMode" | "asksPerMin"> & { modelsOk: number; modelsTotal: number };
   sitesPort: number;
   joinUrls: { label: string; url: string; qrSvg: string }[];
-  settings: { minTeamSize: number; maxTeamSize: number; buildMinutes: number };
+  settings: { minTeamSize: number; maxTeamSize: number; buildMinutes: number; allowCodeEdit: boolean };
 }
 
 /* ---------------- a team's own board (members only) ---------------- */
@@ -178,6 +179,8 @@ export interface TileView {
   done: boolean;
   autoSolved: boolean;
   asks: number;
+  /** hand edits */
+  edits: number;
   hintsUsed: string[];
   hintsLeft: number;
   saves: SaveView[];

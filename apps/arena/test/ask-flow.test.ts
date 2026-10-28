@@ -145,3 +145,30 @@ describe("crash recovery mid-build (spec 16.3)", () => {
     expect(back.hello.me?.teamId).toBe(before.id);
   });
 });
+
+describe("editing the code by hand", () => {
+  it("is free, auto-saved, checked, filtered for safety, and the host can switch it off", async () => {
+    const { a, b, host, t } = await team();
+    await a.emitWithAck(EVC.tileOpen, { tileId: "hero" });
+    const ref = srv!.room.state.teams[t().id].tiles.hero.fragment;
+    expect(ref.html).toBe("");
+    // B can't edit A's tile
+    expect((await b.emitWithAck(EVC.codeEdit, { tileId: "hero", html: "<p>x</p>", css: "", js: "" })).error).toMatch(/Asha is working/);
+    // unsafe code is refused
+    const bad = await a.emitWithAck(EVC.codeEdit, { tileId: "hero", html: '<img src="https://x.y/a.png">', css: "", js: "" });
+    expect(bad.ok).toBe(false);
+    expect(bad.error).toMatch(/external link/);
+    // a correct hand-written hero passes and completes the tile, without using an Ask
+    const html = '<h1 data-hook="hero-title">IEDC Fest 2026</h1><p data-hook="hero-tagline">Build. Break. Launch.</p><a data-hook="hero-cta" href="#register">Register now</a>';
+    const r = await a.timeout(10_000).emitWithAck(EVC.codeEdit, { tileId: "hero", html, css: "#tile-hero{background:linear-gradient(red,blue)}", js: "" });
+    expect(r.ok).toBe(true);
+    expect(r.done).toBe(true);
+    expect(t().asksUsed).toBe(0);
+    expect(t().cooldownUntil).toBe(0);
+    expect(t().tiles.hero.edits).toBe(1);
+    expect(t().tiles.hero.autos).toHaveLength(1);
+    // switched off by the host
+    await host.s.emitWithAck(EVC.hostSettings, { allowCodeEdit: false });
+    expect((await a.emitWithAck(EVC.codeEdit, { tileId: "hero", html: "<p>y</p>", css: "", js: "" })).error).toMatch(/switched off/);
+  });
+});

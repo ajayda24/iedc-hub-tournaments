@@ -85,6 +85,8 @@ export interface TileState {
   lastCheckAt: number;
   holder: { studentId: string; since: number; lastActive: number } | null;
   saveCounter: number;
+  /** code edits by hand (not Asks) */
+  edits?: number;
 }
 
 export interface Puzzle {
@@ -175,6 +177,8 @@ export interface Settings {
   allowHostInternet: boolean;
   /** keep the students' Ask text in the export */
   logPrompts: boolean;
+  /** students may edit a tile's HTML/CSS/JS by hand (free: no Ask, no cooldown) */
+  allowCodeEdit: boolean;
 }
 
 export interface CompetitionState {
@@ -223,6 +227,7 @@ export function defaultSettings(): Settings {
     safeMode: false,
     allowHostInternet: true,
     logPrompts: false,
+    allowCodeEdit: true,
   };
 }
 

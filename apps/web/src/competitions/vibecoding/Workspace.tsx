@@ -75,6 +75,7 @@ export function Workspace({ team, tileId, onBack }: { team: TeamView; tileId: Ti
   };
 
   const autoSolveIn = tile.autoSolveAt != null ? Math.max(0, Math.ceil((tile.autoSolveAt - elapsed) / 60_000)) : null;
+  const canEdit = live && mine && wall?.settings.allowCodeEdit !== false && !team.askPending;
   const canShowMe = tileId !== "warmup" && !tile.done && autoSolveIn === 0 && team.autoSolves < team.autoSolveMax;
 
   return (
@@ -92,9 +93,12 @@ export function Workspace({ team, tileId, onBack }: { team: TeamView; tileId: Ti
         <h2 className="mr-auto text-2xl font-black leading-tight">{tile.title}</h2>
         {tile.done && <span className="chip !bg-mint">✓ {vc.board.done}</span>}
       </header>
-      <p className="font-semibold">{tileId === "warmup" ? vc.board.warmupHint : tile.brief}</p>
+      {/* students write their own Asks: the brief and checklist can't be copied */}
+      <p className="select-none font-semibold" onCopy={noCopy} onContextMenu={noCopy}>
+        {tileId === "warmup" ? vc.board.warmupHint : tile.brief}
+      </p>
 
-      <Slip className="p-3">
+      <Slip className="select-none p-3" onCopy={noCopy} onContextMenu={noCopy}>
         <div className="mb-1 text-xs font-black uppercase tracking-wide text-ink-soft">{W.checklist}</div>
         <ul className="flex flex-col gap-1">
           {tile.checklist.map((c) => (
@@ -127,6 +131,11 @@ export function Workspace({ team, tileId, onBack }: { team: TeamView; tileId: Ti
             placeholder={W.askPlaceholder}
             value={ask}
             onChange={(e) => setAsk(e.target.value)}
+            onPaste={(e) => {
+              e.preventDefault();
+              showToast(W.noPaste);
+            }}
+            onDrop={(e) => e.preventDefault()}
             disabled={busy === "ask"}
           />
           <div className="flex items-center gap-2">
@@ -174,7 +183,7 @@ export function Workspace({ team, tileId, onBack }: { team: TeamView; tileId: Ti
           💡 {W.hint}
         </Btn>
         <Btn size="sm" tone="paper" onClick={() => setPanel(panel === "code" ? "none" : "code")}>
-          {"</>"} {panel === "code" ? W.hideCode : W.code}
+          {"</>"} {panel === "code" ? W.hideCode : canEdit ? W.editCode : W.code}
         </Btn>
         {canShowMe && (
           <Btn
@@ -193,11 +202,14 @@ export function Workspace({ team, tileId, onBack }: { team: TeamView; tileId: Ti
 
       {panel === "goBack" && <GoBack tile={tile} live={live && mine} />}
       {panel === "hints" && <Hints tile={tile} live={live} />}
-      {panel === "code" && (
-        <pre className="max-h-72 overflow-auto rounded-lg bg-ink p-3 text-xs leading-snug text-paper" aria-label="code (read only)">
-          {`<!-- HTML -->\n${tile.fragment.html || "(empty)"}\n\n/* CSS */\n${tile.fragment.css || "(empty)"}\n\n// JS\n${tile.fragment.js || "(empty)"}`}
-        </pre>
-      )}
+      {panel === "code" &&
+        (canEdit ? (
+          <CodeEditor key={`${tileId}-${tile.saves.length}-${tile.edits}-${tile.asks}`} tile={tile} />
+        ) : (
+          <pre className="max-h-72 overflow-auto rounded-lg bg-ink p-3 text-xs leading-snug text-paper" aria-label="code (read only)">
+            {`<!-- HTML -->\n${tile.fragment.html || "(empty)"}\n\n/* CSS */\n${tile.fragment.css || "(empty)"}\n\n// JS\n${tile.fragment.js || "(empty)"}`}
+          </pre>
+        ))}
 
       <div className="flex items-center gap-2">
         <span className="text-xs font-black uppercase tracking-wide text-ink-soft">{W.preview}</span>
@@ -213,6 +225,59 @@ export function Workspace({ team, tileId, onBack }: { team: TeamView; tileId: Ti
         )}
       </div>
       <iframe title={W.preview} sandbox="allow-scripts" srcDoc={preview} className="h-96 w-full rounded-xl border-2 border-ink bg-white" />
+    </div>
+  );
+}
+
+const noCopy = (e: React.SyntheticEvent) => e.preventDefault();
+
+/** Edit the tile's code by hand (when the host allows it): free, auto-saved first, then checked. */
+function CodeEditor({ tile }: { tile: TileView }) {
+  const [f, setF] = useState(tile.fragment);
+  const [busy, setBusy] = useState(false);
+  const changed = f.html !== tile.fragment.html || f.css !== tile.fragment.css || f.js !== tile.fragment.js;
+  const box = (k: "html" | "css" | "js", label: string) => (
+    <label className="flex flex-col gap-1">
+      <span className="text-xs font-black uppercase tracking-wide text-paper/70">{label}</span>
+      <textarea
+        className="min-h-28 rounded-md bg-black/40 p-2 font-mono text-xs leading-snug text-paper outline-none focus:ring-2 focus:ring-yellow"
+        spellCheck={false}
+        autoCapitalize="off"
+        autoCorrect="off"
+        value={f[k]}
+        onChange={(e) => setF({ ...f, [k]: e.target.value })}
+      />
+    </label>
+  );
+  return (
+    <div className="flex flex-col gap-2 rounded-lg bg-ink p-3">
+      <p className="text-xs font-semibold text-paper/80">{W.editHint}</p>
+      {box("html", "HTML")}
+      {box("css", "CSS")}
+      {box("js", "JS")}
+      <div className="flex gap-2">
+        <Btn
+          size="sm"
+          tone="mint"
+          disabled={!changed || busy}
+          onClick={async () => {
+            setBusy(true);
+            const r = await vcAct<CheckAck>(EVC.codeEdit, { tileId: tile.id, ...f }, 30_000);
+            setBusy(false);
+            if (r?.done) {
+              sfx.win();
+              showToast(W.allPassed);
+            }
+          }}
+        >
+          {busy ? W.checking : W.saveCode}
+        </Btn>
+        {changed && (
+          <Btn size="sm" tone="paper" onClick={() => setF(tile.fragment)}>
+            ↺
+          </Btn>
+        )}
+      </div>
     </div>
   );
 }

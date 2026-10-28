@@ -21,6 +21,8 @@ export interface TeamResult {
   asks: number;
   hints: number;
   savePoints: number;
+  /** hand edits of the code */
+  codeEdits: number;
   autoSolves: number;
   tiles: Record<string, { done: boolean; minutes: number | null; asks: number; hints: number; savePoints: number; help: "show-me" | "host" | null; checks: string }>;
   notes: string;
@@ -73,6 +75,7 @@ export function buildResults(s: CompetitionState) {
       asks: t.asksUsed,
       hints: TILE_IDS.reduce((n, id) => n + t.tiles[id].hints, 0),
       savePoints: TILE_IDS.reduce((n, id) => n + t.tiles[id].saves.length, 0),
+      codeEdits: TILE_IDS.reduce((n, id) => n + (t.tiles[id].edits ?? 0), 0),
       autoSolves: t.autoSolves,
       tiles,
       notes: t.notes,
@@ -105,6 +108,7 @@ export function resultsCsv(results: ReturnType<typeof buildResults>): string {
     "Asks",
     "Hints",
     "Save Points",
+    "Code edits",
     "Show me",
     "Cooldown wait (min)",
     ...TILE_IDS.map((id) => `${tileConfig(id).title} (min)`),
@@ -130,6 +134,7 @@ export function resultsCsv(results: ReturnType<typeof buildResults>): string {
       r.asks,
       r.hints,
       r.savePoints,
+      r.codeEdits,
       r.autoSolves,
       r.cooldownWaitMin,
       ...TILE_IDS.map((id) => (r.tiles[id].done ? (r.tiles[id].minutes ?? "") : "")),

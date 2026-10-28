@@ -123,3 +123,12 @@ describe("sliding puzzle (spec 8)", () => {
     expect(piecesInPlace([0, 2, 3, 4, 5, 6, 7, 8, 1])).toBe(7);
   });
 });
+
+describe("hand-edited code", () => {
+  it("goes through the same size and safety rules as AI answers", async () => {
+    const { validateFragment } = await import("./parser");
+    expect(validateFragment({ html: "<p>ok</p>", css: "p{color:red}", js: "console.log(1)" }).ok).toBe(true);
+    expect(validateFragment({ html: "", css: "", js: "fetch('/x')" })).toEqual({ ok: false, reason: "forbidden: fetch(" });
+    expect(validateFragment({ html: "x".repeat(21_000), css: "", js: "" })).toEqual({ ok: false, reason: "too big" });
+  });
+});

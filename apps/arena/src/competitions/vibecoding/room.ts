@@ -32,10 +32,10 @@ import { CompetitionStore } from "./store";
 import fs from "node:fs";
 import path from "node:path";
 import { MODELS, checklist, type TileId } from "@iedc/shared/competitions/vibecoding/config";
-import { parseAnswer } from "@iedc/shared/competitions/vibecoding/parser";
+import { parseAnswer, validateFragment } from "@iedc/shared/competitions/vibecoding/parser";
 import { referenceFragment } from "@iedc/shared/competitions/vibecoding/tiles/index";
 import { allPassed, variantOf } from "@iedc/shared/competitions/vibecoding/rules";
-import { askSchema, hostGeminiKeySchema, hostModelSchema, saveCreateSchema, saveRestoreSchema } from "@iedc/shared/competitions/vibecoding/schemas";
+import { askSchema, codeEditSchema, hostGeminiKeySchema, hostModelSchema, saveCreateSchema, saveRestoreSchema } from "@iedc/shared/competitions/vibecoding/schemas";
 import type { AskAck, CheckAck } from "@iedc/shared/competitions/vibecoding/protocol";
 import { AiGateway } from "./ai/gateway";
 import { GeminiProvider } from "./ai/gemini";
@@ -443,6 +443,15 @@ export class VibecodingRoom {
       const res = this.dispatch({ type: "save:restore", studentId, tileId: d.tileId, saveId: d.saveId });
       if (res.ok && res.teamId) await this.autoCheck(res.teamId, d.tileId);
       return res;
+    });
+    playerAsync(EVC.codeEdit, codeEditSchema, async (studentId, d) => {
+      const fragment = { html: d.html, css: d.css, js: d.js };
+      const safe = validateFragment(fragment);
+      if (!safe.ok) return { ok: false, error: E.editUnsafe(safe.reason.replace(/^forbidden: /, "")) };
+      const res = this.dispatch({ type: "code:edit", studentId, tileId: d.tileId, fragment });
+      if (!res.ok || !res.teamId) return res;
+      const r = await this.autoCheck(res.teamId, d.tileId);
+      return { ok: true, check: r?.result, done: (r?.completed.length ?? 0) > 0 };
     });
     player(EVC.hintUse, tileRefSchema, (studentId, d) => ({ type: "hint:use", studentId, tileId: d.tileId }));
     player(EVC.autosolveUse, tileRefSchema, (studentId, d) => {

@@ -63,6 +63,13 @@ test("a phone practises in warm-up, then completes a tile with the (mock) AI", a
   await a.getByRole("button", { name: "Ask", exact: true }).click();
   await expect(a.getByText("✅")).toBeVisible({ timeout: 15_000 });
   await expect(a.frameLocator("iframe").getByText("Pixel Pals")).toBeVisible();
+  // edit the code by hand: the preview follows, the checks still pass
+  await a.getByRole("button", { name: /Edit code/ }).click();
+  const htmlBox = a.locator("textarea.font-mono").first();
+  await htmlBox.fill('<h1 data-hook="warmup-title">Pixel Pals rock</h1>');
+  await a.getByRole("button", { name: "Save and check" }).click();
+  await expect(a.frameLocator("iframe").getByText("Pixel Pals rock")).toBeVisible();
+  await expect(a.getByText("✅")).toBeVisible();
 
   await host.getByRole("button", { name: "Start the build clock" }).click();
   await a.getByRole("button", { name: /Board/ }).click();
