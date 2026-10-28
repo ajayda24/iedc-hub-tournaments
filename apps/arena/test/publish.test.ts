@@ -1,4 +1,7 @@
+import fs from "node:fs";
+import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
+import { teamScore } from "@iedc/shared/competitions/vibecoding/scoring";
 import { EVC, type PublishAck } from "@iedc/shared/competitions/vibecoding/protocol";
 import { TILE_IDS, TASKS } from "@iedc/shared/competitions/vibecoding/config";
 import { solvePath } from "@iedc/shared/competitions/vibecoding/puzzle";
@@ -93,5 +96,22 @@ describe("puzzle, publish, change request (spec 8–9)", () => {
     await host.emitWithAck(EVC.hostPhase, { phase: "frozen" });
     expect((await fetch(`http://127.0.0.1:${srv!.sitesPort}${ok.sitePath}`)).status).toBe(200);
     expect((await a.emitWithAck(EVC.publishGo)).error).toMatch(/frozen/);
+
+    // freezing exports the results; they match the state (spec 16.3)
+    const dir = path.join(srv!.dataDir, "competitions", "vibecoding", "runs", srv!.room.state.runId);
+    const results = JSON.parse(fs.readFileSync(path.join(dir, "results.json"), "utf8"));
+    expect(results.teams).toHaveLength(1);
+    expect(results.teams[0]).toMatchObject({
+      rank: 1,
+      team: "Byte Me",
+      size: 1,
+      members: [{ name: "Asha", studentId: "A1" }],
+      score: teamScore(srv!.room.state, t()).total,
+      publishCount: 3,
+      puzzle: { moves: t().puzzle!.moves, optimal: t().puzzle!.optimal },
+    });
+    expect(results.teams[0].tiles.hero.help).toBe("host");
+    const csv = fs.readFileSync(path.join(dir, "results.csv"), "utf8");
+    expect(csv.split(/\r?\n/)[1]).toMatch(/^1,Byte Me,1,Asha,A1,CSE,/);
   });
 });

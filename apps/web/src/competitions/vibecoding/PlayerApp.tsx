@@ -11,6 +11,7 @@ import { connectVc, reconnectVc, useVc, vcAck } from "./net";
 import { TeamSetup, Lobby } from "./TeamScreens";
 import { PlayerMain } from "./PlayerMain";
 import { useInternetReport } from "./useInternet";
+import { VoteView } from "./Done";
 
 const transport: JoinTransport = {
   title: "Tile Rush",
@@ -47,7 +48,13 @@ export function VcPlayerApp() {
         <JoinForm via={transport} />
       </>
     );
-  } else if (!team) body = <TeamSetup />;
+  } else if (!team && (wall.clock.phase === "showcase" || wall.clock.phase === "closed"))
+    body = (
+      <main className="mx-auto max-w-md px-5 py-6">
+        <VoteView />
+      </main>
+    );
+  else if (!team) body = <TeamSetup />;
   else if (["setup", "registration"].includes(wall.clock.phase)) body = <Lobby />;
   else body = <PlayerMain />;
 

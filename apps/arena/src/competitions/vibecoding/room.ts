@@ -44,6 +44,7 @@ import { buildPrompt } from "./ai/prompt";
 import { readKey, saveKey } from "./ai/key";
 import { CheckRunner } from "./checks/runner";
 import { SitesServer } from "./sites";
+import { buildResults, resultsCsv } from "@iedc/shared/competitions/vibecoding/export";
 import { EVENT, TASKS, TILE_IDS, tileConfig, type ScoredTileId, type Variant } from "@iedc/shared/competitions/vibecoding/config";
 import { compose } from "@iedc/shared/competitions/vibecoding/composer";
 import { slugify } from "@iedc/shared/competitions/vibecoding/rules";
@@ -462,7 +463,11 @@ export class VibecodingRoom {
     });
 
     host(EVC.hostSettings, hostSettingsSchema, (d) => this.dispatch({ type: "settings", patch: d as Partial<Settings> }));
-    host(EVC.hostPhase, hostPhaseSchema, (d) => this.dispatch({ type: "phase:set", phase: d.phase as Phase }));
+    host(EVC.hostPhase, hostPhaseSchema, (d) => {
+      const res = this.dispatch({ type: "phase:set", phase: d.phase as Phase });
+      if (res.ok && (d.phase === "frozen" || d.phase === "closed")) this.exportResults();
+      return res;
+    });
     host(EVC.hostPause, empty, () => this.dispatch({ type: "clock:pause" }));
     host(EVC.hostResume, empty, () => this.dispatch({ type: "clock:resume" }));
     host(EVC.hostExtend, hostExtendSchema, (d) => this.dispatch({ type: "clock:extend", minutes: d.minutes }));
@@ -471,6 +476,7 @@ export class VibecodingRoom {
     host(EVC.hostSpotlight, hostSpotlightSchema, (d) => this.dispatch({ type: "host:spotlight", teamId: d.teamId }));
     host(EVC.hostShowcase, hostShowcaseSchema, (d) => this.dispatch({ type: "host:showcase", teamId: d.teamId, voting: d.voting }));
     host(EVC.hostNewRun, empty, () => ({ ok: true, archivedTo: this.newRun() }));
+    host(EVC.hostExport, empty, () => ({ ok: true, dir: this.exportResults() }));
     host(EVC.hostModel, hostModelSchema, (d) => ({ ok: this.gateway.setDisabled(d.id, d.disabled) }));
     host(EVC.hostGeminiKey, hostGeminiKeySchema, (d) => {
       saveKey(this.store.dir, d.key);
@@ -574,6 +580,25 @@ export class VibecodingRoom {
     if (!delivered.ok) return { ok: false, error: delivered.error };
     const r = await this.autoCheck(teamId, tileId);
     return { ok: true, explanation, backup, glitched: !!delivered.glitched, check: r?.result };
+  }
+
+  /** Results (JSON + CSV, plus the Ask log if kept) in runs/<runId>/. Private: they contain Student IDs. */
+  exportResults(): string {
+    const dir = path.join(this.store.dir, "runs", this.state.runId);
+    fs.mkdirSync(dir, { recursive: true });
+    const results = buildResults(this.state);
+    fs.writeFileSync(path.join(dir, "results.json"), JSON.stringify(results, null, 2));
+    fs.writeFileSync(path.join(dir, "results.csv"), resultsCsv(results));
+    const log = path.join(this.store.dir, "prompts.jsonl");
+    if (fs.existsSync(log)) {
+      const mine = fs
+        .readFileSync(log, "utf8")
+        .split("\n")
+        .filter((l) => l.includes(`"runId":"${this.state.runId}"`));
+      if (mine.length) fs.writeFileSync(path.join(dir, "prompts.jsonl"), mine.join("\n") + "\n");
+    }
+    this.store.log("export", { dir });
+    return dir;
   }
 
   /** Publish: the site check on the composed page, then live on the sites port. */
