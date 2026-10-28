@@ -178,6 +178,7 @@ export class VibecodingRoom {
       queued: this.gateway.queued,
       inFlight: this.gateway.running,
       asksPerMin: this.gateway.asksPerMin(),
+      checkP95Ms: p95(this.runner.durations),
     };
   }
 
@@ -651,6 +652,12 @@ export class VibecodingRoom {
     this.nsp = nsp;
   }
 }
+
+const p95 = (xs: number[]) => {
+  if (!xs.length) return 0;
+  const s = [...xs].sort((a, b) => a - b);
+  return s[Math.min(s.length - 1, Math.floor(0.95 * s.length))];
+};
 
 /** What goes in events.jsonl: the action minus bulky fragments. */
 function logData(a: Action): Record<string, unknown> {

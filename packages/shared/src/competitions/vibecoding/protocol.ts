@@ -126,6 +126,8 @@ export interface HealthView {
   queued: number;
   inFlight: number;
   asksPerMin: number;
+  /** check runner job time, 95th percentile (ms) */
+  checkP95Ms: number;
 }
 
 export interface AwardView {

@@ -104,7 +104,10 @@ async function main() {
     const svg = await QRCode.toString(text, { type: "svg", margin: 1, errorCorrectionLevel: "M", color: { dark: "#1d1b16", light: "#ffffff" } });
     return reply.type("image/svg+xml").header("Cache-Control", "public, max-age=3600").send(svg);
   });
-  app.get("/api/health", async () => ({ ok: true, app: "brain-arena", version: VERSION, now: Date.now() }));
+  app.get("/api/health", async () => {
+    const cpu = process.cpuUsage();
+    return { ok: true, app: "brain-arena", version: VERSION, now: Date.now(), rss: process.memoryUsage().rss, cpuMs: (cpu.user + cpu.system) / 1000 };
+  });
   // live monthly leaderboard for /leaderboard on the event Wi-Fi (no Student IDs inside)
   app.get("/api/leaderboard", async (_req, reply) => reply.header("Cache-Control", "no-store").send(history.exportMonthly()));
 
@@ -124,7 +127,8 @@ async function main() {
     internet = await hasInternet();
     if (before !== internet) {
       arena.setConfig(arena.config);
-      if (internet) console.log("\n  ⚠  This laptop can reach the internet. Turn off mobile data on the hotspot so students can't either.\n");
+      // ALLOW_HOST_INTERNET=1: router mode (Tile Rush needs the laptop online for Gemini; phones stay offline on the router)
+      if (internet && !process.env.ALLOW_HOST_INTERNET) console.log("\n  ⚠  This laptop can reach the internet. Turn off mobile data on the hotspot so students can't either.\n");
     }
   };
   await refreshNetwork();

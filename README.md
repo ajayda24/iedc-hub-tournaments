@@ -76,6 +76,8 @@ The host taps **Start** and every connected phone gets the same puzzle at the sa
 - doodle avatars made from 2,250 combinations,
 - sounds synthesised in the browser, with no audio files.
 
+**Tile Rush (team competition)** at `/competitions/vibecoding/`: teams of 2–4 build a real one-page site on their phones by asking an AI (Google Gemini), tile by tile, with hidden automated checks; then they solve a sliding puzzle, publish their site on the event network and handle a "client's change request". Save Points, Go Back, Project Notes, hints, a live projector wall, voting and awards. Friendly words at first; the real ones (prompt, commit, revert, deploy) are revealed at the end. See [docs/competitions/](docs/competitions/vibecoding-spec.md) and the [event-day runbook](docs/EVENT_DAY.md#tile-rush-team-competition-event-day).
+
 ---
 
 ## Changing text and settings
@@ -124,6 +126,9 @@ pnpm start          # arena serving the built app on :4000
 pnpm test:e2e       # Playwright: real arena + browsers (needs `pnpm build` first)
 pnpm bots --n 80    # 80 simulated students who actually solve puzzles (dry run / load test)
 pnpm pack:arena     # dist/brain-arena: single-folder build for the event laptop
+pnpm vibecoding:bots     # Tile Rush load test: 15 simulated teams + a forced restart (mock AI)
+pnpm vibecoding:models   # which Gemini models your key can use
+pnpm vibecoding:quality  # can the real models build every tile? (24 beginner prompts)
 ```
 
 Measured locally with `pnpm bots --n 80` over four rounds:
@@ -144,7 +149,9 @@ apps/
     src/screens/       the page screens        src/games/   one view per game
     src/ui/            shared pieces           src/net/     connection to the arena
   arena/           💻  the laptop server: rounds, scoring, PINs, history, crash safety
+    src/competitions/  team competitions (Tile Rush): AI gateway, check runner, published sites
 packages/shared/   🧩  game engines + rules shared by both: protocol, scoring, monthly board
+  src/competitions/  the pure rules of each competition (Tile Rush: tiles, checks, scoring, puzzle)
 scripts/           🛠️  build helpers; scripts/event-kit/ holds the .bat/.ps1 files for the laptop
 e2e/               ✅  end-to-end tests (a real arena + browser)
 docs/              📖  EVENT_DAY.md (host checklist), ADD_A_GAME.md, screenshots
@@ -163,6 +170,8 @@ Each folder has a short README with a file-by-file map: [config](config/README.m
 | Change a game's look on the phone | `apps/web/src/games/<Name>View.tsx` |
 | Change round flow, scoring rules in play, PINs, history | `apps/arena/src/` |
 | Add a game | [docs/ADD_A_GAME.md](docs/ADD_A_GAME.md) |
+| Change Tile Rush's tiles, scoring, AI models | `config/competitions/vibecoding/` (tasks, scoring, models .json) |
+| Add a team competition | [docs/competitions/ADD_A_COMPETITION.md](docs/competitions/ADD_A_COMPETITION.md) |
 | Change the laptop start/hotspot scripts | `scripts/event-kit/` |
 
 **Keeping it working:** run `pnpm check` before pushing (GitHub also runs it on every push, see `.github/workflows/ci.yml`). For bigger changes, also `pnpm build` and `pnpm test:e2e`.

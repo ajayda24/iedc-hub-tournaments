@@ -13,7 +13,8 @@
     "bots": "tsx scripts/bots.ts",
     "recover:first": "tsx scripts/recover-first-tournament.ts",
     "vibecoding:models": "tsx scripts/vibecoding-models.ts",
-    "vibecoding:quality": "tsx scripts/vibecoding-quality.ts"
+    "vibecoding:quality": "tsx scripts/vibecoding-quality.ts",
+    "vibecoding:bots": "tsx scripts/vibecoding-bots.ts"
   },
   "dependencies": {
     "@fastify/static": "^10.1.5",

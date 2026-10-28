@@ -2,6 +2,27 @@
 
 Each run is `pnpm vibecoding:quality` (spec 16.6). Newest first.
 
+## Run 2026-10-28 07:28 UTC (through the gateway)
+
+| Model | pass@1 | pass@3 | Latency p50 / p95 | System instruction | Gate |
+|---|---|---|---|---|---|
+| gateway | 54% | 100% | 16.4 s / 24.5 s | yes, yes, yes | ✅ met |
+
+Per tile (prompts passed within 3 Asks, out of 3):
+
+| Tile | gateway |
+|---|---|
+| Hero banner | 3/3 |
+| Countdown | 3/3 |
+| Schedule | 3/3 |
+| Registration form | 3/3 |
+| Dark/light switch | 3/3 |
+| Gallery | 3/3 |
+| Feedback stars | 3/3 |
+| Fix-it | 3/3 |
+
+By level (pass@3): vague 100%, medium 100%, detailed 100%
+
 ## Run 2026-10-28 03:13 UTC
 
 | Model | pass@1 | pass@3 | Latency p50 / p95 | System instruction | Gate |
