@@ -46,6 +46,40 @@ async function createTeam(page: Page, name: string) {
   return (await page.locator(".font-mono").first().innerText()).trim();
 }
 
+test("a phone practises in warm-up, then completes a tile with the (mock) AI", async ({ browser }) => {
+  const host = await hostPage(browser);
+  await host.getByRole("button", { name: "Start a new run" }).click();
+  await host.getByRole("button", { name: "Open registration" }).click();
+  const a = await phone(browser, "Chris Paul");
+  const code = await createTeam(a, "Pixel Pals");
+  const b = await phone(browser, "Diya Rose");
+  await b.getByPlaceholder("CODE").fill(code);
+  await b.getByRole("button", { name: "Join", exact: true }).click();
+  await expect(b.getByText("Pixel Pals")).toBeVisible();
+
+  await host.getByRole("button", { name: "Start warm-up" }).click();
+  await a.getByRole("button", { name: /Warm-up: your team/ }).click();
+  await a.getByPlaceholder(/Describe what you want/).fill("Make a big heading with our team name");
+  await a.getByRole("button", { name: "Ask", exact: true }).click();
+  await expect(a.getByText("✅")).toBeVisible({ timeout: 15_000 });
+  await expect(a.frameLocator("iframe").getByText("Pixel Pals")).toBeVisible();
+
+  await host.getByRole("button", { name: "Start the build clock" }).click();
+  await a.getByRole("button", { name: /Board/ }).click();
+  await a.getByRole("button", { name: /Hero banner/ }).click();
+  // a teammate watching the same tile can't take it
+  await b.getByRole("button", { name: /Hero banner/ }).click();
+  await expect(b.getByText(/Chris is working on this tile/)).toBeVisible();
+  await a.getByPlaceholder(/Describe what you want/).fill("Hero with IEDC Fest 2026, tagline Build. Break. Launch., gradient, Register now button");
+  await a.getByRole("button", { name: "Ask", exact: true }).click();
+  await expect(a.getByText("Every check passes. Tile done!")).toBeVisible({ timeout: 15_000 });
+  await expect(a.frameLocator("iframe").getByText("IEDC Fest 2026")).toBeVisible();
+  // the cooldown is shared by the team
+  await expect(b.getByText(/Bulbu is thinking… \d+s/).first()).toBeVisible();
+  await a.getByRole("button", { name: /Board/ }).click();
+  await expect(a.getByText("1/8 tiles")).toBeVisible();
+});
+
 test("Tile Rush scaffold: host opens registration, a team forms, the wall shows it", async ({ browser }) => {
   const host = await hostPage(browser);
   const screenCtx = await browser.newContext({ viewport: { width: 1600, height: 900 } });
@@ -53,6 +87,7 @@ test("Tile Rush scaffold: host opens registration, a team forms, the wall shows 
   await wall.goto(`${BASE}/screen/`);
   await expect(wall.getByText("Tile Rush")).toBeVisible();
 
+  await host.getByRole("button", { name: "Start a new run" }).click();
   await host.getByRole("button", { name: "Open registration" }).click();
   const a = await phone(browser, "Asha Menon");
   const code = await createTeam(a, "Byte Me");

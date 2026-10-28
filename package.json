@@ -19,7 +19,9 @@
     "pack:arena": "node scripts/pack-arena.mjs",
     "bots": "pnpm --filter @iedc/arena bots",
     "content:build": "pnpm --filter @iedc/shared content:build",
-    "recover:first": "pnpm --filter @iedc/arena recover:first"
+    "recover:first": "pnpm --filter @iedc/arena recover:first",
+    "vibecoding:models": "pnpm --filter @iedc/arena vibecoding:models",
+    "vibecoding:quality": "pnpm --filter @iedc/arena vibecoding:quality --"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1",

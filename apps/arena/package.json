@@ -11,7 +11,9 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "bots": "tsx scripts/bots.ts",
-    "recover:first": "tsx scripts/recover-first-tournament.ts"
+    "recover:first": "tsx scripts/recover-first-tournament.ts",
+    "vibecoding:models": "tsx scripts/vibecoding-models.ts",
+    "vibecoding:quality": "tsx scripts/vibecoding-quality.ts"
   },
   "dependencies": {
     "@fastify/static": "^10.1.5",

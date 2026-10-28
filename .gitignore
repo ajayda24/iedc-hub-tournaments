@@ -16,3 +16,5 @@ next-env.d.ts
 .e2e-data/
 apps/web/AGENTS.md
 backups/
+# Gemini API keys never go in git
+gemini-key.txt

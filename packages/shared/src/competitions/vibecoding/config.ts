@@ -49,6 +49,8 @@ export interface ModelConfig {
   rpm: number;
   tpm: number;
   rpd: number;
+  /** Gemini thinkingConfig.thinkingLevel (e.g. "minimal"); unset = the model's default */
+  thinkingLevel?: string;
 }
 
 export const EVENT = eventJson;

@@ -13,6 +13,8 @@ export interface CompetitionsOptions {
   dataDir: string;
   network?: RoomDeps["network"];
   now?: () => number;
+  /** extra room settings (tests: a fast mock AI) */
+  room?: Partial<RoomDeps>;
 }
 
 /**
@@ -26,6 +28,7 @@ export function createCompetitions(io: Server, opts: CompetitionsOptions) {
     dir: path.join(opts.dataDir, "competitions", "vibecoding"),
     network: opts.network,
     now: opts.now,
+    ...opts.room,
   });
   const rooms = { vibecoding } as const;
   const nsp = io.of(COMPETITIONS_NAMESPACE);

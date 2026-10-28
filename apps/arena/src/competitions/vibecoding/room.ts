@@ -29,6 +29,20 @@ import { rankTeams } from "@iedc/shared/competitions/vibecoding/scoring";
 import type { WallView } from "@iedc/shared/competitions/vibecoding/protocol";
 import type { Students } from "../../students";
 import { CompetitionStore } from "./store";
+import fs from "node:fs";
+import path from "node:path";
+import { MODELS, checklist, type TileId } from "@iedc/shared/competitions/vibecoding/config";
+import { parseAnswer } from "@iedc/shared/competitions/vibecoding/parser";
+import { referenceFragment } from "@iedc/shared/competitions/vibecoding/tiles/index";
+import { allPassed, variantOf } from "@iedc/shared/competitions/vibecoding/rules";
+import { askSchema, hostGeminiKeySchema, hostModelSchema, saveCreateSchema, saveRestoreSchema } from "@iedc/shared/competitions/vibecoding/schemas";
+import type { AskAck, CheckAck } from "@iedc/shared/competitions/vibecoding/protocol";
+import { AiGateway } from "./ai/gateway";
+import { GeminiProvider } from "./ai/gemini";
+import { MockProvider, mockOptionsFromEnv, type MockOptions } from "./ai/mock";
+import { buildPrompt } from "./ai/prompt";
+import { readKey, saveKey } from "./ai/key";
+import { CheckRunner } from "./checks/runner";
 
 type Ack = (res: unknown) => void;
 const safeAck = (ack: unknown): Ack => (typeof ack === "function" ? (ack as Ack) : () => {});
@@ -42,6 +56,10 @@ export interface RoomDeps {
   /** join URLs (with QR) for this competition's phone page, and whether the laptop has internet */
   network?: () => { joinUrls: WallView["joinUrls"]; laptopInternet: boolean | null };
   seed?: number;
+  /** "mock" forces the pretend AI; "auto" (default) uses Gemini when a key is set */
+  ai?: "auto" | "mock";
+  mock?: MockOptions;
+  checkWorkers?: number;
 }
 
 interface SocketData {
@@ -71,6 +89,10 @@ export class VibecodingRoom {
   private lastHostSent = 0;
   private tickTimer: ReturnType<typeof setInterval> | null = null;
   private restored = false;
+  readonly gateway: AiGateway;
+  readonly runner: CheckRunner;
+  private gemini: GeminiProvider;
+  private mock: MockProvider;
 
   constructor(private deps: RoomDeps) {
     this.now = deps.now ?? Date.now;
@@ -78,6 +100,30 @@ export class VibecodingRoom {
     const loaded = this.store.load();
     this.restored = !!loaded;
     this.state = loaded ?? createState(deps.seed ?? (Math.random() * 2 ** 32) >>> 0, this.now());
+    this.gemini = new GeminiProvider(() => readKey(this.store.dir));
+    this.mock = new MockProvider({ ...mockOptionsFromEnv(), ...deps.mock });
+    this.gateway = new AiGateway({
+      provider: this.pickProvider(),
+      models: MODELS.models,
+      maxInFlight: MODELS.maxInFlight,
+      timeoutMs: MODELS.timeoutMs,
+      maxOutputTokens: MODELS.maxOutputTokens,
+      errorPauseMs: MODELS.errorPauseMs,
+      errorsBeforePause: MODELS.errorsBeforePause,
+      now: this.now,
+      usageFile: path.join(this.store.dir, "ai-usage.json"),
+    });
+    this.runner = new CheckRunner({ size: deps.checkWorkers ?? 2 });
+  }
+
+  /** Gemini when a key is set (and the mock isn't forced), else the mock AI. */
+  private pickProvider() {
+    const forced = (this.deps.ai ?? (process.env.VC_AI === "mock" ? "mock" : "auto")) === "mock";
+    return !forced && readKey(this.store.dir) ? this.gemini : this.mock;
+  }
+
+  get keySet() {
+    return !!readKey(this.store.dir);
   }
 
   get wasRestored() {
@@ -87,7 +133,16 @@ export class VibecodingRoom {
   /* ---------------- runtime facts ---------------- */
 
   health(): HealthView {
-    return { safeMode: this.state.settings.safeMode, autoSafe: false, keySet: false, provider: "mock", models: [], queued: 0, inFlight: 0, asksPerMin: 0 };
+    return {
+      safeMode: this.state.settings.safeMode,
+      autoSafe: this.gateway.down(),
+      keySet: this.keySet,
+      provider: this.gateway.provider.name,
+      models: this.gateway.health(),
+      queued: this.gateway.queued,
+      inFlight: this.gateway.running,
+      asksPerMin: this.gateway.asksPerMin(),
+    };
   }
 
   runtime(): RuntimeInfo {
@@ -170,6 +225,7 @@ export class VibecodingRoom {
   }
 
   stop() {
+    void this.runner.close();
     if (this.tickTimer) clearInterval(this.tickTimer);
     if (this.flushTimer) clearTimeout(this.flushTimer);
     this.store.close(this.state);
@@ -322,6 +378,38 @@ export class VibecodingRoom {
     player(EVC.voteCast, voteSchema, (studentId, d) => ({ type: "vote", studentId, teamId: d.teamId }));
     player(EVC.puzzleMove, puzzleMoveSchema, (studentId, d) => ({ type: "puzzle:move", studentId, cell: d.cell, version: d.version }));
 
+    /** Like player(), for actions that wait on the AI or the check runner. */
+    const playerAsync = <T>(event: string, schema: { safeParse(v: unknown): { success: true; data: T } | { success: false } }, run: (studentId: string, d: T) => Promise<unknown>) => {
+      socket.on(event, (raw: unknown, ack: unknown) => {
+        const reply = safeAck(ack);
+        const id = sid();
+        if (!id) return reply({ ok: false, error: E.joinFirst });
+        const p = schema.safeParse(raw ?? {});
+        if (!p.success) return reply({ ok: false, error: E.notNow });
+        run(id, p.data).then(reply, (e) => reply({ ok: false, error: e instanceof Error ? e.message : "Failed" }));
+      });
+    };
+    playerAsync(EVC.askSend, askSchema, (id, d) => this.ask(id, d.tileId, d.text));
+    playerAsync(EVC.checkRun, tileRefSchema, (id, d) => this.check(id, d.tileId));
+    player(EVC.saveCreate, saveCreateSchema, (studentId, d) => ({ type: "save:create", studentId, tileId: d.tileId, note: d.note }));
+    playerAsync(EVC.saveRestore, saveRestoreSchema, async (studentId, d) => {
+      const res = this.dispatch({ type: "save:restore", studentId, tileId: d.tileId, saveId: d.saveId });
+      if (res.ok && res.teamId) await this.autoCheck(res.teamId, d.tileId);
+      return res;
+    });
+    player(EVC.hintUse, tileRefSchema, (studentId, d) => ({ type: "hint:use", studentId, tileId: d.tileId }));
+    player(EVC.autosolveUse, tileRefSchema, (studentId, d) => {
+      const t = teamOf(this.state, studentId);
+      const v = variantOf(this.state, d.tileId);
+      return {
+        type: "autosolve:use",
+        studentId,
+        tileId: d.tileId,
+        reference: referenceFragment(d.tileId, v, t?.name ?? ""),
+        result: allPassed(checklist(d.tileId, v).map((i) => i.id), this.now()),
+      };
+    });
+
     socket.on(EVC.internet, (raw: unknown) => {
       const id = sid();
       const p = internetSchema.safeParse(raw);
@@ -342,6 +430,12 @@ export class VibecodingRoom {
     host(EVC.hostSpotlight, hostSpotlightSchema, (d) => this.dispatch({ type: "host:spotlight", teamId: d.teamId }));
     host(EVC.hostShowcase, hostShowcaseSchema, (d) => this.dispatch({ type: "host:showcase", teamId: d.teamId, voting: d.voting }));
     host(EVC.hostNewRun, empty, () => ({ ok: true, archivedTo: this.newRun() }));
+    host(EVC.hostModel, hostModelSchema, (d) => ({ ok: this.gateway.setDisabled(d.id, d.disabled) }));
+    host(EVC.hostGeminiKey, hostGeminiKeySchema, (d) => {
+      saveKey(this.store.dir, d.key);
+      this.gateway.provider = this.pickProvider();
+      return { ok: true, keySet: this.keySet, provider: this.gateway.provider.name };
+    });
   }
 
   /** Host team operations. Async ones (unlock a tile) are added with the check runner. */
@@ -359,8 +453,94 @@ export class VibecodingRoom {
         return this.dispatch({ type: "host:glitch", teamId: d.teamId, fire: true });
       case "glitchCancel":
         return this.dispatch({ type: "host:glitch", teamId: d.teamId, fire: false });
-      case "unlockTile":
-        return { ok: false, error: E.notNow };
+      case "unlockTile": {
+        const t = this.state.teams[d.teamId];
+        const v = variantOf(this.state, d.tileId);
+        return this.dispatch({
+          type: "host:unlockTile",
+          teamId: d.teamId,
+          tileId: d.tileId,
+          reference: referenceFragment(d.tileId, v, t?.name ?? ""),
+          result: allPassed(checklist(d.tileId, v).map((i) => i.id), this.now()),
+        });
+      }
+    }
+  }
+
+  /* ---------------- Ask, Check ---------------- */
+
+  /** Run the tile's checks and record the result (may complete the tile). */
+  async autoCheck(teamId: string, tileId: TileId) {
+    const t = this.state.teams[teamId];
+    if (!t) return null;
+    const result = await this.runner.checkTile(tileId, variantOf(this.state, tileId), t.tiles[tileId].fragment, t.name);
+    const res = this.dispatch({ type: "check:result", teamId, tileId, result });
+    return { result, completed: res.completed ?? [] };
+  }
+
+  async check(studentId: string, tileId: TileId): Promise<CheckAck> {
+    const begin = this.dispatch({ type: "check:begin", studentId, tileId });
+    if (!begin.ok || !begin.teamId) return { ok: false, error: begin.error };
+    const r = await this.autoCheck(begin.teamId, tileId);
+    if (!r) return { ok: false, error: E.notNow };
+    return { ok: true, check: r.result, done: r.completed.length > 0 };
+  }
+
+  /** A student's Ask: queue it to the AI (or Safe Mode), install the answer, check it. */
+  async ask(studentId: string, tileId: TileId, text: string): Promise<AskAck> {
+    if (this.internet.has(studentId)) return { ok: false, error: E.internetBlocked };
+    const begin = this.dispatch({ type: "ask:begin", studentId, tileId });
+    if (!begin.ok || !begin.teamId) return { ok: false, error: begin.error };
+    const teamId = begin.teamId;
+    const t = this.state.teams[teamId];
+    const variant = variantOf(this.state, tileId);
+    const prompt = buildPrompt({
+      tileId,
+      variant,
+      fragment: t.tiles[tileId].fragment,
+      notes: t.notes,
+      teamName: t.name,
+      ask: text,
+      changeRequest: !!t.changeRequest && t.changeRequest.doneAt == null,
+    });
+    let fragment = null;
+    let explanation = "";
+    let backup = false;
+    let model = "";
+    const safe = this.state.settings.safeMode || !this.gateway.shouldTry();
+    if (!safe) {
+      const r = await this.gateway.complete(teamId, prompt, (txt) => {
+        const p = parseAnswer(txt);
+        return p.ok ? p : null;
+      });
+      if (r.ok) {
+        fragment = r.value.fragment;
+        explanation = r.value.explanation;
+        model = r.model;
+      }
+    }
+    if (!fragment && (safe || this.gateway.down())) {
+      // Safe Mode: the event goes on with Bulbu's backup answer
+      fragment = referenceFragment(tileId, variant, t.name);
+      backup = true;
+    }
+    this.logPrompt({ teamId, studentId, tileId, text, ok: !!fragment, model: backup ? "safe-mode" : model });
+    if (!fragment) {
+      this.dispatch({ type: "ask:fail", teamId });
+      return { ok: false, error: E.aiDown };
+    }
+    const delivered = this.dispatch({ type: "ask:deliver", teamId, tileId, fragment, queued: this.gateway.queued });
+    if (!delivered.ok) return { ok: false, error: delivered.error };
+    const r = await this.autoCheck(teamId, tileId);
+    return { ok: true, explanation, backup, glitched: !!delivered.glitched, check: r?.result };
+  }
+
+  private logPrompt(entry: Record<string, unknown>) {
+    if (!this.state.settings.logPrompts) return;
+    try {
+      fs.appendFileSync(path.join(this.store.dir, "prompts.jsonl"), JSON.stringify({ t: this.now(), runId: this.state.runId, ...entry }) + "\n");
+    } catch {
+      /* ignore */
     }
   }
 

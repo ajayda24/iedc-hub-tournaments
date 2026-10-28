@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { createRequire } from "node:module";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { Worker } from "node:worker_threads";
 import { checklist, TILE_IDS, type ScoredTileId, type TileId, type Variant } from "@iedc/shared/competitions/vibecoding/config";
 import type { CheckResult, Fragment } from "@iedc/shared/competitions/vibecoding/state";
@@ -35,7 +36,9 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 function workerEntry(): { file: string; execArgv: string[] } {
   const packed = path.join(here, "checks-worker.cjs");
   if (fs.existsSync(packed)) return { file: packed, execArgv: [] };
-  return { file: path.join(here, "worker.ts"), execArgv: ["--import", "tsx"] };
+  // from the repo: load tsx by absolute path (the arena may run from any folder)
+  const tsx = path.join(path.dirname(createRequire(import.meta.url).resolve("tsx/package.json")), "dist", "loader.mjs");
+  return { file: path.join(here, "worker.ts"), execArgv: ["--import", pathToFileURL(tsx).href] };
 }
 
 export interface SiteCheck {

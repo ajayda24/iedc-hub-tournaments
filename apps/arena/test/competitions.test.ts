@@ -9,13 +9,14 @@ import { io as connect, type Socket } from "socket.io-client";
 import { EVC, type TeamView, type WallView } from "@iedc/shared/competitions/vibecoding/protocol";
 import { createCompetitions } from "../src/competitions";
 import { Students } from "../src/students";
+import type { RoomDeps } from "../src/competitions/vibecoding/room";
 
 /** A real arena-like server: http + Socket.IO + the competitions namespace, in a temp data folder. */
-export async function startServer(dataDir = fs.mkdtempSync(path.join(os.tmpdir(), "vc-"))) {
+export async function startServer(dataDir = fs.mkdtempSync(path.join(os.tmpdir(), "vc-")), room: Partial<RoomDeps> = {}) {
   const server = http.createServer();
   const io = new Server(server);
   const students = new Students(dataDir);
-  const comps = createCompetitions(io, { pin: "2468", students, dataDir });
+  const comps = createCompetitions(io, { pin: "2468", students, dataDir, room: { ai: "mock", mock: { latencyMs: [5, 20], failRate: 0, badRate: 0, quality: 1 }, checkWorkers: 1, ...room } });
   await new Promise<void>((r) => server.listen(0, "127.0.0.1", r));
   const url = `http://127.0.0.1:${(server.address() as AddressInfo).port}/competitions`;
   const clients: Socket[] = [];
