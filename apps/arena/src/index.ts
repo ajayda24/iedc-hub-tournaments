@@ -56,7 +56,7 @@ async function main() {
   const rt = createRealtime(app.server, { pin, onExport: () => store.exportCsv(arena), students, history });
   const arena = new Arena({ out: { ...rt.output, log: (t, d) => store.log(t, d) }, network });
   rt.attach(arena);
-  // team competitions (Tile Rush…) on their own namespace and data folder; the weekly arena is untouched
+  // team competitions (Vibe Hackathon…) on their own namespace and data folder; the weekly arena is untouched
   const competitions = createCompetitions(rt.io, {
     pin,
     students,
@@ -97,7 +97,7 @@ async function main() {
     );
   }
 
-  // QR codes for links phones show (e.g. a published Tile Rush site)
+  // QR codes for links phones show (e.g. a published Vibe Hackathon site)
   app.get<{ Querystring: { text?: string } }>("/api/qr", async (req, reply) => {
     const text = String(req.query.text ?? "").slice(0, 300);
     if (!text.startsWith("http://") && !text.startsWith("https://")) return reply.code(400).send({ ok: false });
@@ -127,7 +127,7 @@ async function main() {
     internet = await hasInternet();
     if (before !== internet) {
       arena.setConfig(arena.config);
-      // ALLOW_HOST_INTERNET=1: router mode (Tile Rush needs the laptop online for Gemini; phones stay offline on the router)
+      // ALLOW_HOST_INTERNET=1: router mode (Vibe Hackathon needs the laptop online for Gemini; phones stay offline on the router)
       if (internet && !process.env.ALLOW_HOST_INTERNET) console.log("\n  ⚠  This laptop can reach the internet. Turn off mobile data on the hotspot so students can't either.\n");
     }
   };
@@ -159,7 +159,7 @@ async function main() {
     console.log(`   Host PIN      ${pin}`);
     console.log(`   Host console  http://localhost:${port}/host/`);
     console.log(`   Big screen    http://localhost:${port}/screen/`);
-    console.log(`   Tile Rush     http://localhost:${port}/competitions/vibecoding/host/  (big screen: …/vibecoding/screen/)`);
+    console.log(`   Vibe Hackathon     http://localhost:${port}/competitions/vibecoding/host/  (big screen: …/vibecoding/screen/)`);
     if (interfaces.length === 0) console.log(`   Students      (no network yet — turn on the hotspot)`);
     for (const i of interfaces) console.log(`   Students      ${i.url.padEnd(34)} ${i.label}`);
     if (!web) console.log(`\n   (no web build found — dev mode: web app on http://localhost:3000)`);

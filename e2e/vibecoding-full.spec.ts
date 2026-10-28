@@ -4,7 +4,7 @@ import { expect, test } from "@playwright/test";
 import { TASKS } from "../packages/shared/src/competitions/vibecoding/config";
 import { BASE, createTeam, doTile, hostPage, joinTeam, phone, solvePuzzle } from "./vc-helpers";
 
-// The whole Tile Rush event (spec 16.4): three teams of 2, 3 and 4, the mock AI (fast, 1 s cooldown; see playwright.config.ts).
+// The whole Vibe Hackathon event (spec 16.4): three teams of 2, 3 and 4, the mock AI (fast, 1 s cooldown; see playwright.config.ts).
 const TITLES = ["Hero banner", "Countdown", "Schedule", "Registration form", "Dark/light switch", "Gallery", "Feedback stars", "Fix-it"];
 
 test("the whole event: three teams, every stage, host controls, wall, gallery, voting, export", async ({ browser }) => {

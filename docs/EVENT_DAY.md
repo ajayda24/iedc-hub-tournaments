@@ -19,7 +19,7 @@ Everything runs from **one laptop**. Nobody needs internet, and students install
 3. **Right-click `setup-hotspot.ps1` → Run with PowerShell.** It asks for admin. The script:
    - raises the Mobile Hotspot limit from 8 to **128** phones (`WifiMaxPeers`),
    - stops the hotspot from switching itself off,
-   - opens ports 4000 and 4001 in the firewall (4001: Tile Rush sites),
+   - opens ports 4000 and 4001 in the firewall (4001: Vibe Hackathon sites),
    - helps you add the **Microsoft KM-TEST Loopback Adapter**. Windows will only start a hotspot when it has a connection to share, and sharing the loopback adapter means the hotspot works with **zero internet**. That's what we want.
 4. Open **Settings → Network & internet → Mobile hotspot**. Set:
    - *Share my connection from* → the loopback adapter (shows as "Ethernet 2" or similar),
@@ -90,7 +90,7 @@ The laptop's Wi-Fi card is the limit, not the 128 setting. If phones start dropp
 
 ---
 
-# Tile Rush (team competition): event day
+# Vibe Hackathon (team competition): event day
 
 Teams of 2–4 build the **IEDC Fest Page** on their phones by asking an AI (Google Gemini), tile by tile, then solve a sliding puzzle and publish their site. It runs from the same kit, next to the weekly games:
 
@@ -116,7 +116,7 @@ Students must have **no internet**, but the laptop needs it for Gemini. So:
 6. **Print the join QR** for `http://<static IP>:4000/competitions/vibecoding/` (the host console's Network tab shows it).
 7. Check the router's **real client limit**. For ~60 phones you may need a second access point.
 
-On the day, start it with **`start-tilerush.bat`** (not `start-arena.bat`): it doesn't turn on the hotspot and doesn't warn that the laptop is online.
+On the day, start it with **`start-vibe-hackathon.bat`** (not `start-arena.bat`): it doesn't turn on the hotspot and doesn't warn that the laptop is online.
 
 The host console warns when the laptop has **no** internet (Gemini can't be reached). Students' phones are still checked: a phone that can reach the internet has its Asks blocked until it can't.
 

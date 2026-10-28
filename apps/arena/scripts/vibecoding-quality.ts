@@ -176,7 +176,7 @@ console.log(`\n${report}`);
 console.log(verdicts.length ? `\nGate NOT met for: ${verdicts.join(", ")}. See spec 16.6 "If it fails".` : "\nGate met.");
 
 const md = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/(\w:)/, "$1")), "..", "..", "..", "docs", "competitions", "vibecoding-quality.md");
-const head = "# Tile Rush: AI quality runs\n\nEach run is `pnpm vibecoding:quality` (spec 16.6). Newest first.\n\n";
+const head = "# Vibe Hackathon: AI quality runs\n\nEach run is `pnpm vibecoding:quality` (spec 16.6). Newest first.\n\n";
 const old = fs.existsSync(md) ? fs.readFileSync(md, "utf8").replace(head, "") : "";
 fs.writeFileSync(md, `${head}${report}\n${old}`);
 const out = path.join(dir, "quality");

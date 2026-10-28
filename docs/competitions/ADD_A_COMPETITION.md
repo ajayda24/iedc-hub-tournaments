@@ -1,8 +1,8 @@
 # Adding a competition
 
-A **competition** is a long, team-based event that runs next to the weekly games, with its own pages, Socket.IO namespace and saved data. Tile Rush (`vibecoding`) is the first one; copy its shape.
+A **competition** is a long, team-based event that runs next to the weekly games, with its own pages, Socket.IO namespace and saved data. Vibe Hackathon (`vibecoding`) is the first one; copy its shape.
 
-| Layer | Tile Rush | A new competition `<id>` |
+| Layer | Vibe Hackathon | A new competition `<id>` |
 |---|---|---|
 | Registry | `packages/shared/src/competitions/registry.ts` | add `<id>: { id, title, subtitle }` |
 | Rules (pure, tested) | `packages/shared/src/competitions/vibecoding/` (`state.ts`, `rules.ts`, `scoring.ts`, `views.ts`, `schemas.ts`, `protocol.ts`) | `packages/shared/src/competitions/<id>/`, implementing `CompetitionDefinition` from `../types.ts` |

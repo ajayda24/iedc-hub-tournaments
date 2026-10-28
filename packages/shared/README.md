@@ -13,7 +13,7 @@ Code used by both the arena (server) and the web app (phones, practice). No UI, 
 | `src/scoring.ts` | Points: solve, speed bonus, first blood, penalties. |
 | `src/monthly.ts` | Building the public monthly leaderboard from tournament history. |
 | `src/rng.ts` | Seeded random numbers, so the same seed gives the same puzzle. |
-| `src/competitions/` | Team competitions: the contract and registry; `vibecoding/` holds Tile Rush's pure rules (`rules.ts`), scoring, views, schemas, the composer, the AI-answer parser, the puzzle and `tiles/` (starter, reference and bad fragments + checks for each tile). |
+| `src/competitions/` | Team competitions: the contract and registry; `vibecoding/` holds Vibe Hackathon's pure rules (`rules.ts`), scoring, views, schemas, the composer, the AI-answer parser, the puzzle and `tiles/` (starter, reference and bad fragments + checks for each tile). |
 | `scripts/build-content.mjs` | `pnpm content:build`: rebuilds `config/words/generated/`. |
 
 Adding a game: see [docs/ADD_A_GAME.md](../../docs/ADD_A_GAME.md).

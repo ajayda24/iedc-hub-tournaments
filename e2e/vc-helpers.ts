@@ -1,7 +1,7 @@
 import { expect, type Browser, type Page } from "@playwright/test";
 import { solvePath } from "../packages/shared/src/competitions/vibecoding/puzzle";
 
-/** Helpers for the Tile Rush (/competitions/vibecoding/) end-to-end tests. */
+/** Helpers for the Vibe Hackathon (/competitions/vibecoding/) end-to-end tests. */
 export const PIN = "2468";
 export const BASE = "/competitions/vibecoding";
 
@@ -18,7 +18,7 @@ export async function hostPage(browser: Browser) {
   await page.goto(`${BASE}/host/`);
   await page.locator("input").first().fill(PIN);
   await page.keyboard.press("Enter");
-  await expect(page.getByText("Tile Rush · host")).toBeVisible();
+  await expect(page.getByText("Vibe Hackathon · host")).toBeVisible();
   return page;
 }
 

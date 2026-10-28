@@ -1,5 +1,5 @@
 // Bundles the arena server into a single ESM file (no node_modules needed on the event laptop),
-// plus checks-worker.cjs next to it: the Tile Rush check runner (jsdom) in its own worker thread.
+// plus checks-worker.cjs next to it: the Vibe Hackathon check runner (jsdom) in its own worker thread.
 import { build } from "esbuild";
 import fs from "node:fs";
 import path from "node:path";

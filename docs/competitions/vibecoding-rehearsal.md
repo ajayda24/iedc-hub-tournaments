@@ -1,4 +1,4 @@
-# Tile Rush: rehearsals and calibration
+# Vibe Hackathon: rehearsals and calibration
 
 The automated tests cover the software. These checks need real people, phones and the event laptop (spec 16.7–16.10). Tick them off in order; fix what you find, then re-run the affected tests (`pnpm check`, `pnpm test:e2e`).
 

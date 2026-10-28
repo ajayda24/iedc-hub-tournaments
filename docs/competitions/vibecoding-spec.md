@@ -1,5 +1,6 @@
 > **How this spec maps onto the repo** (decided 2026-10-28; the rest of the text is the original spec):
-> - The competition id is `vibecoding`: pages at `/competitions/vibecoding/` (phones), `/competitions/vibecoding/host/` and `/competitions/vibecoding/screen/`. "Tile Rush" is its display title.
+> - The event is called **Vibe Hackathon** on every screen (renamed 2026-10-29); "Tile Rush" below is the original working title.
+> - The competition id is `vibecoding`: pages at `/competitions/vibecoding/` (phones), `/competitions/vibecoding/host/` and `/competitions/vibecoding/screen/`.
 > - `data/events/tile-rush/*.json` → `config/competitions/vibecoding/*.json`; student-facing text in `config/copy/vibecoding.ts`.
 > - `data/runs/<event-id>/` → `arena-data/competitions/vibecoding/runs/<run-id>/` (private, gitignored).
 > - Code folders `events/tile-rush/` → `competitions/vibecoding/`; Socket.IO namespace `/events` → `/competitions`.

@@ -6,7 +6,7 @@ import { createState, type CompetitionState, type Team } from "./state";
 import { teamView } from "./views";
 import type { TeamView } from "./protocol";
 
-/** Tile Rush ("vibecoding"): the pure rules, plugged into the competition contract. */
+/** Vibe Hackathon ("vibecoding"): the pure rules, plugged into the competition contract. */
 export const vibecoding: CompetitionDefinition<CompetitionState, Team, TeamInit, Action, Ctx, TeamView> = {
   meta: COMPETITIONS.vibecoding,
   createState,

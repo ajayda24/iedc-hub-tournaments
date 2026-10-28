@@ -14,7 +14,7 @@ import { useInternetReport } from "./useInternet";
 import { VoteView } from "./Done";
 
 const transport: JoinTransport = {
-  title: "Tile Rush",
+  title: "Vibe Hackathon",
   check: (studentId) => vcAck<StudentCheckAck>(EVC.studentCheck, { studentId }),
   join: async (payload) => {
     const res = await vcAck<{ ok: boolean; error?: string; me?: unknown }>(EVC.join, payload);
@@ -61,7 +61,7 @@ export function VcPlayerApp() {
   return (
     <div className="min-h-dvh">
       <div className="sticky top-0 z-30 flex items-center gap-2 border-b-2 border-ink/10 bg-paper/90 px-3 py-1.5 text-sm backdrop-blur">
-        <span className="font-black">Tile Rush</span>
+        <span className="font-black">Vibe Hackathon</span>
         <span className="chip !py-0.5 text-xs">{vc.phase[wall.clock.phase]}</span>
         {wall.clock.phase === "build" && <Clock className="ml-1 !text-base" />}
         <span className="ml-auto">

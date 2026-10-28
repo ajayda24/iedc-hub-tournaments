@@ -1,4 +1,4 @@
-# Tile Rush: AI quality runs
+# Vibe Hackathon: AI quality runs
 
 Each run is `pnpm vibecoding:quality` (spec 16.6). Newest first.
 

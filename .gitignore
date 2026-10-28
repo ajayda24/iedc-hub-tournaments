@@ -18,3 +18,6 @@ apps/web/AGENTS.md
 backups/
 # Gemini API keys never go in git
 gemini-key.txt
+
+# a stray cache folder some tools create when TEMP is missing
+undefined/

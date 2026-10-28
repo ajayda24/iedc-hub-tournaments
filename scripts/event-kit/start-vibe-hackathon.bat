@@ -1,7 +1,7 @@
 @echo off
 setlocal
 cd /d "%~dp0"
-title Tile Rush (router mode)
+title Vibe Hackathon (router mode)
 where node >nul 2>nul
 if errorlevel 1 (
   echo.
@@ -10,8 +10,8 @@ if errorlevel 1 (
   pause
   exit /b 1
 )
-rem Tile Rush runs on a router: phones have no internet, this laptop does (Gemini needs it).
-rem No hotspot here, and no warning about the laptop being online. See README.txt, "Tile Rush".
+rem Vibe Hackathon runs on a router: phones have no internet, this laptop does (Gemini needs it).
+rem No hotspot here, and no warning about the laptop being online. See README.txt, "Vibe Hackathon".
 set ALLOW_HOST_INTERNET=1
 node arena.mjs %*
 pause

@@ -14,7 +14,7 @@ Each folder is one URL. The page files are thin; the real screen lives in `src/s
 | `/screen/` | the projector | `src/screens/ScreenApp.tsx` |
 | `/practice/` | anyone, offline too | `src/screens/PracticeApp.tsx` |
 | `/leaderboard/` | anyone | `src/screens/LeaderboardApp.tsx` |
-| `/competitions/vibecoding/` (`host/`, `screen/`) | Tile Rush: phones, host, wall | `src/competitions/vibecoding/` (`PlayerApp`, `HostApp`, `ScreenApp`) |
+| `/competitions/vibecoding/` (`host/`, `screen/`) | Vibe Hackathon: phones, host, wall | `src/competitions/vibecoding/` (`PlayerApp`, `HostApp`, `ScreenApp`) |
 
 `layout.tsx` (fonts, PWA), `globals.css` (colours, notebook look), `manifest.ts` and `sw.ts` (the service worker) apply to every page.
 

@@ -15,7 +15,7 @@ const PIN_KEY = "ba:pin";
 const NEXT: Record<string, string> = { setup: "registration", registration: "warmup", warmup: "build", build: "frozen", frozen: "showcase", showcase: "closed" };
 type Tab = "control" | "teams" | "people" | "setup" | "ai" | "network" | "showcase";
 
-/** The host console for Tile Rush. Same PIN as the weekly host console. */
+/** The host console for Vibe Hackathon. Same PIN as the weekly host console. */
 export function VcHostApp() {
   const { host, wall, helloDone, helloError, conn } = useVc();
   const [pin, setPin] = useState("");

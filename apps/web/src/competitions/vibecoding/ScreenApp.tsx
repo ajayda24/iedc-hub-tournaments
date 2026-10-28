@@ -14,7 +14,7 @@ const S = vc.screen;
 
 const STAGE_ICON: Record<string, string> = { registered: "📝", ready: "✋", tiles: "🧱", puzzle: "🧩", published: "🚀", change_request: "📞", done: "✅" };
 
-/** The projector wall for Tile Rush: big type, icons with every colour, readable from the back row. */
+/** The projector wall for Vibe Hackathon: big type, icons with every colour, readable from the back row. */
 export function VcScreenApp() {
   const wall = useVc((s) => s.wall);
   useEffect(() => {

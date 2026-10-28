@@ -6,7 +6,7 @@
   What it does:
     1. Raises the Mobile Hotspot client limit (WifiMaxPeers, default 8) to 128.
     2. Stops the hotspot from switching itself off when nobody is connected.
-    3. Opens TCP ports 4000 (the arena) and 4001 (Tile Rush published sites) in Windows Firewall.
+    3. Opens TCP ports 4000 (the arena) and 4001 (Vibe Hackathon published sites) in Windows Firewall.
     4. Checks for a "Microsoft KM-TEST Loopback Adapter" — Windows only lets you
        start Mobile Hotspot when it has a connection to share. Sharing the
        loopback adapter means the hotspot works with NO internet at all

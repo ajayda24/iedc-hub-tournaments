@@ -79,7 +79,7 @@ interface SocketData {
 }
 
 /**
- * The live Tile Rush event. Rules live in @iedc/shared (pure); this class owns
+ * The live Vibe Hackathon event. Rules live in @iedc/shared (pure); this class owns
  * the sockets, the clock tick, saving, and (later gates) the AI, checks and sites.
  */
 export class VibecodingRoom {
@@ -147,7 +147,7 @@ export class VibecodingRoom {
     try {
       return await this.sites.listen(port, host);
     } catch (e) {
-      console.error(`  ⚠  Tile Rush sites could not start on port ${port}: ${e instanceof Error ? e.message : e}`);
+      console.error(`  ⚠  Vibe Hackathon sites could not start on port ${port}: ${e instanceof Error ? e.message : e}`);
       return null;
     }
   }

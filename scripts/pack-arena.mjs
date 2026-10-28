@@ -1,6 +1,6 @@
 // Produces dist/brain-arena/: everything the event laptop needs, no install step.
 // Safe to re-run on a kit that was already used: arena-data/ is left untouched.
-//   arena.mjs  checks-worker.cjs  web/  start-arena.bat  start-tilerush.bat  start-arena.sh  setup-hotspot.ps1  start-hotspot.ps1  README.txt
+//   arena.mjs  checks-worker.cjs  web/  start-arena.bat  start-vibe-hackathon.bat  start-arena.sh  setup-hotspot.ps1  start-hotspot.ps1  README.txt
 import { execSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
@@ -14,7 +14,7 @@ const run = (cmd) => execSync(cmd, { stdio: "inherit", cwd: root });
 
 // Only replace what this script builds. Never wipe the whole folder: the laptop's
 // live data (arena-data/: PINs, tournament history, results) lives inside it.
-const BUILT = ["arena.mjs", "checks-worker.cjs", "web", "start-arena.bat", "start-tilerush.bat", "start-arena.sh", "setup-hotspot.ps1", "start-hotspot.ps1", "README.txt"];
+const BUILT = ["arena.mjs", "checks-worker.cjs", "web", "start-arena.bat", "start-vibe-hackathon.bat", "start-arena.sh", "setup-hotspot.ps1", "start-hotspot.ps1", "README.txt"];
 fs.mkdirSync(out, { recursive: true });
 for (const f of BUILT) fs.rmSync(path.join(out, f), { recursive: true, force: true });
 
@@ -23,7 +23,7 @@ run(`node apps/arena/build.mjs "${path.join(out, "arena.mjs")}"`);
 fs.cpSync(path.join(root, "apps", "web", "out"), path.join(out, "web"), { recursive: true });
 // the service worker is only for the online site; the LAN copy doesn't need it
 for (const f of fs.readdirSync(path.join(out, "web"))) if (/^(sw|swe-worker)/.test(f)) fs.rmSync(path.join(out, "web", f));
-for (const f of ["start-arena.bat", "start-tilerush.bat", "start-arena.sh", "setup-hotspot.ps1", "start-hotspot.ps1"]) {
+for (const f of ["start-arena.bat", "start-vibe-hackathon.bat", "start-arena.sh", "setup-hotspot.ps1", "start-hotspot.ps1"]) {
   fs.copyFileSync(path.join(root, "scripts", "event-kit", f), path.join(out, f));
 }
 fs.chmodSync(path.join(out, "start-arena.sh"), 0o755);

@@ -1,6 +1,6 @@
 import { expect, test, type Browser, type Page } from "@playwright/test";
 
-// Tile Rush (/competitions/vibecoding/). The arena starts with an empty competitions folder (see playwright.config.ts).
+// Vibe Hackathon (/competitions/vibecoding/). The arena starts with an empty competitions folder (see playwright.config.ts).
 const PIN = "2468";
 const BASE = "/competitions/vibecoding";
 
@@ -17,7 +17,7 @@ async function hostPage(browser: Browser) {
   await page.goto(`${BASE}/host/`);
   await page.locator("input").first().fill(PIN);
   await page.keyboard.press("Enter");
-  await expect(page.getByText("Tile Rush · host")).toBeVisible();
+  await expect(page.getByText("Vibe Hackathon · host")).toBeVisible();
   return page;
 }
 
@@ -85,12 +85,12 @@ test("a phone practises in warm-up, then completes a tile with the (mock) AI", a
   await expect(a.getByText("1/8 tiles")).toBeVisible();
 });
 
-test("Tile Rush scaffold: host opens registration, a team forms, the wall shows it", async ({ browser }) => {
+test("Vibe Hackathon scaffold: host opens registration, a team forms, the wall shows it", async ({ browser }) => {
   const host = await hostPage(browser);
   const screenCtx = await browser.newContext({ viewport: { width: 1600, height: 900 } });
   const wall = await screenCtx.newPage();
   await wall.goto(`${BASE}/screen/`);
-  await expect(wall.getByText("Tile Rush")).toBeVisible();
+  await expect(wall.getByText("Vibe Hackathon")).toBeVisible();
 
   await host.getByRole("button", { name: "Start a new run" }).click();
   await host.getByRole("button", { name: "Open registration" }).click();

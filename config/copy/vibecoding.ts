@@ -1,4 +1,4 @@
-/** Every word on the Tile Rush (vibecoding) screens. Edit freely; keep the ${...} parts. */
+/** Every word on the Vibe Hackathon (vibecoding) screens. Edit freely; keep the ${...} parts. */
 
 export const vcErrors = {
   joinFirst: "Join first.",
@@ -192,7 +192,7 @@ export const vc = {
     sites: "All sites",
   },
   host: {
-    title: "Tile Rush · host",
+    title: "Vibe Hackathon · host",
     pinHint: "Enter the host PIN (it's in the arena window).",
     enter: "Enter",
     tabs: { control: "Control", teams: "Teams", people: "People", setup: "Setup", ai: "AI", network: "Network", showcase: "Showcase" } as Record<string, string>,

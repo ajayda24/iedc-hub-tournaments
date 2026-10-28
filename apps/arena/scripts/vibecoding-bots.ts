@@ -1,5 +1,5 @@
 /**
- * pnpm vibecoding:bots — load test and soak for Tile Rush (spec 16.5), with the mock AI.
+ * pnpm vibecoding:bots — load test and soak for Vibe Hackathon (spec 16.5), with the mock AI.
  *
  *   Starts its own arena (a throwaway data folder), fills it with simulated teams
  *   of 2, 3 and 4 equally skilled students who really play: open tiles, Ask,

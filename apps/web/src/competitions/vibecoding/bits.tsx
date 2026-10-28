@@ -4,7 +4,7 @@ import type { ClockView } from "@iedc/shared/competitions/vibecoding/protocol";
 import { cx, fmtClock } from "@/lib/format";
 import { useVc, vcNow } from "./net";
 
-/** Small shared pieces for the Tile Rush screens. */
+/** Small shared pieces for the Vibe Hackathon screens. */
 
 export const COMPETITION = "vibecoding";
 

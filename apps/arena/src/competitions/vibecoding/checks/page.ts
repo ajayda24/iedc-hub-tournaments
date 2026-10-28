@@ -153,9 +153,9 @@ function installFakeTime(w: any, start: number, errors: string[]): CheckPage["cl
 /** No network, no popups, and the browser APIs jsdom lacks (so harmless code doesn't crash). */
 function stubWindow(w: any) {
   const offline = () => {
-    throw new Error("The network is off in Tile Rush checks");
+    throw new Error("The network is off in Vibe Hackathon checks");
   };
-  w.fetch = () => Promise.reject(new Error("The network is off in Tile Rush checks"));
+  w.fetch = () => Promise.reject(new Error("The network is off in Vibe Hackathon checks"));
   w.XMLHttpRequest = function XMLHttpRequest() {
     offline();
   };

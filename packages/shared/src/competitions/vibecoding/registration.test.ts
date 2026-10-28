@@ -23,7 +23,7 @@ describe("registry and contract", () => {
     expect(COMPETITION_IDS).toEqual(["vibecoding"]);
     expect(isCompetitionId("vibecoding")).toBe(true);
     expect(isCompetitionId("constructor")).toBe(false);
-    expect(COMPETITIONS.vibecoding.title).toBe("Tile Rush");
+    expect(COMPETITIONS.vibecoding.title).toBe("Vibe Hackathon");
     expect(vibecoding.meta.id).toBe("vibecoding");
   });
 
