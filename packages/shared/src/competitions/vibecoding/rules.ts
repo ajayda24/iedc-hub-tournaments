@@ -108,6 +108,8 @@ export type Action =
 
 export interface Ctx {
   now: number;
+  /** test/rehearsal overrides (e.g. a 1-second cooldown for end-to-end tests) */
+  limits?: Partial<Record<"cooldownBaseSec" | "cooldownPerQueuedSec" | "cooldownMaxSec", number>>;
 }
 
 export interface Result extends ActionResult {
@@ -576,7 +578,8 @@ export function applyAction(s: CompetitionState, a: Action, ctx: Ctx): Result {
         tile.asks++;
         t.asksUsed++;
       }
-      const cd = Math.min(LIMITS.cooldownMaxSec, LIMITS.cooldownBaseSec + LIMITS.cooldownPerQueuedSec * Math.max(0, a.queued)) * 1000;
+      const L = { ...LIMITS, ...ctx.limits };
+      const cd = Math.min(L.cooldownMaxSec, L.cooldownBaseSec + L.cooldownPerQueuedSec * Math.max(0, a.queued)) * 1000;
       t.cooldownUntil = now + cd;
       if (s.phase === "build") t.cooldownWaitMs += cd;
       if (tile.holder) tile.holder.lastActive = now;

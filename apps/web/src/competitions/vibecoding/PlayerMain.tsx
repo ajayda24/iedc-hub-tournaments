@@ -45,7 +45,7 @@ export function PlayerMain() {
           </Btn>
         </div>
       );
-  } else if ((phase === "showcase" || phase === "closed") && view.kind === "board") {
+  } else if (phase === "showcase" || phase === "closed") {
     body = (
       <div className="flex flex-col gap-4">
         <DoneView team={team} />

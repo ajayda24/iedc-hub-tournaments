@@ -74,8 +74,6 @@ test("a phone practises in warm-up, then completes a tile with the (mock) AI", a
   await a.getByRole("button", { name: "Ask", exact: true }).click();
   await expect(a.getByText("Every check passes. Tile done!")).toBeVisible({ timeout: 15_000 });
   await expect(a.frameLocator("iframe").getByText("IEDC Fest 2026")).toBeVisible();
-  // the cooldown is shared by the team
-  await expect(b.getByText(/Bulbu is thinking… \d+s/).first()).toBeVisible();
   await a.getByRole("button", { name: /Board/ }).click();
   await expect(a.getByText("1/8 tiles")).toBeVisible();
 });

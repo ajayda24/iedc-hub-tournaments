@@ -104,6 +104,8 @@ export class VibecodingRoom {
   private mock: MockProvider;
   readonly sites: SitesServer;
   private publishing = new Set<string>();
+  /** VC_COOLDOWN_SEC=1 shortens the Ask cooldown (end-to-end tests, quick rehearsals) */
+  private limits = process.env.VC_COOLDOWN_SEC ? { cooldownBaseSec: Number(process.env.VC_COOLDOWN_SEC), cooldownPerQueuedSec: 0 } : undefined;
 
   constructor(private deps: RoomDeps) {
     this.now = deps.now ?? Date.now;
@@ -189,13 +191,14 @@ export class VibecodingRoom {
       joinUrls: net.joinUrls,
       laptopInternet: net.laptopInternet,
       dataDir: this.store.dir,
+      sitesPort: this.sites.port,
     };
   }
 
   /* ---------------- dispatch + broadcast ---------------- */
 
   dispatch(action: Action): Result {
-    const res = applyAction(this.state, action, { now: this.now() });
+    const res = applyAction(this.state, action, { now: this.now(), limits: this.limits });
     if (res.ok) {
       if (action.type !== "tick") this.store.log(action.type, logData(action));
       this.changed();

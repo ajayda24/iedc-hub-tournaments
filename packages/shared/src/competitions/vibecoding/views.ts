@@ -13,6 +13,8 @@ export interface RuntimeInfo {
   joinUrls: WallView["joinUrls"];
   laptopInternet: boolean | null;
   dataDir: string;
+  /** the port published sites are really served on */
+  sitesPort?: number;
 }
 
 export const sitePath = (slug: string) => `/s/${slug}/`;
@@ -32,7 +34,7 @@ export function clockView(s: CompetitionState, now: number): ClockView {
 /** Revealed picture pieces: completing TILE_IDS[k] reveals perm[k]. */
 export const revealedPieces = (t: Team) => TILE_IDS.flatMap((id, k) => (t.tiles[id].doneAt != null ? [t.perm[k]] : []));
 
-export function wallView(s: CompetitionState, rt: Pick<RuntimeInfo, "now" | "health" | "joinUrls">): WallView {
+export function wallView(s: CompetitionState, rt: Pick<RuntimeInfo, "now" | "health" | "joinUrls" | "sitesPort">): WallView {
   const ranked = rankTeams(s);
   const pr = publishRanks(s);
   const teams: WallTeam[] = ranked.map((r) => {
@@ -68,7 +70,7 @@ export function wallView(s: CompetitionState, rt: Pick<RuntimeInfo, "now" | "hea
     votes: s.phase === "closed" ? voteCounts(s) : null,
     awards: showAwards ? awards(s) : null,
     health: { safeMode: rt.health.safeMode, asksPerMin: rt.health.asksPerMin, modelsOk: okModels, modelsTotal: rt.health.models.length },
-    sitesPort: EVENT.sitesPort,
+    sitesPort: rt.sitesPort || EVENT.sitesPort,
     joinUrls: rt.joinUrls,
     settings: { minTeamSize: s.settings.minTeamSize, maxTeamSize: s.settings.maxTeamSize, buildMinutes: s.settings.buildMinutes },
   };
