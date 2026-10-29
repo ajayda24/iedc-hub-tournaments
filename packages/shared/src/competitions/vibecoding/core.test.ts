@@ -132,3 +132,50 @@ describe("hand-edited code", () => {
     expect(validateFragment({ html: "x".repeat(21_000), css: "", js: "" })).toEqual({ ok: false, reason: "too big" });
   });
 });
+
+describe("each tile's CSS stays in its own section", () => {
+  it("scopes plain rules, @media blocks and page-wide rules; leaves @keyframes alone", async () => {
+    const { scopeCss } = await import("./composer");
+    const out = scopeCss(
+      `.label{color:red} h1, .card:hover{x:1}
+       @media (max-width:600px){.grid{display:block}}
+       @keyframes pop{from{opacity:0}to{opacity:1}}
+       body{background:#000} body.dark .card{color:#fff} :root{--accent:red} * {margin:0}
+       #tile-countdown .ok{y:1} [data-hook="star"]{z:1}`,
+      "countdown",
+    );
+    expect(out).toContain("#tile-countdown .label{");
+    expect(out).toContain("#tile-countdown h1, #tile-countdown .card:hover{");
+    expect(out).toContain("@media (max-width:600px){#tile-countdown .grid{");
+    expect(out).toContain("@keyframes pop{from{opacity:0}to{opacity:1}}");
+    expect(out).toContain("#tile-countdown{background:#000}");
+    expect(out).toContain("body.dark #tile-countdown .card{");
+    expect(out).toContain("#tile-countdown{--accent:red}");
+    expect(out).toContain("#tile-countdown *{");
+    expect(out).toContain("#tile-countdown .ok{");
+    expect(out).toContain('#tile-countdown [data-hook="star"]{');
+  });
+
+  it("the theme tile may still restyle the page; selectors with commas inside :is() survive", async () => {
+    const { scopeCss } = await import("./composer");
+    expect(scopeCss("body.dark{--bg:#111} .toggle{a:1}", "theme")).toContain("body.dark{--bg:#111}");
+    expect(scopeCss("body.dark{--bg:#111} .toggle{a:1}", "theme")).toContain("#tile-theme .toggle{");
+    expect(scopeCss(":is(.a, .b) p{c:1}", "hero")).toContain("#tile-hero :is(.a, .b) p{");
+  });
+
+  it("composes scoped CSS into the page", () => {
+    const html = compose({ hero: { html: "<p class='label'>x</p>", css: ".label{color:red}", js: "" } });
+    expect(html).toContain("#tile-hero .label{color:red}");
+  });
+});
+
+describe("AI answers keep code they left out", () => {
+  it("an empty or missing block keeps the current code (29 Oct: CSS was wiped)", () => {
+    const current = { html: "<form>old</form>", css: ".x{color:red}", js: "console.log(1)" };
+    const r = parseAnswer("Added the line.\n<html><form>new</form></html><css></css>", current);
+    expect(r.ok && r.fragment).toEqual({ html: "<form>new</form>", css: ".x{color:red}", js: "console.log(1)" });
+    const all = parseAnswer("<html></html><css></css><js></js>", current);
+    expect(all.ok && all.fragment).toEqual(current);
+    expect(parseAnswer("<html></html><css></css><js></js>").ok).toBe(false);
+  });
+});

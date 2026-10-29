@@ -282,22 +282,61 @@ function CodeEditor({ tile }: { tile: TileView }) {
   );
 }
 
+/**
+ * Every version of the tile, newest first, each saying what replaced it and
+ * whether it is the code the tile has now. Peek shows it before going back.
+ */
 function GoBack({ tile, live }: { tile: TileView; live: boolean }) {
+  const [peek, setPeek] = useState<{ id: string; html: string } | null>(null);
+  const time = (at: number) => new Date(at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  const showPeek = async (saveId: string) => {
+    if (peek?.id === saveId) return setPeek(null);
+    const r = await vcAct<{ ok: boolean; fragment?: TileView["fragment"] }>(EVC.savePreview, { tileId: tile.id, saveId });
+    if (r?.ok && r.fragment) setPeek({ id: saveId, html: compose({ [tile.id]: r.fragment }, { tiles: [tile.id], placeholders: true, csp: true }) });
+  };
   return (
     <Slip className="flex flex-col gap-2 p-3">
       <p className="text-sm font-semibold text-ink-soft">{W.goBackHint}</p>
       {tile.saves.length === 0 && <p className="text-sm font-bold">{W.goBackEmpty}</p>}
       {tile.saves.map((s) => (
-        <div key={s.id} className="flex items-center gap-2 text-sm">
-          <span className={cx("chip !py-0 text-xs", s.kind === "save" && "!bg-yellow")}>{s.kind === "save" ? "💾" : "⟲"}</span>
-          <span className="mr-auto font-bold">
-            {s.label}
-            {s.note ? ` · ${s.note}` : ""}
-            <span className="ml-1 text-xs font-semibold text-ink-soft">{new Date(s.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
-          </span>
-          <Btn size="sm" tone="sky" disabled={!live} onClick={() => vcAct(EVC.saveRestore, { tileId: tile.id, saveId: s.id }, 15_000)}>
-            {W.restore}
-          </Btn>
+        <div key={s.id} className={cx("flex flex-col gap-1 rounded-lg border-2 p-2 text-sm", s.current ? "border-mint bg-mint/20" : "border-ink/10")}>
+          <div className="flex items-start gap-2">
+            <span className={cx("chip !py-0 text-xs", s.kind === "save" && "!bg-yellow")}>{s.kind === "save" ? "💾" : "⟲"}</span>
+            <div className="mr-auto min-w-0">
+              <div className="font-bold">
+                {s.label}
+                {s.note ? ` · ${s.note}` : ""}
+                <span className="ml-1 text-xs font-semibold text-ink-soft">{time(s.at)}</span>
+                {s.current && <span className="chip ml-1 !bg-mint !py-0 text-xs">{W.current}</span>}
+              </div>
+              {s.detail && <div className="truncate text-xs font-semibold text-ink-soft">“{s.detail}”</div>}
+              <div className="truncate text-xs text-ink-soft">
+                {s.text || "(empty)"} · {W.versionInfo(s.cssChars, s.jsChars)}
+              </div>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Btn size="sm" tone="paper" onClick={() => showPeek(s.id)}>
+              👀 {peek?.id === s.id ? W.hidePeek : W.peek}
+            </Btn>
+            {!s.current && (
+              <Btn
+                size="sm"
+                tone="sky"
+                disabled={!live}
+                onClick={async () => {
+                  const r = await vcAct(EVC.saveRestore, { tileId: tile.id, saveId: s.id }, 15_000);
+                  if (r?.ok) {
+                    setPeek(null);
+                    showToast(W.restored(s.note || s.label));
+                  }
+                }}
+              >
+                {W.restore}
+              </Btn>
+            )}
+          </div>
+          {peek?.id === s.id && <iframe title={W.peek} sandbox="allow-scripts" srcDoc={peek.html} className="h-56 w-full rounded-lg border-2 border-ink bg-white" />}
         </div>
       ))}
     </Slip>

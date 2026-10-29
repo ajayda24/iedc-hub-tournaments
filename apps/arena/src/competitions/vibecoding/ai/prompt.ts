@@ -41,7 +41,9 @@ The user may write in English, Malayalam or Manglish. Reply in the same
 language in at most 2 short sentences, then give the code.
 Rules:
 - Output exactly three blocks: <html>...</html>, <css>...</css>, <js>...</js>.
-  Leave a block empty if not needed. No markdown fences, no other code.
+  Each block holds the COMPLETE code of this section after your change: start from
+  the current code below, change only what the user asked, and repeat everything
+  else unchanged. Never drop existing styles or scripts. No markdown fences, no other code.
 - Write only the inner HTML of this section (no <html>, <head>, <body>,
   no <section> wrapper). ${scope}
 - No external files, libraries, fonts, images or network calls. Use emoji or CSS.

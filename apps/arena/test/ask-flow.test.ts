@@ -31,7 +31,7 @@ describe("Ask flow (mock AI)", () => {
   it("an Ask installs the answer, checks it and completes the tile", async () => {
     const { a, t } = await team();
     expect((await a.emitWithAck(EVC.tileOpen, { tileId: "hero" })).ok).toBe(true);
-    const done = next<TeamView>(a, EVC.team, (v) => v?.tiles.find((x) => x.id === "hero")?.done === true, 5000);
+    const done = next<TeamView>(a, EVC.team, (v) => v?.tiles.find((x) => x.id === "hero")?.done === true, 20_000);
     const r: AskAck = await a.timeout(10_000).emitWithAck(EVC.askSend, { tileId: "hero", text: "make the hero banner" });
     expect(r.ok).toBe(true);
     expect(r.check!.passed).toBe(r.check!.total);

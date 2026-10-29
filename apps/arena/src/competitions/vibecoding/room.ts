@@ -34,8 +34,8 @@ import path from "node:path";
 import { MODELS, checklist, type TileId } from "@iedc/shared/competitions/vibecoding/config";
 import { parseAnswer, validateFragment } from "@iedc/shared/competitions/vibecoding/parser";
 import { referenceFragment } from "@iedc/shared/competitions/vibecoding/tiles/index";
-import { allPassed, variantOf } from "@iedc/shared/competitions/vibecoding/rules";
-import { askSchema, codeEditSchema, hostGeminiKeySchema, hostModelSchema, saveCreateSchema, saveRestoreSchema } from "@iedc/shared/competitions/vibecoding/schemas";
+import { allPassed, currentHash, variantOf } from "@iedc/shared/competitions/vibecoding/rules";
+import { askSchema, codeEditSchema, hostGeminiKeySchema, hostModelSchema, saveCreateSchema, savePreviewSchema, saveRestoreSchema } from "@iedc/shared/competitions/vibecoding/schemas";
 import type { AskAck, CheckAck } from "@iedc/shared/competitions/vibecoding/protocol";
 import { AiGateway } from "./ai/gateway";
 import { GeminiProvider } from "./ai/gemini";
@@ -199,12 +199,34 @@ export class VibecodingRoom {
   /* ---------------- dispatch + broadcast ---------------- */
 
   dispatch(action: Action): Result {
+    const wasBuilding = this.state.phase === "build";
     const res = applyAction(this.state, action, { now: this.now(), limits: this.limits });
     if (res.ok) {
       if (action.type !== "tick") this.store.log(action.type, logData(action));
       this.changed();
+      // the build just ended (Freeze, the clock running out, or a jump to the showcase)
+      if (wasBuilding && this.state.phase !== "build") void this.onBuildEnded();
     }
     return res;
+  }
+
+  /**
+   * When the build ends: export the results at once, then re-publish every
+   * published team whose page changed since its last publish (if it still
+   * passes the site check), so the projector shows each team's final work.
+   */
+  private async onBuildEnded() {
+    this.exportResults();
+    let changed = false;
+    for (const t of Object.values(this.state.teams)) {
+      if (!t.publish || t.publish.hash === currentHash(t) || this.publishing.has(t.id)) continue;
+      const r = await this.publishTeam(t.id).catch(() => null);
+      if (r?.ok) {
+        changed = true;
+        this.store.log("auto-republish", { teamId: t.id });
+      }
+    }
+    if (changed) this.exportResults();
   }
 
   /** Something changed: save soon and push fresh views (batched). */
@@ -444,6 +466,17 @@ export class VibecodingRoom {
       if (res.ok && res.teamId) await this.autoCheck(res.teamId, d.tileId);
       return res;
     });
+    // peek at an older version of a tile (Go Back list)
+    socket.on(EVC.savePreview, (raw: unknown, ack: unknown) => {
+      const reply = safeAck(ack);
+      const id = sid();
+      const p = savePreviewSchema.safeParse(raw);
+      const t = id ? teamOf(this.state, id) : null;
+      if (!t || !p.success) return reply({ ok: false, error: E.notInTeam });
+      const tile = t.tiles[p.data.tileId];
+      const sp = [...tile.saves, ...tile.autos].find((x) => x.id === p.data.saveId);
+      reply(sp ? { ok: true, fragment: sp.fragment } : { ok: false, error: E.noSuchSave });
+    });
     playerAsync(EVC.codeEdit, codeEditSchema, async (studentId, d) => {
       const fragment = { html: d.html, css: d.css, js: d.js };
       const safe = validateFragment(fragment);
@@ -479,7 +512,8 @@ export class VibecodingRoom {
     host(EVC.hostSettings, hostSettingsSchema, (d) => this.dispatch({ type: "settings", patch: d as Partial<Settings> }));
     host(EVC.hostPhase, hostPhaseSchema, (d) => {
       const res = this.dispatch({ type: "phase:set", phase: d.phase as Phase });
-      if (res.ok && (d.phase === "frozen" || d.phase === "closed")) this.exportResults();
+      // leaving the build exports by itself (onBuildEnded); closing exports the final votes
+      if (res.ok && d.phase === "closed") this.exportResults();
       return res;
     });
     host(EVC.hostPause, empty, () => this.dispatch({ type: "clock:pause" }));
@@ -564,6 +598,7 @@ export class VibecodingRoom {
       ask: text,
       changeRequest: !!t.changeRequest && t.changeRequest.doneAt == null,
     });
+    const before = { ...t.tiles[tileId].fragment };
     let fragment = null;
     let explanation = "";
     let backup = false;
@@ -571,7 +606,7 @@ export class VibecodingRoom {
     const safe = this.state.settings.safeMode || !this.gateway.shouldTry();
     if (!safe) {
       const r = await this.gateway.complete(teamId, prompt, (txt) => {
-        const p = parseAnswer(txt);
+        const p = parseAnswer(txt, before);
         return p.ok ? p : null;
       });
       if (r.ok) {
@@ -590,7 +625,7 @@ export class VibecodingRoom {
       this.dispatch({ type: "ask:fail", teamId });
       return { ok: false, error: E.aiDown };
     }
-    const delivered = this.dispatch({ type: "ask:deliver", teamId, tileId, fragment, queued: this.gateway.queued });
+    const delivered = this.dispatch({ type: "ask:deliver", teamId, tileId, fragment, queued: this.gateway.queued, askText: text });
     if (!delivered.ok) return { ok: false, error: delivered.error };
     const r = await this.autoCheck(teamId, tileId);
     return { ok: true, explanation, backup, glitched: !!delivered.glitched, check: r?.result };
@@ -619,7 +654,11 @@ export class VibecodingRoom {
   async publish(studentId: string): Promise<PublishAck> {
     const begin = this.dispatch({ type: "publish:begin", studentId });
     if (!begin.ok || !begin.teamId) return { ok: false, error: begin.error };
-    const teamId = begin.teamId;
+    return this.publishTeam(begin.teamId);
+  }
+
+  /** The publish itself (also used to re-publish automatically when the build ends). */
+  private async publishTeam(teamId: string): Promise<PublishAck> {
     if (this.publishing.has(teamId)) return { ok: false, error: E.publishBusy };
     this.publishing.add(teamId);
     try {

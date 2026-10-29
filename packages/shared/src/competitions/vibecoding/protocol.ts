@@ -25,6 +25,7 @@ export const EVC = {
   saveCreate: "save:create",
   saveRestore: "save:restore",
   codeEdit: "code:edit",
+  savePreview: "save:preview",
   notesUpdate: "notes:update",
   hintUse: "hint:use",
   autosolveUse: "autosolve:use",
@@ -164,7 +165,15 @@ export interface SaveView {
   kind: "save" | "auto";
   label: string;
   note?: string;
+  /** auto-saves: the Ask (first words) or Save Point that replaced this version */
+  detail?: string;
   at: number;
+  /** this version is exactly the code the tile has now */
+  current: boolean;
+  /** tiny summary: the visible text, and how much CSS/JS it has */
+  text: string;
+  cssChars: number;
+  jsChars: number;
 }
 
 export interface TileView {
@@ -224,7 +233,7 @@ export interface TeamView {
   /** warm-up first, then the 8 tiles in this team's board order */
   tiles: TileView[];
   puzzle: { board: number[]; moves: number; optimal: number; startedAt: number; solvedAt: number | null; version: number } | null;
-  publish: { sitePath: string; firstAt: number; rank: number; count: number; lastAt: number } | null;
+  publish: { sitePath: string; firstAt: number; rank: number; count: number; lastAt: number; stale: boolean } | null;
   changeRequest: { text: string; phrase: string; sentAt: number; doneAt: number | null } | null;
   message: { text: string; at: number } | null;
   score: TeamScore;

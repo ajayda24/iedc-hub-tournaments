@@ -1,6 +1,6 @@
 import { EVENT, TASKS, TILE_IDS, checklist, hintsFor, tileConfig, type TileId } from "./config";
 import type { ClockView, HealthView, HostTeam, HostView, PersonView, TeamView, TileView, WallTeam, WallView } from "./protocol";
-import { LIMITS, isScored, variantOf } from "./rules";
+import { LIMITS, currentHash, isScored, variantOf } from "./rules";
 import { awards, badges, publishRanks, rankTeams, teamScore, voteCounts } from "./scoring";
 import { buildElapsed, buildRemaining, type CompetitionState, type Team } from "./state";
 
@@ -98,7 +98,20 @@ function tileView(s: CompetitionState, t: Team, id: TileId, now: number): TileVi
     edits: tile.edits ?? 0,
     hintsUsed: hints.slice(0, tile.hints),
     hintsLeft: LIMITS.hintMax - tile.hints,
-    saves: [...tile.saves, ...tile.autos].sort((a, b) => b.at - a.at).map(({ fragment: _f, ...rest }) => rest),
+    saves: [...tile.saves, ...tile.autos]
+      .sort((a, b) => b.at - a.at)
+      .map(({ fragment, ...rest }) => ({
+        id: rest.id,
+        kind: rest.kind,
+        label: rest.label,
+        note: rest.note,
+        detail: rest.detail,
+        at: rest.at,
+        current: fragment.html === tile.fragment.html && fragment.css === tile.fragment.css && fragment.js === tile.fragment.js,
+        text: fragment.html.replace(/<style[\s\S]*?<\/style>|<script[\s\S]*?<\/script>/gi, " ").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 70),
+        cssChars: fragment.css.length,
+        jsChars: fragment.js.length,
+      })),
     holder: tile.holder && holderName ? { studentId: tile.holder.studentId, name: holderName } : null,
     firstOpenedAt: tile.firstOpenedAt,
     doneAt: tile.doneAt,
@@ -131,7 +144,14 @@ export function teamView(s: CompetitionState, t: Team, rt: Pick<RuntimeInfo, "no
       ? { board: t.puzzle.board, moves: t.puzzle.moves, optimal: t.puzzle.optimal, startedAt: t.puzzle.startedAt, solvedAt: t.puzzle.solvedAt, version: t.puzzle.version }
       : null,
     publish: t.publish
-      ? { sitePath: sitePath(t.publish.slug), firstAt: t.publish.firstAt, rank: publishRanks(s).get(t.id) ?? 0, count: t.publish.count, lastAt: t.publish.lastAt }
+      ? {
+          sitePath: sitePath(t.publish.slug),
+          firstAt: t.publish.firstAt,
+          rank: publishRanks(s).get(t.id) ?? 0,
+          count: t.publish.count,
+          lastAt: t.publish.lastAt,
+          stale: t.publish.hash != null && t.publish.hash !== currentHash(t),
+        }
       : null,
     changeRequest: t.changeRequest && cr ? { text: cr.text, phrase: cr.phrase, sentAt: t.changeRequest.sentAt, doneAt: t.changeRequest.doneAt } : null,
     message: t.message,

@@ -115,3 +115,29 @@ describe("puzzle, publish, change request (spec 8–9)", () => {
     expect(csv.split(/\r?\n/)[1]).toMatch(/^1,Byte Me,1,Asha,A1,CSE,/);
   });
 });
+
+describe("the end of the build", () => {
+  it("re-publishes a team whose page changed since its last publish; Go Back can peek at old versions", async () => {
+    const { a, t, host } = await finishedTeam();
+    for (const cell of solvePath(t().puzzle!.board)) await a.emitWithAck(EVC.puzzleMove, { cell, version: t().puzzle!.version });
+    const first: PublishAck = await a.timeout(30_000).emitWithAck(EVC.publishGo);
+    expect(first.ok).toBe(true);
+    const url = `http://127.0.0.1:${srv!.sitesPort}${first.sitePath}`;
+    // a later hand edit the team never published
+    await a.emitWithAck(EVC.tileOpen, { tileId: "hero" });
+    const hero = t().tiles.hero.fragment;
+    const edited = await a.timeout(10_000).emitWithAck(EVC.codeEdit, { tileId: "hero", html: hero.html.replace("Register now", "Register now, it's free"), css: hero.css, js: hero.js });
+    expect(edited.ok).toBe(true);
+    expect(await (await fetch(url)).text()).not.toContain("it's free");
+    // peek at the version before the edit
+    const before = t().tiles.hero.autos.at(-1)!;
+    expect(before.label).toBe("Before your code edit");
+    const peek = await a.emitWithAck(EVC.savePreview, { tileId: "hero", saveId: before.id });
+    expect(peek.fragment.html).toContain("Register now");
+    expect(peek.fragment.html).not.toContain("it's free");
+    // the host freezes: the latest page goes live by itself
+    await host.emitWithAck(EVC.hostPhase, { phase: "frozen" });
+    await expect.poll(async () => (await (await fetch(url)).text()).includes("it's free"), { timeout: 20_000 }).toBe(true);
+    expect(t().publish!.count).toBe(2);
+  });
+});

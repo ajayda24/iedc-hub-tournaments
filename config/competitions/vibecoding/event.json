@@ -5,7 +5,7 @@
   "projectName": "IEDC Fest Page",
   "defaults": {
     "buildMinutes": 100,
-    "glitch": true,
+    "glitch": false,
     "minTeamSize": 2,
     "maxTeamSize": 4,
     "maxTeams": 15

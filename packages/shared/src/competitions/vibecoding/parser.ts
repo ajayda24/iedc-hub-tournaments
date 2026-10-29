@@ -59,7 +59,13 @@ export function validateFragment(fragment: Fragment): { ok: true } | { ok: false
   return bad ? { ok: false, reason: `forbidden: ${bad.label}` } : { ok: true };
 }
 
-export function parseAnswer(raw: string): ParseResult {
+/**
+ * `current` is the tile's code before this answer. A block the AI leaves empty
+ * or out keeps the current code: models use an empty block to mean "unchanged",
+ * and treating it as "delete" wiped working CSS/JS (event of 29 Oct 2026).
+ * Students can still delete code on purpose with "Edit code".
+ */
+export function parseAnswer(raw: string, current?: Fragment): ParseResult {
   const text = stripFences(raw ?? "");
   // the html block is named like the tag, so find it from the outside: first <html>, last </html>
   const hStart = text.search(/<html>/i);
@@ -69,7 +75,13 @@ export function parseAnswer(raw: string): ParseResult {
   const js = block(text, "js");
   if (html == null && css == null && js == null) return { ok: false, reason: "no code blocks" };
 
-  const fragment: Fragment = { html: cleanHtml(html ?? ""), css: unwrap(css ?? "", "style"), js: unwrap(js ?? "", "script") };
+  const keep = (fresh: string, old: string | undefined) => (fresh.trim() ? fresh : (old ?? ""));
+  const fragment: Fragment = {
+    html: keep(cleanHtml(html ?? ""), current?.html),
+    css: keep(unwrap(css ?? "", "style"), current?.css),
+    js: keep(unwrap(js ?? "", "script"), current?.js),
+  };
+  if (!fragment.html.trim() && !fragment.css.trim() && !fragment.js.trim()) return { ok: false, reason: "empty answer" };
   if (byteLength(fragment) > MAX_FRAGMENT_BYTES) return { ok: false, reason: "too big" };
   const all = `${fragment.html}\n${fragment.css}\n${fragment.js}`;
   const bad = FORBIDDEN.find((f) => f.re.test(all));

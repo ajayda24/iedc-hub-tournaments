@@ -14,11 +14,13 @@ import {
   type FeedItem,
   type Fragment,
   type Phase,
+  type SaveReason,
   type Settings,
   type Team,
   type TileState,
 } from "./state";
 import { starterFragment } from "./tiles";
+import { siteHash } from "./composer";
 import { rankTeams } from "./scoring";
 
 /* ------------------------------------------------------------------ */
@@ -81,7 +83,7 @@ export type Action =
   | { type: "tile:open"; studentId: string; tileId: TileId }
   | { type: "tile:close"; studentId: string; tileId: TileId }
   | { type: "ask:begin"; studentId: string; tileId: TileId }
-  | { type: "ask:deliver"; teamId: string; tileId: TileId; fragment: Fragment; queued: number }
+  | { type: "ask:deliver"; teamId: string; tileId: TileId; fragment: Fragment; queued: number; askText?: string }
   | { type: "ask:fail"; teamId: string }
   | { type: "check:begin"; studentId: string; tileId: TileId }
   | { type: "check:result"; teamId: string; tileId: TileId; result: CheckResult }
@@ -281,8 +283,25 @@ function editable(s: CompetitionState, tileId: TileId): string | null {
   return null;
 }
 
-function autoSave(tile: TileState, now: number) {
-  tile.autos.push({ id: `a${++tile.saveCounter}`, kind: "auto", label: "Auto", at: now, fragment: { ...tile.fragment } });
+const AUTO_LABEL: Record<SaveReason, string> = {
+  ask: "Before Bulbu's answer",
+  goBack: "Before Go Back",
+  edit: "Before your code edit",
+  showMe: "Before Show me",
+  unlock: "Before the host unlocked it",
+};
+
+/** Keep the code as it is now, before something replaces it (Go Back can return here). */
+function autoSave(tile: TileState, now: number, reason: SaveReason, detail?: string) {
+  tile.autos.push({
+    id: `a${++tile.saveCounter}`,
+    kind: "auto",
+    label: AUTO_LABEL[reason],
+    reason,
+    detail: detail ? detail.replace(/\s+/g, " ").trim().slice(0, 60) : undefined,
+    at: now,
+    fragment: { ...tile.fragment },
+  });
   if (tile.autos.length > LIMITS.autoKeep) tile.autos.splice(0, tile.autos.length - LIMITS.autoKeep);
 }
 
@@ -436,7 +455,7 @@ export function applyAction(s: CompetitionState, a: Action, ctx: Ctx): Result {
         }
         feed(s, "info", "The build clock is running. Go!", now);
       }
-      if (a.phase === "frozen") {
+      if (from <= PHASES.indexOf("build") && to > PHASES.indexOf("build")) {
         if (s.clock.startedAt != null && s.clock.pausedAt == null) s.clock.pausedAt = now;
         for (const t of Object.values(s.teams)) {
           for (const id of ALL_TILE_IDS) t.tiles[id].holder = null;
@@ -562,7 +581,7 @@ export function applyAction(s: CompetitionState, a: Action, ctx: Ctx): Result {
         return fail(E.frozen);
       }
       const scoredBuild = s.phase === "build" && isScored(a.tileId);
-      autoSave(tile, now);
+      autoSave(tile, now, "ask", a.askText);
       if (scoredBuild && s.settings.glitch && !t.glitch.done && !t.glitch.cancelled) {
         const el = buildElapsed(s.clock, now);
         if (t.glitch.armed || (el >= t.glitch.at && el < LIMITS.glitchToMin * 60_000)) {
@@ -647,7 +666,7 @@ export function applyAction(s: CompetitionState, a: Action, ctx: Ctx): Result {
       const g = holderGuard(s, t, tile, a.studentId);
       if (g) return fail(g);
       if (t.askPending?.tileId === a.tileId) return fail(E.askPending);
-      autoSave(tile, now);
+      autoSave(tile, now, "edit");
       tile.fragment = { html: a.fragment.html, css: a.fragment.css, js: a.fragment.js };
       tile.edits = (tile.edits ?? 0) + 1;
       tile.holder!.lastActive = now;
@@ -667,7 +686,7 @@ export function applyAction(s: CompetitionState, a: Action, ctx: Ctx): Result {
       const sp = [...tile.saves, ...tile.autos].find((x) => x.id === a.saveId);
       if (!sp) return fail(E.noSuchSave);
       const fragment = { ...sp.fragment };
-      autoSave(tile, now);
+      autoSave(tile, now, "goBack", sp.kind === "save" ? sp.label : sp.detail);
       tile.fragment = fragment;
       tile.usedGoBack = true;
       tile.holder!.lastActive = now;
@@ -709,7 +728,7 @@ export function applyAction(s: CompetitionState, a: Action, ctx: Ctx): Result {
       const el = buildElapsed(s.clock, now);
       if (tile.firstOpenedAt == null || el - tile.firstOpenedAt < LIMITS.autoSolveAfterMs) return fail(E.autoSolveNotYet(LIMITS.autoSolveAfterMs / 60_000));
       if (t.askPending?.tileId === a.tileId) return fail(E.askPending);
-      autoSave(tile, now);
+      autoSave(tile, now, "showMe");
       tile.fragment = { ...a.reference };
       tile.autoSolved = true;
       tile.lastCheck = a.result;
@@ -755,7 +774,7 @@ export function applyAction(s: CompetitionState, a: Action, ctx: Ctx): Result {
       if (!t) return fail(E.notNow);
       const at = buildElapsed(s.clock, now);
       if (!t.publish) {
-        t.publish = { firstAt: at, adjustedAt: Math.round(at * sizeFactor(t.members.length)), lastAt: at, count: 1, slug: a.slug };
+        t.publish = { firstAt: at, adjustedAt: Math.round(at * sizeFactor(t.members.length)), lastAt: at, count: 1, slug: a.slug, hash: currentHash(t) };
         const rng = createRng(t.seed ^ 0xc4a7);
         t.changeRequest = { variant: rng.pick(TASKS.changeRequests).id, sentAt: at, doneAt: null };
         t.stage = "change_request";
@@ -763,6 +782,7 @@ export function applyAction(s: CompetitionState, a: Action, ctx: Ctx): Result {
         feed(s, "publish", firstEver ? `🚀 ${t.name} published first!` : `🚀 ${t.name} published their site`, now, t.id);
       } else {
         t.publish.lastAt = at;
+        t.publish.hash = currentHash(t);
         t.publish.count++;
         if (t.changeRequest && t.changeRequest.doneAt == null && a.changePassed) {
           t.changeRequest.doneAt = at;
@@ -822,7 +842,7 @@ export function applyAction(s: CompetitionState, a: Action, ctx: Ctx): Result {
       if (s.phase !== "build") return fail(E.notNow);
       const tile = t.tiles[a.tileId];
       if (tile.doneAt != null) return fail(E.alreadyDone);
-      autoSave(tile, now);
+      autoSave(tile, now, "unlock");
       tile.fragment = { ...a.reference };
       tile.hostUnlocked = true;
       tile.lastCheck = a.result;
@@ -909,6 +929,9 @@ export function applyAction(s: CompetitionState, a: Action, ctx: Ctx): Result {
     }
   }
 }
+
+/** Fingerprint of a team's 8 tiles now (compare with publish.hash). */
+export const currentHash = (t: Team) => siteHash(Object.fromEntries(TILE_IDS.map((id) => [id, t.tiles[id].fragment])));
 
 /** Every check passing on a tile → a CheckResult with all items true (used by Safe Mode / unlock). */
 export function allPassed(itemIds: string[], now: number): CheckResult {

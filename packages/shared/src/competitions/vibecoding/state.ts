@@ -41,10 +41,16 @@ export interface Person extends Omit<Member, "ready" | "joinedAt"> {
   joinedAt: number;
 }
 
+/** Why an auto-save was taken (shown in the Go Back list). */
+export type SaveReason = "ask" | "goBack" | "edit" | "showMe" | "unlock";
+
 export interface SavePoint {
   id: string;
   kind: "save" | "auto";
   label: string;
+  /** auto-saves: what replaced this version, and (for an Ask) its first words */
+  reason?: SaveReason;
+  detail?: string;
   note?: string;
   /** epoch ms */
   at: number;
@@ -108,6 +114,8 @@ export interface Publish {
   lastAt: number;
   count: number;
   slug: string;
+  /** siteHash() of the code that was published: is the live site older than the page now? */
+  hash?: string;
 }
 
 export interface ChangeRequest {

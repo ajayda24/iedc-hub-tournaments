@@ -210,3 +210,40 @@ describe("state after a host reset", () => {
     expect((s as CompetitionState).teams[t().id].tiles.hero.autos).toHaveLength(0);
   });
 });
+
+describe("Go Back labels, the end of the build, stale publishes", () => {
+  it("auto-saves say what replaced them (with the Ask's first words)", () => {
+    const { go, t } = building();
+    go({ type: "tile:open", studentId: "A1", tileId: "hero" });
+    go({ type: "ask:begin", studentId: "A1", tileId: "hero" });
+    go({ type: "ask:deliver", teamId: t().id, tileId: "hero", fragment: f("<p>v1</p>"), queued: 0, askText: "Make   the heading purple and big" });
+    const a = t().tiles.hero.autos.at(-1)!;
+    expect(a.label).toBe("Before Bulbu's answer");
+    expect(a.detail).toBe("Make the heading purple and big");
+    go({ type: "save:create", studentId: "A1", tileId: "hero" });
+    go({ type: "save:restore", studentId: "A1", tileId: "hero", saveId: a.id });
+    expect(t().tiles.hero.autos.at(-1)!.label).toBe("Before Go Back");
+  });
+
+  it("jumping from the build straight to the showcase still freezes the clock", () => {
+    const { s, go, at } = building();
+    at(30 * MIN);
+    go({ type: "phase:set", phase: "showcase" });
+    expect(s.clock.pausedAt).toBe(T0 + 30 * MIN);
+    at(90 * MIN);
+    expect(s.clock.pausedAt).toBe(T0 + 30 * MIN);
+  });
+
+  it("the team sees when its published site is older than its page", async () => {
+    const { teamView } = await import("./views");
+    const { go, t, s, ask, at } = building();
+    go({ type: "publish:result", teamId: t().id, changePassed: false, slug: "x" });
+    const view = () => teamView(s, t(), { now: T0, online: new Set(), internet: new Set() });
+    expect(view().publish!.stale).toBe(false);
+    at(MIN);
+    ask("hero", "<p>changed</p>");
+    expect(view().publish!.stale).toBe(true);
+    go({ type: "publish:result", teamId: t().id, changePassed: false, slug: "x" });
+    expect(view().publish!.stale).toBe(false);
+  });
+});

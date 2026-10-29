@@ -70,6 +70,11 @@ export function Board({ team, onTile, onPuzzle, onPublish, onNotes }: { team: Te
           <p className="font-bold">{team.message.text}</p>
         </Slip>
       )}
+      {team.publish?.stale && (
+        <button type="button" onClick={onPublish} className="slip !bg-coral p-3 text-left font-bold">
+          🚀 {vc.publish.stale}
+        </button>
+      )}
       {team.changeRequest && team.changeRequest.doneAt == null && (
         <Slip className="!bg-lilac p-3">
           <div className="font-black">{vc.change.title}</div>

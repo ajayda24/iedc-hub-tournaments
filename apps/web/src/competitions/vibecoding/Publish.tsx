@@ -43,6 +43,7 @@ export function PublishView({ team, onBack }: { team: TeamView; onBack: () => vo
       <h2 className="text-2xl font-black">🚀 {P.title}</h2>
       <p className="font-semibold">{P.intro}</p>
 
+      {team.publish?.stale && <Slip className="!bg-coral p-3 font-bold">{P.stale}</Slip>}
       {team.changeRequest && (
         <Slip className={team.changeRequest.doneAt != null ? "!bg-mint p-3" : "!bg-lilac p-3"}>
           <div className="font-black">{team.changeRequest.doneAt != null ? `✅ ${vc.change.done}` : vc.change.title}</div>

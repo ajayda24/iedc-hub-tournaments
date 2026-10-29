@@ -38,6 +38,7 @@ export const tileRefSchema = z.object({ tileId });
 export const askSchema = z.object({ tileId, text: z.string().trim().min(1).max(600) });
 export const saveCreateSchema = z.object({ tileId, note: z.string().trim().max(80).optional() });
 export const codeEditSchema = z.object({ tileId, html: z.string().max(20_000), css: z.string().max(20_000), js: z.string().max(20_000) });
+export const savePreviewSchema = z.object({ tileId, saveId: z.string().max(24) });
 export const saveRestoreSchema = z.object({ tileId, saveId: z.string().max(24) });
 export const notesSchema = z.object({ notes: z.string().max(500) });
 export const puzzleMoveSchema = z.object({ cell: z.number().int().min(0).max(8), version: z.number().int().min(0) });

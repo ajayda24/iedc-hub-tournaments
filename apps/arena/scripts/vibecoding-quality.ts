@@ -86,7 +86,7 @@ async function runOne(gw: AiGateway, label: string, p: CorpusPrompt): Promise<Ru
     const prompt = buildPrompt({ tileId: p.tile, variant, fragment, notes: "", teamName: "Byte Me", ask });
     const t0 = Date.now();
     const r = await gw.complete(`q-${p.tile}-${p.level}`, prompt, (text) => {
-      const parsed = parseAnswer(text);
+      const parsed = parseAnswer(text, fragment);
       return parsed.ok ? parsed : null;
     });
     const a: Attempt = { ask, ok: r.ok, ms: Date.now() - t0 };
