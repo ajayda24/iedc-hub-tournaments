@@ -11,18 +11,23 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "bots": "tsx scripts/bots.ts",
-    "recover:first": "tsx scripts/recover-first-tournament.ts"
+    "recover:first": "tsx scripts/recover-first-tournament.ts",
+    "vibecoding:models": "tsx scripts/vibecoding-models.ts",
+    "vibecoding:quality": "tsx scripts/vibecoding-quality.ts",
+    "vibecoding:bots": "tsx scripts/vibecoding-bots.ts"
   },
   "dependencies": {
     "@fastify/static": "^10.1.5",
     "@iedc/config": "workspace:*",
     "@iedc/shared": "workspace:*",
     "fastify": "^5.6.2",
+    "jsdom": "^27.4.0",
     "qrcode": "^1.5.4",
     "socket.io": "^4.8.1",
     "zod": "^4.3.5"
   },
   "devDependencies": {
+    "@types/jsdom": "^27.0.0",
     "@types/node": "^22.19.0",
     "@types/qrcode": "^1.5.6",
     "esbuild": "^0.28.0",

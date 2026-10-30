@@ -50,6 +50,12 @@ roundOf: (n: number, total: number) => `round ${n} of ${total}`,
 | Shared bits: live/offline, sound on/muted, tab names, 404 / offline pages, page titles | `copy/common.ts` |
 | Word Hunt answers | `words/wordhunt-answers.txt` |
 | Anagram word packs | `words/anagram-packs.source.json` |
+| **Vibe Hackathon**: event name, defaults (clock, team sizes), sites port | `competitions/vibecoding/event.json` |
+| Vibe Hackathon: the 8 tiles (brief, checklist, hints, hooks for the AI, par times, full/simple variant), change requests | `competitions/vibecoding/tasks.json` |
+| Vibe Hackathon: every point (speed, Asks, hints, puzzle, publish rank, team-size factors) | `competitions/vibecoding/scoring.json` |
+| Vibe Hackathon: AI models and their limits | `competitions/vibecoding/models.json` |
+| Vibe Hackathon: friendly words and their real names (revealed at the end) | `competitions/vibecoding/vocabulary.json` |
+| Vibe Hackathon: every word on its screens | `copy/vibecoding.ts` |
 
 ## Word lists
 

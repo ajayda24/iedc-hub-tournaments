@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-23T09:00:52.090Z",
+  "updatedAt": "2026-10-30T08:49:36.986Z",
   "months": {
     "2026-10": {
       "tournaments": [
@@ -12,6 +12,11 @@
           "name": "Weekly Series",
           "date": 1792745428166,
           "players": 35
+        },
+        {
+          "name": "Weekly Series",
+          "date": 1793349561121,
+          "players": 19
         }
       ],
       "standings": [
@@ -20,10 +25,30 @@
           "name": "Sneha P",
           "dept": "EC",
           "sem": "S3",
-          "points": 9242,
-          "played": 2,
+          "points": 12561,
+          "played": 3,
           "wins": 2,
           "best": 5716
+        },
+        {
+          "key": "9k2u7k",
+          "name": "Gopika T P",
+          "dept": "CSE",
+          "sem": "S5",
+          "points": 7823,
+          "played": 2,
+          "wins": 0,
+          "best": 4585
+        },
+        {
+          "key": "13dvipr",
+          "name": "Hrishikesh",
+          "dept": "IT",
+          "sem": "S7",
+          "points": 5518,
+          "played": 2,
+          "wins": 0,
+          "best": 2815
         },
         {
           "key": "13xrklq",
@@ -46,6 +71,16 @@
           "best": 3672
         },
         {
+          "key": "14qlv8b",
+          "name": "keerthi mohan",
+          "dept": "CSE",
+          "sem": "S5",
+          "points": 4863,
+          "played": 1,
+          "wins": 1,
+          "best": 4863
+        },
+        {
           "key": "1sa9l90",
           "name": "Zainaba ASHIQUA",
           "dept": "IT",
@@ -56,14 +91,24 @@
           "best": 4651
         },
         {
-          "key": "9k2u7k",
-          "name": "Gopika T P",
+          "key": "b80gde",
+          "name": "Jaliba Nasrin K P",
           "dept": "CSE",
           "sem": "S5",
-          "points": 4585,
+          "points": 4532,
           "played": 1,
           "wins": 0,
-          "best": 4585
+          "best": 4532
+        },
+        {
+          "key": "10qb561",
+          "name": "Arun Mannanchery",
+          "dept": "ME",
+          "sem": "S7",
+          "points": 4368,
+          "played": 1,
+          "wins": 0,
+          "best": 4368
         },
         {
           "key": "duj4xm",
@@ -106,6 +151,16 @@
           "best": 3916
         },
         {
+          "key": "129bzc9",
+          "name": "Akshay",
+          "dept": "ME",
+          "sem": "S3",
+          "points": 3783,
+          "played": 3,
+          "wins": 0,
+          "best": 2114
+        },
+        {
           "key": "v9ekpd",
           "name": "Minha Sherin. K. V.",
           "dept": "IT",
@@ -114,6 +169,16 @@
           "played": 1,
           "wins": 0,
           "best": 3538
+        },
+        {
+          "key": "dgieis",
+          "name": "Nooramariyam",
+          "dept": "CE",
+          "sem": "S5",
+          "points": 3523,
+          "played": 1,
+          "wins": 0,
+          "best": 3523
         },
         {
           "key": "1rgdxo2",
@@ -126,6 +191,26 @@
           "best": 2998
         },
         {
+          "key": "bi022d",
+          "name": "HARSHIDA P",
+          "dept": "CSE",
+          "sem": "S5",
+          "points": 2995,
+          "played": 1,
+          "wins": 0,
+          "best": 2995
+        },
+        {
+          "key": "uf9gmi",
+          "name": "ATHINA T K",
+          "dept": "IT",
+          "sem": "S7",
+          "points": 2984,
+          "played": 1,
+          "wins": 0,
+          "best": 2984
+        },
+        {
           "key": "v8bo4l",
           "name": "FATHIMA MUNAZZA CK",
           "dept": "CSE",
@@ -134,6 +219,26 @@
           "played": 1,
           "wins": 0,
           "best": 2981
+        },
+        {
+          "key": "6mwyd4",
+          "name": "Emad Sameer",
+          "dept": "EC",
+          "sem": "S1",
+          "points": 2969,
+          "played": 1,
+          "wins": 0,
+          "best": 2969
+        },
+        {
+          "key": "dlxun7",
+          "name": "Adilsha Muhammed",
+          "dept": "EC",
+          "sem": "S1",
+          "points": 2920,
+          "played": 1,
+          "wins": 0,
+          "best": 2920
         },
         {
           "key": "e5x215",
@@ -156,6 +261,16 @@
           "best": 2756
         },
         {
+          "key": "dwehyi",
+          "name": "Gopika",
+          "dept": "EC",
+          "sem": "S3",
+          "points": 2753,
+          "played": 1,
+          "wins": 0,
+          "best": 2753
+        },
+        {
           "key": "tldt1k",
           "name": "Fathima Lazi",
           "dept": "IT",
@@ -164,16 +279,6 @@
           "played": 1,
           "wins": 0,
           "best": 2705
-        },
-        {
-          "key": "13dvipr",
-          "name": "Hrishikesh",
-          "dept": "IT",
-          "sem": "S7",
-          "points": 2703,
-          "played": 1,
-          "wins": 0,
-          "best": 2703
         },
         {
           "key": "13dae45",
@@ -196,6 +301,16 @@
           "best": 2602
         },
         {
+          "key": "a4k0p5",
+          "name": "Minha",
+          "dept": "CSE",
+          "sem": "S5",
+          "points": 2565,
+          "played": 1,
+          "wins": 0,
+          "best": 2565
+        },
+        {
           "key": "pgi6t6",
           "name": "Nandhana. K",
           "dept": "CSE",
@@ -216,6 +331,26 @@
           "best": 2096
         },
         {
+          "key": "a4n674",
+          "name": "Navami E",
+          "dept": "CSE",
+          "sem": "S5",
+          "points": 2095,
+          "played": 1,
+          "wins": 0,
+          "best": 2095
+        },
+        {
+          "key": "d2fovl",
+          "name": "Diya Fathima.l",
+          "dept": "EC",
+          "sem": "S3",
+          "points": 1988,
+          "played": 2,
+          "wins": 0,
+          "best": 1868
+        },
+        {
           "key": "dby8y8",
           "name": "Ken",
           "dept": "PT",
@@ -226,14 +361,24 @@
           "best": 1773
         },
         {
-          "key": "129bzc9",
-          "name": "Akshay k Ramesh",
+          "key": "boktwp",
+          "name": "ANSHIFA P K",
+          "dept": "EC",
+          "sem": "S3",
+          "points": 1772,
+          "played": 1,
+          "wins": 0,
+          "best": 1772
+        },
+        {
+          "key": "12tb6q7",
+          "name": "Aswin KM",
           "dept": "ME",
           "sem": "S3",
-          "points": 1669,
-          "played": 2,
+          "points": 1765,
+          "played": 1,
           "wins": 0,
-          "best": 1609
+          "best": 1765
         },
         {
           "key": "nihtge",
@@ -244,6 +389,16 @@
           "played": 2,
           "wins": 0,
           "best": 1341
+        },
+        {
+          "key": "9tzaek",
+          "name": "Fadil Yusuf",
+          "dept": "CSE",
+          "sem": "S5",
+          "points": 1616,
+          "played": 2,
+          "wins": 0,
+          "best": 1163
         },
         {
           "key": "1u9dtc7",
@@ -336,16 +491,6 @@
           "best": 626
         },
         {
-          "key": "9tzaek",
-          "name": "Fadil Yusuf",
-          "dept": "CSE",
-          "sem": "S5",
-          "points": 453,
-          "played": 1,
-          "wins": 0,
-          "best": 453
-        },
-        {
           "key": "11zucqx",
           "name": "Sami",
           "dept": "EEE",
@@ -406,16 +551,6 @@
           "best": 129
         },
         {
-          "key": "d2fovl",
-          "name": "Diya Fathima. P",
-          "dept": "EC",
-          "sem": "S3",
-          "points": 120,
-          "played": 1,
-          "wins": 0,
-          "best": 120
-        },
-        {
           "key": "1oem541",
           "name": "Anjali Krishna M S",
           "dept": "CSE",
@@ -429,33 +564,39 @@
       "depts": [
         {
           "dept": "EC",
-          "players": 4,
-          "points": 13763,
-          "avg": 3441
+          "players": 8,
+          "points": 29364,
+          "avg": 3671
+        },
+        {
+          "dept": "CE",
+          "players": 1,
+          "points": 3523,
+          "avg": 3523
         },
         {
           "dept": "IT",
-          "players": 9,
-          "points": 23923,
-          "avg": 2658
+          "players": 10,
+          "points": 29722,
+          "avg": 2972
+        },
+        {
+          "dept": "CSE",
+          "players": 18,
+          "points": 48409,
+          "avg": 2689
+        },
+        {
+          "dept": "ME",
+          "players": 13,
+          "points": 31195,
+          "avg": 2400
         },
         {
           "dept": "EEE",
           "players": 2,
           "points": 4728,
           "avg": 2364
-        },
-        {
-          "dept": "ME",
-          "players": 11,
-          "points": 22948,
-          "avg": 2086
-        },
-        {
-          "dept": "CSE",
-          "players": 13,
-          "points": 26958,
-          "avg": 2074
         },
         {
           "dept": "PT",

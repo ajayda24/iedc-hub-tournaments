@@ -6,7 +6,7 @@
   What it does:
     1. Raises the Mobile Hotspot client limit (WifiMaxPeers, default 8) to 128.
     2. Stops the hotspot from switching itself off when nobody is connected.
-    3. Opens TCP port 4000 in Windows Firewall for the arena.
+    3. Opens TCP ports 4000 (the arena) and 4001 (Vibe Hackathon published sites) in Windows Firewall.
     4. Checks for a "Microsoft KM-TEST Loopback Adapter" — Windows only lets you
        start Mobile Hotspot when it has a connection to share. Sharing the
        loopback adapter means the hotspot works with NO internet at all
@@ -18,7 +18,8 @@
 #>
 param(
   [int]$MaxPeers = 128,
-  [int]$Port = 4000
+  [int]$Port = 4000,
+  [int]$SitesPort = 4001
 )
 
 $ErrorActionPreference = "Stop"
@@ -43,9 +44,9 @@ New-ItemProperty -Path $key -Name "PeerlessTimeoutEnabled" -PropertyType DWord -
 New-ItemProperty -Path $key -Name "PeerlessTimeout" -PropertyType DWord -Value 120 -Force | Out-Null
 Write-Host "    (also turn off Settings > Network > Mobile hotspot > Power saving, if you see it)"
 
-Step "Allowing Brain Arena through Windows Firewall (TCP $Port)"
+Step "Allowing Brain Arena through Windows Firewall (TCP $Port and $SitesPort)"
 Get-NetFirewallRule -DisplayName "Brain Arena" -ErrorAction SilentlyContinue | Remove-NetFirewallRule
-New-NetFirewallRule -DisplayName "Brain Arena" -Direction Inbound -Protocol TCP -LocalPort $Port -Action Allow -Profile Any | Out-Null
+New-NetFirewallRule -DisplayName "Brain Arena" -Direction Inbound -Protocol TCP -LocalPort $Port,$SitesPort -Action Allow -Profile Any | Out-Null
 Write-Host "    rule 'Brain Arena' added"
 
 Step "Checking for a loopback adapter to share"

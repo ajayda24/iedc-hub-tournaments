@@ -14,6 +14,7 @@ Each folder is one URL. The page files are thin; the real screen lives in `src/s
 | `/screen/` | the projector | `src/screens/ScreenApp.tsx` |
 | `/practice/` | anyone, offline too | `src/screens/PracticeApp.tsx` |
 | `/leaderboard/` | anyone | `src/screens/LeaderboardApp.tsx` |
+| `/competitions/vibecoding/` (`host/`, `screen/`) | Vibe Hackathon: phones, host, wall | `src/competitions/vibecoding/` (`PlayerApp`, `HostApp`, `ScreenApp`) |
 
 `layout.tsx` (fonts, PWA), `globals.css` (colours, notebook look), `manifest.ts` and `sw.ts` (the service worker) apply to every page.
 
@@ -28,5 +29,6 @@ Each folder is one URL. The page files are thin; the real screen lives in `src/s
 | `anticheat/` | Internet probe, leaving-the-tab strikes, and their overlays. |
 | `lib/` | Small helpers: where the arena is (`arenaUrl.ts`), formatting, safe localStorage. |
 | `pwa/` | Registers the service worker (online site only). |
+| `competitions/` | Team competitions. `vibecoding/`: board, tile workspace, puzzle, publish, host console, projector wall, its own socket (`net.ts`). |
 
 `@/…` in imports means `src/…`. All text comes from [`config/`](../../config/README.md), never hard-coded here.

@@ -13,6 +13,7 @@ export const host = {
   // header
   online: (online: number, total: number) => `${online}/${total} online`,
   openScreen: "Open big screen ↗",
+  competitionsLink: "Vibe Hackathon ↗",
   exportCsv: "Export CSV",
   csvFileSuffix: "-results.csv",
 

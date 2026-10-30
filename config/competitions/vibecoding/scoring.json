@@ -1,0 +1,33 @@
+{
+  "tile": {
+    "base": 100,
+    "speedMax": 50,
+    "efficiency": { "upTo3": 50, "is4": 30, "is5": 15, "from6": 0 },
+    "savePointBonus": 10,
+    "hintCost": 10,
+    "hintCostMax": 30,
+    "autoSolvedBase": 50,
+    "partialMax": 50
+  },
+  "team": {
+    "notesBonus": 60,
+    "notesMinWords": 15,
+    "notesAtTile": 4,
+    "cleanRewind": 20,
+    "puzzleSolved": 300,
+    "puzzleTimeMax": 150,
+    "puzzleTimeBaseSec": 30,
+    "puzzleTimePerMoveSec": 8,
+    "puzzleMovesMax": 100,
+    "puzzlePartialMax": 100,
+    "publish": 200,
+    "publishRankBonus": [100, 80, 60, 40, 40, 40],
+    "publishRankBonusLater": 20,
+    "changeRequestFast": 100,
+    "changeRequestFastMin": 10,
+    "changeRequestSlow": 50,
+    "changeRequestSlowMin": 20
+  },
+  "sizeFactor": { "2": 0.85, "3": 1.0, "4": 1.15 },
+  "comebackAtMinute": 60
+}

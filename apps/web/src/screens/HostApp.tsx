@@ -116,6 +116,9 @@ function Console({ host, state }: { host: HostState; state: PublicState }) {
           <a className="sticker !bg-sky !px-3 !py-1.5 text-sm" href="/screen/" target="_blank" rel="noreferrer">
             {H.openScreen}
           </a>
+          <a className="sticker !bg-lilac !px-3 !py-1.5 text-sm" href="/competitions/vibecoding/host/" target="_blank" rel="noreferrer">
+            {H.competitionsLink}
+          </a>
           <Btn size="sm" tone="paper" onClick={exportCsv}>
             {H.exportCsv}
           </Btn>

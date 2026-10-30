@@ -4,6 +4,7 @@ import { parseArgs } from "node:util";
 import { fileURLToPath } from "node:url";
 import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
+import QRCode from "qrcode";
 import type { NetIface, NetworkInfo } from "@iedc/shared";
 import { Arena } from "./arena";
 import { createRealtime } from "./realtime";
@@ -12,6 +13,7 @@ import { hasInternet } from "./net/internetCheck";
 import { Store } from "./persist/store";
 import { Students } from "./students";
 import { History } from "./history";
+import { createCompetitions } from "./competitions";
 import { site } from "@iedc/config/site";
 
 const VERSION = "0.1.0";
@@ -45,6 +47,7 @@ async function main() {
 
   let interfaces: NetIface[] = [];
   let internet: boolean | null = null;
+  let competitionUrls: NetIface[] = [];
   const network = (): NetworkInfo => ({ port, interfaces, internet, groups: [] });
 
   const dataDir = path.resolve(args.data!);
@@ -53,6 +56,13 @@ async function main() {
   const rt = createRealtime(app.server, { pin, onExport: () => store.exportCsv(arena), students, history });
   const arena = new Arena({ out: { ...rt.output, log: (t, d) => store.log(t, d) }, network });
   rt.attach(arena);
+  // team competitions (Vibe Hackathon…) on their own namespace and data folder; the weekly arena is untouched
+  const competitions = createCompetitions(rt.io, {
+    pin,
+    students,
+    dataDir,
+    network: () => ({ joinUrls: competitionUrls.map((i) => ({ label: i.label, url: i.url, qrSvg: i.qrSvg })), laptopInternet: internet }),
+  });
 
   const snap = args.fresh ? null : store.load();
   if (snap) arena.restore(snap);
@@ -87,7 +97,17 @@ async function main() {
     );
   }
 
-  app.get("/api/health", async () => ({ ok: true, app: "brain-arena", version: VERSION, now: Date.now() }));
+  // QR codes for links phones show (e.g. a published Vibe Hackathon site)
+  app.get<{ Querystring: { text?: string } }>("/api/qr", async (req, reply) => {
+    const text = String(req.query.text ?? "").slice(0, 300);
+    if (!text.startsWith("http://") && !text.startsWith("https://")) return reply.code(400).send({ ok: false });
+    const svg = await QRCode.toString(text, { type: "svg", margin: 1, errorCorrectionLevel: "M", color: { dark: "#1d1b16", light: "#ffffff" } });
+    return reply.type("image/svg+xml").header("Cache-Control", "public, max-age=3600").send(svg);
+  });
+  app.get("/api/health", async () => {
+    const cpu = process.cpuUsage();
+    return { ok: true, app: "brain-arena", version: VERSION, now: Date.now(), rss: process.memoryUsage().rss, cpuMs: (cpu.user + cpu.system) / 1000 };
+  });
   // live monthly leaderboard for /leaderboard on the event Wi-Fi (no Student IDs inside)
   app.get("/api/leaderboard", async (_req, reply) => reply.header("Cache-Control", "no-store").send(history.exportMonthly()));
 
@@ -96,6 +116,7 @@ async function main() {
       const next = await listInterfaces(port);
       const changed = next.map((i) => i.url).join() !== interfaces.map((i) => i.url).join();
       interfaces = next;
+      competitionUrls = await listInterfaces(port, "/competitions/vibecoding/");
       if (changed) arena.setConfig(arena.config); // re-broadcast join urls
     } catch {
       /* ignore */
@@ -106,7 +127,8 @@ async function main() {
     internet = await hasInternet();
     if (before !== internet) {
       arena.setConfig(arena.config);
-      if (internet) console.log("\n  ⚠  This laptop can reach the internet. Turn off mobile data on the hotspot so students can't either.\n");
+      // ALLOW_HOST_INTERNET=1: router mode (Vibe Hackathon needs the laptop online for Gemini; phones stay offline on the router)
+      if (internet && !process.env.ALLOW_HOST_INTERNET) console.log("\n  ⚠  This laptop can reach the internet. Turn off mobile data on the hotspot so students can't either.\n");
     }
   };
   await refreshNetwork();
@@ -120,6 +142,7 @@ async function main() {
   const shutdown = () => {
     console.log("\n  Saving and shutting down…");
     store.close(arena);
+    competitions.close();
     arena.dispose();
     rt.io.close();
     void app.close().then(() => process.exit(0));
@@ -136,6 +159,7 @@ async function main() {
     console.log(`   Host PIN      ${pin}`);
     console.log(`   Host console  http://localhost:${port}/host/`);
     console.log(`   Big screen    http://localhost:${port}/screen/`);
+    console.log(`   Vibe Hackathon     http://localhost:${port}/competitions/vibecoding/host/  (big screen: …/vibecoding/screen/)`);
     if (interfaces.length === 0) console.log(`   Students      (no network yet — turn on the hotspot)`);
     for (const i of interfaces) console.log(`   Students      ${i.url.padEnd(34)} ${i.label}`);
     if (!web) console.log(`\n   (no web build found — dev mode: web app on http://localhost:3000)`);
